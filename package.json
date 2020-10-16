@@ -1,0 +1,34 @@
+{
+    "name": "vending-api",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "dev": "concurrently \"tsc -w\" \"nodemon dist/index.js\"",
+        "start": "node dist/index.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "bcryptjs": "*",
+        "dotenv": "*",
+        "express": "*",
+        "jsonwebtoken": "*",
+        "mongoose": "*",
+        "mqtt": "^4.2.1",
+        "ws": "*"
+    },
+    "devDependencies": {
+        "@types/bcryptjs": "*",
+        "@types/dotenv": "*",
+        "@types/express": "*",
+        "@types/jsonwebtoken": "*",
+        "@types/mongoose": "*",
+        "@types/mqtt": "^2.5.0",
+        "@types/ws": "*",
+        "concurrently": "*",
+        "nodemon": "*",
+        "typescript": "*"
+    }
+}
