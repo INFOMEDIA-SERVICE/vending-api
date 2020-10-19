@@ -1,21 +1,20 @@
 import mqtt from 'mqtt';
 import {Request, Response} from 'express';
-import {StringDecoder} from 'string_decoder';
 
 class MachineController {
     
     public dispense = (req: Request, res: Response) => {
 
-        const data: any[] = req.body.data;
-
-        const options = {
+        const options: mqtt.IClientOptions = {
             clientId: 'infomedia-vmc0003',
             username: 'infomedia',
             password: 'infomedia',
             port: 10110,
         };
 
-        const client: mqtt.MqttClient = mqtt.connect('mqtt://iot.infomediaservice.com', options);
+        const data: any[] = req.body.data;
+
+        const client: mqtt.MqttClient = mqtt.connect('wxs://iot.infomediaservice.com', options);
 
         client.on('connect', () => {
 
@@ -35,8 +34,11 @@ class MachineController {
                 action: 'vend.request',
                 mid: 'STM32-24001A001557414D38313320',
                 tid: 345,
-                credit: '-1',
-                products
+                credit: -1,
+                products: [
+                    {'item': '01', 'qty': '1'},
+                    {'item': '02', 'qty': '2'}
+                ]
             };
 
             // {
@@ -50,22 +52,29 @@ class MachineController {
             //     ]
             // }
     
-            client.publish('infomedia/machinewallet/vmc0003', JSON.stringify(order));
-            client.subscribe('infomedia/vmc/machinewallet/vmc0003/vend');
-            client.subscribe('infomedia/vmc/machinewallet/vmc0003/cless');
-            client.subscribe('infomedia/vmc/machinewallet/vmc0003');
+            client.publish('infomedia/vmc/machinewallet/vmc0003/', JSON.stringify(order));
+            // client.emit('VMSTART', JSON.stringify(order));
+            client.subscribe([
+                // 'infomedia/vmc/machinewallet/vmc0003/',
+                'infomedia/vmc/machinewallet/vmc0003/vend',
+                'infomedia/vmc/machinewallet/vmc0003/cless'
+            ], (err, data: mqtt.ISubscriptionGrant[]) => {
+                // if(!err) console.log(data);
+            });
     
             client.on('message', (topic, message, packet) => {
-                
+
                 if (topic === 'infomedia/vmc/machinewallet/vmc0003/vend') {
                     
                     console.log('CONNECTED TO TOPIC');
                     console.log(message.toString());
 
-                    res.send({
-                        ok: true,
-                        message: 'connected'
-                    });
+                    // client.end();
+
+                    // res.send({
+                    //     ok: true,
+                    //     message: 'connected'
+                    // });
 
                     // switch (JSON.parse(message.toString('utf8')).action) {
                         
