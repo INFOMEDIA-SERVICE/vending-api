@@ -18,6 +18,8 @@ class MachineController {
 
         client.on('connect', () => {
 
+            let connected: boolean = false;
+
             console.log('CONNECTED');
 
             let products: object[] = [];
@@ -58,23 +60,33 @@ class MachineController {
                 // 'infomedia/vmc/machinewallet/vmc0003/',
                 'infomedia/vmc/machinewallet/vmc0003/vend',
                 'infomedia/vmc/machinewallet/vmc0003/cless'
-            ], (err, data: mqtt.ISubscriptionGrant[]) => {
-                // if(!err) console.log(data);
-            });
+            ]);
+
+            setTimeout(() => {
+
+                if(!connected) res.send({
+                    ok: false,
+                    message: 'The machine is off'
+                })
+            }, 3000);
     
             client.on('message', (topic, message, packet) => {
 
+                console.log(topic);
+
                 if (topic === 'infomedia/vmc/machinewallet/vmc0003/vend') {
+
+                    connected = true;
                     
                     console.log('CONNECTED TO TOPIC');
                     console.log(message.toString());
 
                     // client.end();
 
-                    // res.send({
-                    //     ok: true,
-                    //     message: 'connected'
-                    // });
+                    res.send({
+                        ok: true,
+                        message: 'connected'
+                    });
 
                     // switch (JSON.parse(message.toString('utf8')).action) {
                         

@@ -19,8 +19,7 @@ const Product = sequelize.define('products', {
     },
     name: {
         allowNull: false,
-        type: Sequelize.TEXT,
-        unique: true
+        type: Sequelize.TEXT
     },
     price: {
         type: Sequelize.BIGINT,

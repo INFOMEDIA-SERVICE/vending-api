@@ -12,8 +12,7 @@ const Product = database_1.sequelize.define('products', {
     },
     name: {
         allowNull: false,
-        type: sequelize_1.default.TEXT,
-        unique: true
+        type: sequelize_1.default.TEXT
     },
     price: {
         type: sequelize_1.default.BIGINT,

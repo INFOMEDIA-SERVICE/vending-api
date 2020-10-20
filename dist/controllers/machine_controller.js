@@ -17,6 +17,7 @@ class MachineController {
             const data = req.body.data;
             const client = mqtt_1.default.connect('wxs://iot.infomediaservice.com', options);
             client.on('connect', () => {
+                let connected = false;
                 console.log('CONNECTED');
                 let products = [];
                 data.forEach(product => {
@@ -52,18 +53,25 @@ class MachineController {
                     // 'infomedia/vmc/machinewallet/vmc0003/',
                     'infomedia/vmc/machinewallet/vmc0003/vend',
                     'infomedia/vmc/machinewallet/vmc0003/cless'
-                ], (err, data) => {
-                    // if(!err) console.log(data);
-                });
+                ]);
+                setTimeout(() => {
+                    if (!connected)
+                        res.send({
+                            ok: false,
+                            message: 'The machine is off'
+                        });
+                }, 3000);
                 client.on('message', (topic, message, packet) => {
+                    console.log(topic);
                     if (topic === 'infomedia/vmc/machinewallet/vmc0003/vend') {
+                        connected = true;
                         console.log('CONNECTED TO TOPIC');
                         console.log(message.toString());
                         // client.end();
-                        // res.send({
-                        //     ok: true,
-                        //     message: 'connected'
-                        // });
+                        res.send({
+                            ok: true,
+                            message: 'connected'
+                        });
                         // switch (JSON.parse(message.toString('utf8')).action) {
                         //     case 'vend.fails':
                         //         client.end();
