@@ -25,7 +25,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const app_1 = __importStar(require("./app"));
-require("./database");
 const main = () => {
     app_1.server.listen(app_1.default.get('port'));
     require('./routes/socket_routes');

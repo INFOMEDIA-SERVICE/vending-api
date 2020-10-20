@@ -1,6 +1,6 @@
 import express, {Application} from 'express';
-import userRoutes from './routes/user_routes';
 import machineRoutes from './routes/machine_routes';
+import productsRoutes from './routes/products_routes';
 import http from 'http';
 import path from 'path';
 
@@ -20,7 +20,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 
 // Routes
-app.use('/users', userRoutes);
-app.use('/machine', machineRoutes);
+app.use('/api/products', productsRoutes);
+app.use('/api/machine', machineRoutes);
 
 export default app;

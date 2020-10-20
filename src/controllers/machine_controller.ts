@@ -32,7 +32,7 @@ class MachineController {
             let order = {
                 // action: 'vend.reset',
                 action: 'vend.request',
-                mid: 'STM32-24001A001557414D38313320',
+                item: 'STM32-24001A001557414D38313320',
                 tid: 345,
                 credit: -1,
                 products: [
@@ -43,7 +43,7 @@ class MachineController {
 
             // {
             //     "action":"vend.request",
-            //     "mid":"STM32-24001A001557414D38313320",
+            //     "item":"STM32-24001A001557414D38313320",
             //     "tid":"345",
             //     "credit":"-1",
             //     "products":[
