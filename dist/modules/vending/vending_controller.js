@@ -10,115 +10,98 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.vendingsController = void 0;
+const vending_repository_1 = require("./vending_repository");
 class VendingController {
     constructor() {
         this.create = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            // const {name} = req.body;
-            // const newVending = await Vending.create({
-            //     name
-            // }, {
-            //     fields: ['name']
-            // }).catch((err: any) => {
-            //     res.status(400).json({
-            //         ok: false,
-            //         message: err.message
-            //     });
-            // })
-            // if(newVending) res.send({
-            //     ok: true,
-            //     product: newVending
-            // });
+            const response = yield vending_repository_1.vendingsRepository.create(req.body);
+            if (response.ok) {
+                res.send({
+                    ok: true,
+                    product: response.data
+                });
+            }
+            else {
+                res.send({
+                    ok: false,
+                    message: response.data
+                });
+            }
         });
         this.getAll = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            // const vendings = await Vending.findAll()
-            // .catch((err: any) => {
-            //     res.status(400).json({
-            //         ok: false,
-            //         message: err.message
-            //     });
-            // });
-            // if(vendings) res.send({
-            //     ok: true,
-            //     project: vendings
-            // });
+            const response = yield vending_repository_1.vendingsRepository.getAll();
+            if (response.ok) {
+                res.send({
+                    ok: true,
+                    vendings: response.data
+                });
+            }
+            else {
+                res.send({
+                    ok: false,
+                    message: response.data
+                });
+            }
         });
         this.getCount = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            // const vendings = await Vending.findAll()
-            // .catch((err: any) => {
-            //     res.status(400).json({
-            //         ok: false,
-            //         message: err.message
-            //     });
-            // });
-            // if(vendings) res.send({
-            //     ok: true,
-            //     count: vendings.length
-            // });
+            const response = yield vending_repository_1.vendingsRepository.getAll();
+            if (response.ok) {
+                res.send({
+                    ok: true,
+                    count: response.data
+                });
+            }
+            else {
+                res.send({
+                    ok: false,
+                    message: response.data
+                });
+            }
         });
         this.getById = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            // const id: string = req.params.id;
-            // const product = await Vending.findOne({where: {id}})
-            // .catch((err: any) => {
-            //     res.status(400).json({
-            //         ok: false,
-            //         message: err.message
-            //     });
-            // });
-            // console.log(product);
-            // if(product) res.send({
-            //     ok: true,
-            //     product
-            // });
-            // else res.status(400).json({
-            //     ok: false,
-            //     message: 'Vending not found'
-            // });
+            const response = yield vending_repository_1.vendingsRepository.getById(parseInt(req.params.id));
+            if (response.ok) {
+                res.send({
+                    ok: true,
+                    product: response.data
+                });
+            }
+            else {
+                res.send({
+                    ok: false,
+                    message: response.data
+                });
+            }
         });
         this.update = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            // const id: string = req.params.id;
-            // const {name} = req.body;
-            // const product = await Vending.findOne({
-            //     attributes: ['name'],
-            //     where: {
-            //         id
-            //     }
-            // }).catch((err: any) => {
-            //     res.status(400).json({
-            //         ok: false,
-            //         message: err.message
-            //     });
-            // }) || null;
-            // if(product) {
-            //     let update: any = {};
-            //     if(name) update.name = name;
-            //     const updatedVending = await product.update(update);
-            //     res.send({
-            //         ok: true,
-            //         product: updatedVending
-            //     });
-            // }
-            // else res.status(400).json({
-            //     ok: false,
-            //     message: 'Vending not found'
-            // });
+            const response = yield vending_repository_1.vendingsRepository.update(parseInt(req.params.id), req.body);
+            if (response.ok) {
+                res.send({
+                    ok: true,
+                    product: response.data
+                });
+            }
+            else {
+                res.send({
+                    ok: false,
+                    message: response.data
+                });
+            }
         });
         this.delete = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            // const id: string = req.params.id;
-            // const deleteRowCount = await Vending.destroy({where: {id}})
-            // .catch((err: any) => {
-            //     res.status(400).json({
-            //         ok: false,
-            //         message: err.message
-            //     });
-            // });
-            // if(deleteRowCount) res.send({
-            //     ok: true,
-            //     message: 'Vending deleted succesfully' 
-            // });
-            // else res.status(400).json({
-            //     ok: false,
-            //     message: 'Vending not found'
-            // });
+            const response = yield vending_repository_1.vendingsRepository.delete(parseInt(req.params.id));
+            if (response.ok) {
+                res.send({
+                    ok: true,
+                    message: 'Product deleted successfully'
+                });
+            }
+            else {
+                res.send({
+                    ok: false,
+                    message: response.data
+                });
+            }
         });
     }
 }

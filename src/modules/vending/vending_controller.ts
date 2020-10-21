@@ -1,145 +1,113 @@
 // import Vending from '../../models/vending_model';
 import {Request, Response} from 'express';
+import {vendingsRepository} from './vending_repository';
+import { IQueryResponse } from '../../models/postgres_responses';
 
 class VendingController {
 
     public create = async(req: Request, res: Response):Promise<void> => {
-        
-        // const {name} = req.body;
 
-        // const newVending = await Vending.create({
-        //     name
-        // }, {
-        //     fields: ['name']
-        // }).catch((err: any) => {
-        //     res.status(400).json({
-        //         ok: false,
-        //         message: err.message
-        //     });
-        // })
+        const response:IQueryResponse = await vendingsRepository.create(req.body);
 
-        // if(newVending) res.send({
-        //     ok: true,
-        //     product: newVending
-        // });
-
+        if(response.ok) {
+            res.send({
+                ok: true,
+                product: response.data
+            });
+        } else {
+            res.send({
+                ok: false,
+                message: response.data
+            });
+        }
     };
 
     public getAll = async(req: Request, res: Response):Promise<void> => {
-        
-        // const vendings = await Vending.findAll()
-        // .catch((err: any) => {
-        //     res.status(400).json({
-        //         ok: false,
-        //         message: err.message
-        //     });
-        // });
 
-        // if(vendings) res.send({
-        //     ok: true,
-        //     project: vendings
-        // });
+        const response = await vendingsRepository.getAll();
+
+        if(response.ok) {
+            res.send({
+                ok: true,
+                vendings: response.data
+            });
+        } else {
+            res.send({
+                ok: false,
+                message: response.data
+            });
+        }
 
     };
 
     public getCount = async(req: Request, res: Response):Promise<void> => {
         
-        // const vendings = await Vending.findAll()
-        // .catch((err: any) => {
-        //     res.status(400).json({
-        //         ok: false,
-        //         message: err.message
-        //     });
-        // });
+        const response = await vendingsRepository.getAll();
 
-        // if(vendings) res.send({
-        //     ok: true,
-        //     count: vendings.length
-        // });
+        if(response.ok) {
+            res.send({
+                ok: true,
+                count: response.data
+            });
+        } else {
+            res.send({
+                ok: false,
+                message: response.data
+            });
+        }
 
     };
 
     public getById = async(req: Request, res: Response):Promise<void> => {
 
-        // const id: string = req.params.id;
-        
-        // const product = await Vending.findOne({where: {id}})
-        // .catch((err: any) => {
-        //     res.status(400).json({
-        //         ok: false,
-        //         message: err.message
-        //     });
-        // });
+        const response = await vendingsRepository.getById(parseInt(req.params.id));
 
-        // console.log(product);
-
-        // if(product) res.send({
-        //     ok: true,
-        //     product
-        // });
-        // else res.status(400).json({
-        //     ok: false,
-        //     message: 'Vending not found'
-        // });
+        if(response.ok) {
+            res.send({
+                ok: true,
+                product: response.data
+            });
+        } else {
+            res.send({
+                ok: false,
+                message: response.data
+            });
+        }
 
     };
 
     public update = async(req: Request, res: Response):Promise<void> => {
 
-        // const id: string = req.params.id;
+        const response:IQueryResponse = await vendingsRepository.update(parseInt(req.params.id), req.body);
 
-        // const {name} = req.body;
-        
-        // const product = await Vending.findOne({
-        //     attributes: ['name'],
-        //     where: {
-        //         id
-        //     }
-        // }).catch((err: any) => {
-        //     res.status(400).json({
-        //         ok: false,
-        //         message: err.message
-        //     });
-        // }) || null;
-
-        // if(product) {
-        //     let update: any = {};
-
-        //     if(name) update.name = name;
-
-        //     const updatedVending = await product.update(update);
-
-        //     res.send({
-        //         ok: true,
-        //         product: updatedVending
-        //     });
-        // }
-        // else res.status(400).json({
-        //     ok: false,
-        //     message: 'Vending not found'
-        // });
+        if(response.ok) {
+            res.send({
+                ok: true,
+                product: response.data
+            });
+        } else {
+            res.send({
+                ok: false,
+                message: response.data
+            });
+        }
     };
 
     public delete = async(req: Request, res: Response):Promise<void> => {
 
-        // const id: string = req.params.id;
-        
-        // const deleteRowCount = await Vending.destroy({where: {id}})
-        // .catch((err: any) => {
-        //     res.status(400).json({
-        //         ok: false,
-        //         message: err.message
-        //     });
-        // });
+        const response:IQueryResponse = await vendingsRepository.delete(parseInt(req.params.id));
 
-        // if(deleteRowCount) res.send({
-        //     ok: true,
-        //     message: 'Vending deleted succesfully' 
-        // });
-        // else res.status(400).json({
-        //     ok: false,
-        //     message: 'Vending not found'
-        // });
+        if(response.ok) {
+            res.send({
+                ok: true,
+                message: 'Product deleted successfully'
+            });
+        } else {
+            res.send({
+                ok: false,
+                message: response.data
+            });
+        }
 
     };
 }

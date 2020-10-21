@@ -44,7 +44,7 @@ class ProductsController {
             }
         });
         this.getCount = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const response = yield products_repository_1.productsRepository.getAll();
+            const response = yield products_repository_1.productsRepository.getCount();
             if (response.ok) {
                 res.send({
                     ok: true,

@@ -41,7 +41,7 @@ class ProductsController {
 
     public getCount = async(req: Request, res: Response):Promise<void> => {
         
-        const response = await productsRepository.getAll();
+        const response = await productsRepository.getCount();
 
         if(response.ok) {
             res.send({
