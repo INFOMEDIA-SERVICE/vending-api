@@ -1,6 +1,6 @@
 import express, {Application} from 'express';
-import machineRoutes from './routes/machine_routes';
-import productsRoutes from './routes/products_routes';
+import machineRoutes from './modules/machine/machine_routes';
+import productsRoutes from './modules/products/products_routes';
 import http from 'http';
 import path from 'path';
 

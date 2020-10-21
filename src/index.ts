@@ -5,7 +5,7 @@ import app, {server} from './app';
 
 const main = ():void => {
     server.listen(app.get('port'));
-    require('./routes/socket_routes');
+    require('./modules/socket/socket_routes');
     console.log(`Server on port ${app.get('port')}`);
 }
 

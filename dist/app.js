@@ -5,8 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.server = void 0;
 const express_1 = __importDefault(require("express"));
-const machine_routes_1 = __importDefault(require("./routes/machine_routes"));
-const products_routes_1 = __importDefault(require("./routes/products_routes"));
+const machine_routes_1 = __importDefault(require("./modules/machine/machine_routes"));
+const products_routes_1 = __importDefault(require("./modules/products/products_routes"));
 const http_1 = __importDefault(require("http"));
 const path_1 = __importDefault(require("path"));
 const app = express_1.default();
