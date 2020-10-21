@@ -1,5 +1,6 @@
 import mqtt from 'mqtt';
 import {Request, Response} from 'express';
+import { v4 as uuidv4 } from 'uuid';
 
 class MachineController {
 
@@ -23,9 +24,11 @@ class MachineController {
             let order = {
                 action: 'vend.request',
                 mid: 'STM32-24001A001557414D38313320',
-                tid: '345',
+                tid: uuidv4(),
                 credit: '-1'
             };
+
+            console.log(order);
 
             client.publish('infomedia/vmc/machinewallet/vmc0003/', JSON.stringify(order));
             client.subscribe([
@@ -33,13 +36,13 @@ class MachineController {
                 'infomedia/vmc/machinewallet/vmc0003/cless'
             ]);
 
-            setTimeout(() => {
+            // setTimeout(() => {
 
-                if(!connected) res.send({
-                    ok: false,
-                    message: 'The machine is off'
-                })
-            }, 3000);
+            //     if(!connected) res.send({
+            //         ok: false,
+            //         message: 'The machine is off'
+            //     })
+            // }, 3000);
     
         });
     };
@@ -69,38 +72,42 @@ class MachineController {
                 // action: 'vend.reset',
                 action: 'vend.request',
                 mid: 'STM32-24001A001557414D38313320',
-                tid: 'VMOK',
-                credit: '-1',
+                tid: uuidv4(),
+                credit: -1,
                 products
             };
 
             client.publish('infomedia/vmc/machinewallet/vmc0003/', JSON.stringify(order));
             client.subscribe([
                 'infomedia/vmc/machinewallet/vmc0003/vend',
-                'infomedia/vmc/machinewallet/vmc0003/cless'
+                // 'infomedia/vmc/machinewallet/vmc0003/cless'
             ]);
 
-            setTimeout(() => {
+            // setTimeout(() => {
 
-                if(!connected) res.send({
-                    ok: false,
-                    message: 'The machine is off'
-                })
-            }, 3000);
+            //     if(!connected) res.send({
+            //         ok: false,
+            //         message: 'The machine is off'
+            //     })
+            // }, 3000);
     
             client.on('message', (topic, message, packet) => {
 
-                if (topic === 'infomedia/vmc/machinewallet/vmc0003/vend') {
+                console.log('CONNECTED TO', topic);
+                console.log(message.toString());
 
-                    connected = true;
+                // if (topic === 'infomedia/vmc/machinewallet/vmc0003/vend') {
+
+                //     connected = true;
                     
-                    console.log('CONNECTED TO TOPIC');
-                    console.log(message.toString());
+                //     console.log('CONNECTED TO TOPIC');
+                //     console.log(message.toString());
+                //     console.log(packet.cmd);
 
-                    client.publish('infomedia/vmc/machinewallet/vmc0003/vend', JSON.stringify({action: 'session.status'}))
+                //     // client.publish('infomedia/vmc/machinewallet/vmc0003/vend', JSON.stringify({action: 'session.status'}))
 
-                    // client.end();
-                }
+                //     // client.end();
+                // }
             });
         });
     };

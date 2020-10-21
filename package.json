@@ -19,6 +19,7 @@
         "mqtt": "^4.2.1",
         "pg": "^8.4.1",
         "pg-hstore": "^2.3.3",
+        "uuid": "^8.3.1",
         "ws": "*"
     },
     "devDependencies": {
@@ -30,6 +31,7 @@
         "@types/mqtt": "^2.5.0",
         "@types/node": "^14.14.0",
         "@types/pg": "^7.14.5",
+        "@types/uuid": "^8.3.0",
         "@types/validator": "^13.1.0",
         "@types/ws": "*",
         "concurrently": "*",
