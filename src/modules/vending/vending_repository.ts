@@ -4,16 +4,17 @@ import { IQueryResponse } from '../../models/postgres_responses';
 
 class VendingRepository {
 
+    private table: string = 'vendings';
+
     public create = async(vending: IVending): Promise<IQueryResponse> => {
 
         return database.query(
-            `insert into vendings(name, machine_id) values('${vending.name}', '${vending.machine_id}')`
+            `insert into ${this.table}(name, machine_id) values('${vending.name}', '${vending.machine_id}') RETURNING *`
         )
         .then((value) => {
-            console.log(value);
             return {
                 ok: true,
-                data: vending
+                data: value.rows[0]
             }
         })
         .catch((err) => {
@@ -24,9 +25,9 @@ class VendingRepository {
         });
     }
 
-    public getAll = async(): Promise<IQueryResponse> => {
+    public getVendingProducts = async(id: string): Promise<IQueryResponse> => {
 
-        return database.query('SELECT * FROM vendings')
+        return database.query(`SELECT * FROM products WHERE machine_id = '${id}'`)
         .then((value) => {
             return {
                 ok: true,
@@ -41,9 +42,26 @@ class VendingRepository {
         });
     }
 
-    public getById = async(id: number): Promise<IQueryResponse> => {
+    public getAll = async(): Promise<IQueryResponse> => {
 
-        return database.query(`SELECT * FROM vendings WHERE id = ${id}`)
+        return database.query(`SELECT * FROM ${this.table}`)
+        .then((value) => {
+            return {
+                ok: true,
+                data: value.rows
+            }
+        })
+        .catch((err) => {
+            return {
+                ok: false,
+                data: err.message
+            }
+        });
+    }
+
+    public getById = async(id: string): Promise<IQueryResponse> => {
+
+        return database.query(`SELECT * FROM ${this.table} WHERE id = '${id}'`)
         .then((value) => {
             if(value.rowCount === 0) return {
                 ok: false,
@@ -62,9 +80,9 @@ class VendingRepository {
         });
     }
 
-    public update = async(id: number, vending: IVending): Promise<IQueryResponse> => {
+    public update = async(id: string, vending: IVending): Promise<IQueryResponse> => {
 
-        return database.query(`UPDATE vendings SET(name, machine_id) = ('${vending.name}', '${vending.machine_id}') WHERE id = ${id}`)
+        return database.query(`UPDATE ${this.table} SET(name, machine_id) = ('${vending.name}', '${vending.machine_id}') WHERE id = '${id}' RETURNING *`)
 
         .then(async(value) => {
         
@@ -73,12 +91,9 @@ class VendingRepository {
                 data: 'User not found'
             }
 
-            const user = await this.getById(id);
-            if(!user.ok) return user;
-
             return {
                 ok: true,
-                data: user.data
+                data: value.rows[0]
             }
         })
         .catch((err) => {
@@ -91,7 +106,7 @@ class VendingRepository {
 
     public getCount = async(): Promise<IQueryResponse> => {
 
-        return database.query('SELECT * FROM vendings')
+        return database.query(`SELECT * FROM ${this.table}`)
         .then((value) => {
             return {
                 ok: true,
@@ -106,9 +121,9 @@ class VendingRepository {
         });
     }
 
-    public delete = async(id: number): Promise<IQueryResponse> => {
+    public delete = async(id: string): Promise<IQueryResponse> => {
 
-        return database.query(`delete from vendings WHERE id = ${id}`)
+        return database.query(`delete from ${this.table} WHERE id = '${id}'`)
         .then((value) => {
             if(value.rowCount === 0) return {
                 ok: false,
@@ -128,4 +143,4 @@ class VendingRepository {
     }
 }
 
-export const vendingsRepository = new VendingRepository;
+export const vendingsRepository: VendingRepository = new VendingRepository;

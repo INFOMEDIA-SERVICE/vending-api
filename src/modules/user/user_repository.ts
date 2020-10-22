@@ -4,10 +4,12 @@ import { IQueryResponse } from '../../models/postgres_responses';
 
 class UsersRepository {
 
+    private table: string = 'users';
+
     public signup = async(user: IUser): Promise<IQueryResponse> => {
 
         return database.query(
-            `insert into users(username, email, password) values('${user.username}', '${user.email}', '${user.password}')`
+            `insert into ${this.table}(username, email, password) values('${user.username}', '${user.email}', '${user.password}')`
         )
         .then((value) => {
             user.status = true;
@@ -26,7 +28,7 @@ class UsersRepository {
 
     public login = async(email: string): Promise<IQueryResponse> => {
 
-        return database.query(`SELECT * FROM users WHERE email = '${email}'`)
+        return database.query(`SELECT * FROM ${this.table} WHERE email = '${email}'`)
         .then((value) => {
             if(value.rowCount === 0) return {
                 ok: false,
@@ -47,7 +49,7 @@ class UsersRepository {
     
     public getAll = async(): Promise<IQueryResponse> => {
 
-        return database.query('SELECT * FROM users')
+        return database.query(`SELECT * FROM ${this.table}`)
         .then((value) => {
             return {
                 ok: true,
@@ -62,9 +64,9 @@ class UsersRepository {
         });
     }
 
-    public getById = async(id: number): Promise<IQueryResponse> => {
+    public getById = async(id: string): Promise<IQueryResponse> => {
 
-        return database.query(`SELECT * FROM users WHERE id = ${id}`)
+        return database.query(`SELECT * FROM ${this.table} WHERE id = '${id}'`)
         .then((value) => {
             if(value.rowCount === 0) return {
                 ok: false,
@@ -83,9 +85,9 @@ class UsersRepository {
         });
     }
 
-    public update = async(id: number, user: IUser): Promise<IQueryResponse> => {
+    public update = async(id: string, user: IUser): Promise<IQueryResponse> => {
 
-        return database.query(`UPDATE users SET(username, email) = ('${user.username}', '${user.email}') WHERE id = ${id}`)
+        return database.query(`UPDATE ${this.table} SET(username, email) = ('${user.username}', '${user.email}') WHERE id = '${id}' RETURNING *`)
 
         .then(async(value) => {
         
@@ -94,12 +96,9 @@ class UsersRepository {
                 data: 'User not found'
             }
 
-            const user = await this.getById(id);
-            if(!user.ok) return user;
-
             return {
                 ok: true,
-                data: user.data
+                data: value.rows[0]
             }
         })
         .catch((err) => {
@@ -112,7 +111,7 @@ class UsersRepository {
 
     public getCount = async(): Promise<IQueryResponse> => {
 
-        return database.query('SELECT * FROM users')
+        return database.query(`SELECT * FROM ${this.table}`)
         .then((value) => {
             return {
                 ok: true,
@@ -127,9 +126,9 @@ class UsersRepository {
         });
     }
 
-    public delete = async(id: number): Promise<IQueryResponse> => {
+    public delete = async(id: string): Promise<IQueryResponse> => {
 
-        return database.query(`delete from users WHERE id = ${id}`)
+        return database.query(`delete from ${this.table} WHERE id = '${id}'`)
         .then((value) => {
             if(value.rowCount === 0) return {
                 ok: false,

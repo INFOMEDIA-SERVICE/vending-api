@@ -13,13 +13,13 @@ exports.productsRepository = void 0;
 const database_1 = require("../../database/database");
 class ProductsRepository {
     constructor() {
+        this.table = 'products';
         this.create = (product) => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`insert into products(name, price, image, item) values('${product.name}', ${product.price}, '${product.image}', ${product.item})`)
+            return database_1.database.query(`insert into ${this.table}(name, price, image, machine_id) values('${product.name}', ${product.price}, '${product.image}', '${product.machine_id}') RETURNING *`)
                 .then((value) => {
-                console.log(value);
                 return {
                     ok: true,
-                    data: product
+                    data: value.rows[0]
                 };
             })
                 .catch((err) => {
@@ -30,7 +30,7 @@ class ProductsRepository {
             });
         });
         this.getAll = () => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query('SELECT * FROM products')
+            return database_1.database.query(`SELECT * FROM ${this.table}`)
                 .then((value) => {
                 return {
                     ok: true,
@@ -45,7 +45,7 @@ class ProductsRepository {
             });
         });
         this.getById = (id) => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`SELECT * FROM products WHERE id = ${id}`)
+            return database_1.database.query(`SELECT * FROM ${this.table} WHERE id = '${id}'`)
                 .then((value) => {
                 if (value.rowCount === 0)
                     return {
@@ -66,23 +66,19 @@ class ProductsRepository {
             });
         });
         this.update = (id, product) => __awaiter(this, void 0, void 0, function* () {
-            // if(name) update.name = name;
-            // if(price) update.price = price;
-            // if(image) update.image = image;
-            // if(item) update.name = item;
-            return database_1.database.query(`UPDATE products SET(name, price, item) = ('${product.name}', ${product.price}, ${product.item}) WHERE id = ${id}`)
+            return database_1.database.query(`UPDATE ${this.table} SET(name, price, machine_id) = ('${product.name}', ${product.price}, '${product.machine_id}') WHERE id = '${id}' RETURNING *`)
                 .then((value) => __awaiter(this, void 0, void 0, function* () {
                 if (value.rowCount === 0)
                     return {
                         ok: false,
                         data: 'User not found'
                     };
-                const user = yield this.getById(id);
-                if (!user.ok)
-                    return user;
+                // const user = await this.getById(id);
+                // if(!user.ok) return user;
+                console.log(value.rows[0]);
                 return {
                     ok: true,
-                    data: user.data
+                    data: value.rows[0]
                 };
             }))
                 .catch((err) => {
@@ -93,7 +89,7 @@ class ProductsRepository {
             });
         });
         this.getCount = () => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query('SELECT * FROM products')
+            return database_1.database.query(`SELECT * FROM ${this.table}`)
                 .then((value) => {
                 return {
                     ok: true,
@@ -108,7 +104,7 @@ class ProductsRepository {
             });
         });
         this.delete = (id) => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`delete from products WHERE id = ${id}`)
+            return database_1.database.query(`delete from ${this.table} WHERE id = '${id}'`)
                 .then((value) => {
                 if (value.rowCount === 0)
                     return {

@@ -59,7 +59,7 @@ class ProductsController {
 
     public getById = async(req: Request, res: Response):Promise<void> => {
 
-        const response = await productsRepository.getById(parseInt(req.params.id));
+        const response = await productsRepository.getById(req.params.id);
 
         if(response.ok) {
             res.send({
@@ -77,7 +77,7 @@ class ProductsController {
 
     public update = async(req: Request, res: Response):Promise<void> => {
 
-        const response:IQueryResponse = await productsRepository.update(parseInt(req.params.id), req.body);
+        const response:IQueryResponse = await productsRepository.update(req.params.id, req.body);
 
         if(response.ok) {
             res.send({
@@ -94,7 +94,7 @@ class ProductsController {
 
     public delete = async(req: Request, res: Response):Promise<void> => {
 
-        const response:IQueryResponse = await productsRepository.delete(parseInt(req.params.id));
+        const response:IQueryResponse = await productsRepository.delete(req.params.id);
 
         if(response.ok) {
             res.send({

@@ -12,23 +12,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userController = void 0;
+exports.clientController = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const user_repository_1 = require("./user_repository");
+const clients_repository_1 = require("./clients_repository");
 class UserController {
     constructor() {
         this.signup = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const { username, email, password } = req.body;
-            if (username.match(' ')) {
+            const { name, email, password } = req.body;
+            if (name.match(' ')) {
                 res.send({
                     ok: false,
-                    message: 'Invalid username'
+                    message: 'Invalid name'
                 });
                 return;
             }
             const newPass = bcryptjs_1.default.hashSync(password, 10);
-            const response = yield user_repository_1.usersRepository.signup({
-                username,
+            const response = yield clients_repository_1.clientsRepository.signup({
+                name,
                 email,
                 password: newPass
             });
@@ -36,7 +36,7 @@ class UserController {
                 delete response.data.password;
                 res.send({
                     ok: true,
-                    user: response.data
+                    client: response.data
                 });
             }
             else {
@@ -48,7 +48,7 @@ class UserController {
         });
         this.login = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { email, password } = req.body;
-            const response = yield user_repository_1.usersRepository.login(email);
+            const response = yield clients_repository_1.clientsRepository.login(email);
             if (response.ok) {
                 let pass = yield bcryptjs_1.default.compare(password, response.data.password);
                 if (!pass) {
@@ -61,7 +61,7 @@ class UserController {
                 delete response.data.password;
                 res.send({
                     ok: true,
-                    user: response.data
+                    client: response.data
                 });
             }
             else {
@@ -72,15 +72,15 @@ class UserController {
             }
         });
         this.getAll = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const response = yield user_repository_1.usersRepository.getAll();
+            const response = yield clients_repository_1.clientsRepository.getAll();
             if (response.ok) {
-                response.data.forEach((user) => {
-                    delete user.password;
-                    return user;
+                response.data.forEach((client) => {
+                    delete client.password;
+                    return client;
                 });
                 res.send({
                     ok: true,
-                    users: response.data
+                    clients: response.data
                 });
             }
             else {
@@ -91,7 +91,7 @@ class UserController {
             }
         });
         this.getCount = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const response = yield user_repository_1.usersRepository.getCount();
+            const response = yield clients_repository_1.clientsRepository.getCount();
             if (response.ok) {
                 res.send({
                     ok: true,
@@ -106,12 +106,12 @@ class UserController {
             }
         });
         this.getById = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const response = yield user_repository_1.usersRepository.getById(req.params.id);
+            const response = yield clients_repository_1.clientsRepository.getById(req.params.id);
             if (response.ok) {
                 delete response.data.password;
                 res.send({
                     ok: true,
-                    user: response.data
+                    client: response.data
                 });
             }
             else {
@@ -122,11 +122,11 @@ class UserController {
             }
         });
         this.update = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const response = yield user_repository_1.usersRepository.update(req.params.id, req.body);
+            const response = yield clients_repository_1.clientsRepository.update(req.params.id, req.body);
             if (response.ok) {
                 res.send({
                     ok: true,
-                    user: response.data
+                    client: response.data
                 });
             }
             else {
@@ -137,7 +137,7 @@ class UserController {
             }
         });
         this.delete = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const response = yield user_repository_1.usersRepository.delete(req.params.id);
+            const response = yield clients_repository_1.clientsRepository.delete(req.params.id);
             if (response.ok) {
                 res.send({
                     ok: true,
@@ -153,5 +153,5 @@ class UserController {
         });
     }
 }
-exports.userController = new UserController;
-//# sourceMappingURL=user_controller.js.map
+exports.clientController = new UserController;
+//# sourceMappingURL=clients_controller.js.map

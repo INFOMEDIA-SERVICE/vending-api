@@ -1,8 +1,8 @@
 import { Pool } from 'pg';
 
-export const database = new Pool({
-    user: 'postgres',
-    database: 'vendings',
-    host: 'localhost',
-    password: '37375930'
+export const database: Pool = new Pool({
+    user: process.env.POSTGRESS_USER,
+    database: process.env.POSTGRESS_DATABASE,
+    host: process.env.POSTGRESS_HOST,
+    password: process.env.POSTGRESS_PASSWORD
 });

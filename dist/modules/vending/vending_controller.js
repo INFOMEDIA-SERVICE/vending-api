@@ -18,7 +18,22 @@ class VendingController {
             if (response.ok) {
                 res.send({
                     ok: true,
-                    product: response.data
+                    vending: response.data
+                });
+            }
+            else {
+                res.send({
+                    ok: false,
+                    message: response.data
+                });
+            }
+        });
+        this.getVendingProducts = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const response = yield vending_repository_1.vendingsRepository.getVendingProducts(req.params.id);
+            if (response.ok) {
+                res.send({
+                    ok: true,
+                    products: response.data
                 });
             }
             else {
@@ -59,11 +74,11 @@ class VendingController {
             }
         });
         this.getById = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const response = yield vending_repository_1.vendingsRepository.getById(parseInt(req.params.id));
+            const response = yield vending_repository_1.vendingsRepository.getById(req.params.id);
             if (response.ok) {
                 res.send({
                     ok: true,
-                    product: response.data
+                    vending: response.data
                 });
             }
             else {
@@ -74,11 +89,11 @@ class VendingController {
             }
         });
         this.update = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const response = yield vending_repository_1.vendingsRepository.update(parseInt(req.params.id), req.body);
+            const response = yield vending_repository_1.vendingsRepository.update(req.params.id, req.body);
             if (response.ok) {
                 res.send({
                     ok: true,
-                    product: response.data
+                    vending: response.data
                 });
             }
             else {
@@ -89,7 +104,7 @@ class VendingController {
             }
         });
         this.delete = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const response = yield vending_repository_1.vendingsRepository.delete(parseInt(req.params.id));
+            const response = yield vending_repository_1.vendingsRepository.delete(req.params.id);
             if (response.ok) {
                 res.send({
                     ok: true,

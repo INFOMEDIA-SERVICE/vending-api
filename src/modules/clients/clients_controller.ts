@@ -1,27 +1,27 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import { IQueryResponse } from '../../models/postgres_responses';
-import {usersRepository} from './user_repository'
-import { IUser } from './users_model';
+import {clientsRepository} from './clients_repository'
+import { IClient } from './clients_model';
 
 class UserController {
 
     public signup = async(req: Request, res: Response):Promise<void> => {
 
-        const {username, email, password}: IUser = req.body;
+        const {name, email, password}: IClient = req.body;
 
-        if(username.match(' ')) {
+        if(name.match(' ')) {
             res.send({
                 ok: false,
-                message: 'Invalid username'
+                message: 'Invalid name'
             });
             return;
         }
 
         const newPass: string = bcrypt.hashSync(password, 10);
 
-        const response:IQueryResponse = await usersRepository.signup({
-            username,
+        const response:IQueryResponse = await clientsRepository.signup({
+            name,
             email,
             password: newPass
         });
@@ -30,7 +30,7 @@ class UserController {
             delete response.data.password;
             res.send({
                 ok: true,
-                user: response.data
+                client: response.data
             });
         } else {
             res.send({
@@ -44,7 +44,7 @@ class UserController {
 
         const {email, password} = req.body;
 
-        const response:IQueryResponse = await usersRepository.login(email);
+        const response:IQueryResponse = await clientsRepository.login(email);
 
         if(response.ok) {
 
@@ -62,7 +62,7 @@ class UserController {
             
             res.send({
                 ok: true,
-                user: response.data
+                client: response.data
             });
         } else {
             res.send({
@@ -74,16 +74,16 @@ class UserController {
 
     public getAll = async(req: Request, res: Response):Promise<void> => {
 
-        const response = await usersRepository.getAll();
+        const response = await clientsRepository.getAll();
 
         if(response.ok) {
-            response.data.forEach((user: any) => {
-                delete user.password;
-                return user;
+            response.data.forEach((client: any) => {
+                delete client.password;
+                return client;
             });
             res.send({
                 ok: true,
-                users: response.data
+                clients: response.data
             });
         } else {
             res.send({
@@ -96,7 +96,7 @@ class UserController {
 
     public getCount = async(req: Request, res: Response):Promise<void> => {
         
-        const response = await usersRepository.getCount();
+        const response = await clientsRepository.getCount();
 
         if(response.ok) {
             res.send({
@@ -114,13 +114,13 @@ class UserController {
 
     public getById = async(req: Request, res: Response):Promise<void> => {
 
-        const response = await usersRepository.getById(req.params.id);
+        const response = await clientsRepository.getById(req.params.id);
 
         if(response.ok) {
             delete response.data.password;
             res.send({
                 ok: true,
-                user: response.data
+                client: response.data
             });
         } else {
             res.send({
@@ -133,12 +133,12 @@ class UserController {
 
     public update = async(req: Request, res: Response):Promise<void> => {
 
-        const response:IQueryResponse = await usersRepository.update(req.params.id, req.body);
+        const response:IQueryResponse = await clientsRepository.update(req.params.id, req.body);
 
         if(response.ok) {
             res.send({
                 ok: true,
-                user: response.data
+                client: response.data
             });
         } else {
             res.send({
@@ -150,7 +150,7 @@ class UserController {
 
     public delete = async(req: Request, res: Response):Promise<void> => {
 
-        const response:IQueryResponse = await usersRepository.delete(req.params.id);
+        const response:IQueryResponse = await clientsRepository.delete(req.params.id);
 
         if(response.ok) {
             res.send({
@@ -167,4 +167,4 @@ class UserController {
     };
 }
 
-export const userController = new UserController;
+export const clientController = new UserController;

@@ -13,13 +13,28 @@ exports.vendingsRepository = void 0;
 const database_1 = require("../../database/database");
 class VendingRepository {
     constructor() {
+        this.table = 'vendings';
         this.create = (vending) => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`insert into vendings(name, machine_id) values('${vending.name}', '${vending.machine_id}')`)
+            return database_1.database.query(`insert into ${this.table}(name, machine_id) values('${vending.name}', '${vending.machine_id}') RETURNING *`)
                 .then((value) => {
-                console.log(value);
                 return {
                     ok: true,
-                    data: vending
+                    data: value.rows[0]
+                };
+            })
+                .catch((err) => {
+                return {
+                    ok: false,
+                    data: err.message
+                };
+            });
+        });
+        this.getVendingProducts = (id) => __awaiter(this, void 0, void 0, function* () {
+            return database_1.database.query(`SELECT * FROM products WHERE machine_id = '${id}'`)
+                .then((value) => {
+                return {
+                    ok: true,
+                    data: value.rows
                 };
             })
                 .catch((err) => {
@@ -30,7 +45,7 @@ class VendingRepository {
             });
         });
         this.getAll = () => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query('SELECT * FROM vendings')
+            return database_1.database.query(`SELECT * FROM ${this.table}`)
                 .then((value) => {
                 return {
                     ok: true,
@@ -45,7 +60,7 @@ class VendingRepository {
             });
         });
         this.getById = (id) => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`SELECT * FROM vendings WHERE id = ${id}`)
+            return database_1.database.query(`SELECT * FROM ${this.table} WHERE id = '${id}'`)
                 .then((value) => {
                 if (value.rowCount === 0)
                     return {
@@ -66,19 +81,16 @@ class VendingRepository {
             });
         });
         this.update = (id, vending) => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`UPDATE vendings SET(name, machine_id) = ('${vending.name}', '${vending.machine_id}') WHERE id = ${id}`)
+            return database_1.database.query(`UPDATE ${this.table} SET(name, machine_id) = ('${vending.name}', '${vending.machine_id}') WHERE id = '${id}' RETURNING *`)
                 .then((value) => __awaiter(this, void 0, void 0, function* () {
                 if (value.rowCount === 0)
                     return {
                         ok: false,
                         data: 'User not found'
                     };
-                const user = yield this.getById(id);
-                if (!user.ok)
-                    return user;
                 return {
                     ok: true,
-                    data: user.data
+                    data: value.rows[0]
                 };
             }))
                 .catch((err) => {
@@ -89,7 +101,7 @@ class VendingRepository {
             });
         });
         this.getCount = () => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query('SELECT * FROM vendings')
+            return database_1.database.query(`SELECT * FROM ${this.table}`)
                 .then((value) => {
                 return {
                     ok: true,
@@ -104,7 +116,7 @@ class VendingRepository {
             });
         });
         this.delete = (id) => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`delete from vendings WHERE id = ${id}`)
+            return database_1.database.query(`delete from ${this.table} WHERE id = '${id}'`)
                 .then((value) => {
                 if (value.rowCount === 0)
                     return {

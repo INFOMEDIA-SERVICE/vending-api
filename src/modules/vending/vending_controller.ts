@@ -12,7 +12,7 @@ class VendingController {
         if(response.ok) {
             res.send({
                 ok: true,
-                product: response.data
+                vending: response.data
             });
         } else {
             res.send({
@@ -20,6 +20,24 @@ class VendingController {
                 message: response.data
             });
         }
+    };
+
+    public getVendingProducts = async(req: Request, res: Response):Promise<void> => {
+
+        const response = await vendingsRepository.getVendingProducts(req.params.id);
+
+        if(response.ok) {
+            res.send({
+                ok: true,
+                products: response.data
+            });
+        } else {
+            res.send({
+                ok: false,
+                message: response.data
+            });
+        }
+
     };
 
     public getAll = async(req: Request, res: Response):Promise<void> => {
@@ -60,12 +78,12 @@ class VendingController {
 
     public getById = async(req: Request, res: Response):Promise<void> => {
 
-        const response = await vendingsRepository.getById(parseInt(req.params.id));
+        const response = await vendingsRepository.getById(req.params.id);
 
         if(response.ok) {
             res.send({
                 ok: true,
-                product: response.data
+                vending: response.data
             });
         } else {
             res.send({
@@ -78,12 +96,12 @@ class VendingController {
 
     public update = async(req: Request, res: Response):Promise<void> => {
 
-        const response:IQueryResponse = await vendingsRepository.update(parseInt(req.params.id), req.body);
+        const response:IQueryResponse = await vendingsRepository.update(req.params.id, req.body);
 
         if(response.ok) {
             res.send({
                 ok: true,
-                product: response.data
+                vending: response.data
             });
         } else {
             res.send({
@@ -95,7 +113,7 @@ class VendingController {
 
     public delete = async(req: Request, res: Response):Promise<void> => {
 
-        const response:IQueryResponse = await vendingsRepository.delete(parseInt(req.params.id));
+        const response:IQueryResponse = await vendingsRepository.delete(req.params.id);
 
         if(response.ok) {
             res.send({

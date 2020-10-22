@@ -59,7 +59,7 @@ class ProductsController {
             }
         });
         this.getById = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const response = yield products_repository_1.productsRepository.getById(parseInt(req.params.id));
+            const response = yield products_repository_1.productsRepository.getById(req.params.id);
             if (response.ok) {
                 res.send({
                     ok: true,
@@ -74,7 +74,7 @@ class ProductsController {
             }
         });
         this.update = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const response = yield products_repository_1.productsRepository.update(parseInt(req.params.id), req.body);
+            const response = yield products_repository_1.productsRepository.update(req.params.id, req.body);
             if (response.ok) {
                 res.send({
                     ok: true,
@@ -89,7 +89,7 @@ class ProductsController {
             }
         });
         this.delete = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const response = yield products_repository_1.productsRepository.delete(parseInt(req.params.id));
+            const response = yield products_repository_1.productsRepository.delete(req.params.id);
             if (response.ok) {
                 res.send({
                     ok: true,

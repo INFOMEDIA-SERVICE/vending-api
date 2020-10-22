@@ -9,18 +9,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.usersRepository = void 0;
+exports.clientsRepository = void 0;
 const database_1 = require("../../database/database");
-class UsersRepository {
+// import { validate } from 'uuid';
+class ClientsRepository {
     constructor() {
-        this.table = 'users';
+        this.table = 'clients';
         this.signup = (user) => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`insert into ${this.table}(username, email, password) values('${user.username}', '${user.email}', '${user.password}')`)
+            return database_1.database.query(`insert into ${this.table}(name, email, password) values('${user.name}', '${user.email}', '${user.password}') RETURNING *`)
                 .then((value) => {
-                user.status = true;
                 return {
                     ok: true,
-                    data: user
+                    data: value.rows[0]
                 };
             })
                 .catch((err) => {
@@ -88,16 +88,19 @@ class UsersRepository {
             });
         });
         this.update = (id, user) => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`UPDATE ${this.table} SET(username, email) = ('${user.username}', '${user.email}') WHERE id = '${id}' RETURNING *`)
+            return database_1.database.query(`UPDATE ${this.table} SET(name, email) = ('${user.name}', '${user.email}') WHERE id = '${id}'`)
                 .then((value) => __awaiter(this, void 0, void 0, function* () {
                 if (value.rowCount === 0)
                     return {
                         ok: false,
                         data: 'User not found'
                     };
+                const user = yield this.getById(id);
+                if (!user.ok)
+                    return user;
                 return {
                     ok: true,
-                    data: value.rows[0]
+                    data: user.data
                 };
             }))
                 .catch((err) => {
@@ -145,5 +148,5 @@ class UsersRepository {
         });
     }
 }
-exports.usersRepository = new UsersRepository;
-//# sourceMappingURL=user_repository.js.map
+exports.clientsRepository = new ClientsRepository;
+//# sourceMappingURL=clients_repository.js.map

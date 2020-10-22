@@ -1,15 +1,16 @@
-import { IProduct } from './products_model';
+import { IClient } from './clients_model';
 import { database } from '../../database/database';
 import { IQueryResponse } from '../../models/postgres_responses';
+// import { validate } from 'uuid';
 
-class ProductsRepository {
+class ClientsRepository {
 
-    private table: string = 'products';
+    private table: string = 'clients';
 
-    public create = async(product: IProduct): Promise<IQueryResponse> => {
+    public signup = async(user: IClient): Promise<IQueryResponse> => {
 
         return database.query(
-            `insert into ${this.table}(name, price, image, machine_id) values('${product.name}', ${product.price}, '${product.image}', '${product.machine_id}') RETURNING *`
+            `insert into ${this.table}(name, email, password) values('${user.name}', '${user.email}', '${user.password}') RETURNING *`
         )
         .then((value) => {
             return {
@@ -25,6 +26,27 @@ class ProductsRepository {
         });
     }
 
+    public login = async(email: string): Promise<IQueryResponse> => {
+
+        return database.query(`SELECT * FROM ${this.table} WHERE email = '${email}'`)
+        .then((value) => {
+            if(value.rowCount === 0) return {
+                ok: false,
+                data: 'Email or Password does\'not match'
+            }
+            else return {
+                ok: true,
+                data: value.rows[0]
+            }
+        })
+        .catch((err) => {
+            return {
+                ok: false,
+                data: err.message
+            }
+        });
+    }
+    
     public getAll = async(): Promise<IQueryResponse> => {
 
         return database.query(`SELECT * FROM ${this.table}`)
@@ -63,9 +85,9 @@ class ProductsRepository {
         });
     }
 
-    public update = async(id: string, product: IProduct): Promise<IQueryResponse> => {
+    public update = async(id: string, user: IClient): Promise<IQueryResponse> => {
 
-        return database.query(`UPDATE ${this.table} SET(name, price, machine_id) = ('${product.name}', ${product.price}, '${product.machine_id}') WHERE id = '${id}' RETURNING *`)
+        return database.query(`UPDATE ${this.table} SET(name, email) = ('${user.name}', '${user.email}') WHERE id = '${id}'`)
 
         .then(async(value) => {
         
@@ -74,14 +96,12 @@ class ProductsRepository {
                 data: 'User not found'
             }
 
-            // const user = await this.getById(id);
-            // if(!user.ok) return user;
-
-            console.log(value.rows[0]);
+            const user = await this.getById(id);
+            if(!user.ok) return user;
 
             return {
                 ok: true,
-                data: value.rows[0]
+                data: user.data
             }
         })
         .catch((err) => {
@@ -131,4 +151,4 @@ class ProductsRepository {
     }
 }
 
-export const productsRepository = new ProductsRepository;
+export const clientsRepository = new ClientsRepository;

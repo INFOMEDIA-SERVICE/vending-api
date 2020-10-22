@@ -4,7 +4,7 @@ export interface IProduct {
     name: string
     price: number
     image: string
-    item: number
+    machine_id: number
     status?: boolean
     createdAt?: Date;
     updatedAt?: Date;
