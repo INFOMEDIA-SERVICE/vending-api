@@ -114,6 +114,24 @@ class UserController {
                 });
             }
         });
+        this.me = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const user = req.body.user;
+            console.log(user);
+            const response = yield clients_repository_1.clientsRepository.getById(user.id);
+            if (response.ok) {
+                delete response.data.password;
+                res.send({
+                    ok: true,
+                    client: response.data
+                });
+            }
+            else {
+                res.send({
+                    ok: false,
+                    message: response.data
+                });
+            }
+        });
         this.update = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const response = yield clients_repository_1.clientsRepository.update(req.params.id, req.body);
             if (response.ok) {

@@ -122,6 +122,29 @@ class UserController {
 
     };
 
+    public me = async(req: Request, res: Response):Promise<void> => {
+
+        const user = req.body.user;
+
+        console.log(user);
+
+        const response = await clientsRepository.getById(user.id);
+
+        if(response.ok) {
+            delete response.data.password;
+            res.send({
+                ok: true,
+                client: response.data
+            });
+        } else {
+            res.send({
+                ok: false,
+                message: response.data
+            });
+        }
+
+    };
+
     public update = async(req: Request, res: Response):Promise<void> => {
 
         const response:IQueryResponse = await clientsRepository.update(req.params.id, req.body);
