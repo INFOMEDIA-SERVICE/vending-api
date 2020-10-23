@@ -13,10 +13,10 @@ exports.machineRepository = void 0;
 const database_1 = require("../../database/database");
 class MachineRepository {
     constructor() {
-        this.table = 'clients';
+        this.table = 'users';
         this.updateClientsRequest = (id) => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`UPDATE ${this.table} SET request = request + 1 WHERE id = '${id}' AND status = true`)
-                .then((value) => __awaiter(this, void 0, void 0, function* () {
+            return database_1.database.query(`UPDATE ${this.table} SET request = request + 1 WHERE id = '${id}' AND status = true RETURNING *`)
+                .then((value) => {
                 if (value.rowCount === 0)
                     return {
                         ok: false,
@@ -25,7 +25,7 @@ class MachineRepository {
                 return {
                     ok: true
                 };
-            }))
+            })
                 .catch((err) => {
                 return {
                     ok: false,

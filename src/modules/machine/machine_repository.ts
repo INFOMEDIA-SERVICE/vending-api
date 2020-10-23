@@ -3,13 +3,13 @@ import { database } from '../../database/database';
 
 class MachineRepository {
 
-    private table: string = 'clients';
+    private table: string = 'users';
 
     public updateClientsRequest = async(id: string):Promise<IQueryResponse> => {
 
-        return database.query(`UPDATE ${this.table} SET request = request + 1 WHERE id = '${id}' AND status = true`)
+        return database.query(`UPDATE ${this.table} SET request = request + 1 WHERE id = '${id}' AND status = true RETURNING *`)
 
-        .then(async(value) => {
+        .then((value) => {
         
             if(value.rowCount === 0) return {
                 ok: false,

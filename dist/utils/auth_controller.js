@@ -8,7 +8,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const jwt_decode_1 = __importDefault(require("jwt-decode"));
 class AuthController {
     constructor() {
-        this.generateUserToken = (user) => {
+        this.generateToken = (user) => {
             return jsonwebtoken_1.default.sign(user, process.env.USER_TOKEN_KEY + '');
         };
         this.validateUserToken = (token) => {
@@ -20,14 +20,15 @@ class AuthController {
                     };
                 const user = jwt_decode_1.default(token);
                 if (user.role !== 0)
-                    return {};
+                    return {
+                        ok: false,
+                        message: 'Rol inválido'
+                    };
                 return {
                     ok: true,
+                    user
                 };
             });
-        };
-        this.generateClientToken = (user) => {
-            return jsonwebtoken_1.default.sign(user, process.env.USER_TOKEN_KEY + '');
         };
         this.validateClientToken = (token) => {
             return jsonwebtoken_1.default.verify(token, process.env.USER_TOKEN_KEY + '', (err) => {
@@ -37,14 +38,18 @@ class AuthController {
                         message: err.message
                     };
                 const user = jwt_decode_1.default(token);
-                if (user.role !== 0)
-                    return {};
+                if (user.role !== 1)
+                    return {
+                        ok: false,
+                        message: 'Rol inválido'
+                    };
                 return {
                     ok: true,
+                    user
                 };
             });
         };
     }
 }
 exports.authController = new AuthController;
-//# sourceMappingURL=auth.js.map
+//# sourceMappingURL=auth_controller.js.map

@@ -15,12 +15,11 @@ class UsersRepository {
     constructor() {
         this.table = 'users';
         this.signup = (user) => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`insert into ${this.table}(username, email, password) values('${user.username}', '${user.email}', '${user.password}')`)
+            return database_1.database.query(`insert into ${this.table}(first_name, last_name, email, password) values('${user.first_name}', '${user.last_name}', '${user.email}', '${user.password}') RETURNING *`)
                 .then((value) => {
-                user.status = true;
                 return {
                     ok: true,
-                    data: user
+                    data: value.rows[0]
                 };
             })
                 .catch((err) => {
@@ -88,7 +87,7 @@ class UsersRepository {
             });
         });
         this.update = (id, user) => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`UPDATE ${this.table} SET(username, email) = ('${user.username}', '${user.email}') WHERE id = '${id}' RETURNING *`)
+            return database_1.database.query(`UPDATE ${this.table} SET(first_name, last_name, email) = ('${user.first_name}', '${user.last_name}', '${user.email}') WHERE id = '${id}' RETURNING *`)
                 .then((value) => __awaiter(this, void 0, void 0, function* () {
                 if (value.rowCount === 0)
                     return {

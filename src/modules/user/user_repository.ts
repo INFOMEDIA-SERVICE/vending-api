@@ -9,13 +9,12 @@ class UsersRepository {
     public signup = async(user: IUser): Promise<IQueryResponse> => {
 
         return database.query(
-            `insert into ${this.table}(username, email, password) values('${user.username}', '${user.email}', '${user.password}')`
+            `insert into ${this.table}(first_name, last_name, email, password) values('${user.first_name}', '${user.last_name}', '${user.email}', '${user.password}') RETURNING *`
         )
         .then((value) => {
-            user.status = true;
             return {
                 ok: true,
-                data: user
+                data: value.rows[0]
             }
         })
         .catch((err) => {
@@ -87,7 +86,7 @@ class UsersRepository {
 
     public update = async(id: string, user: IUser): Promise<IQueryResponse> => {
 
-        return database.query(`UPDATE ${this.table} SET(username, email) = ('${user.username}', '${user.email}') WHERE id = '${id}' RETURNING *`)
+        return database.query(`UPDATE ${this.table} SET(first_name, last_name, email) = ('${user.first_name}', '${user.last_name}', '${user.email}') WHERE id = '${id}' RETURNING *`)
 
         .then(async(value) => {
         

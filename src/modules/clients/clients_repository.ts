@@ -1,16 +1,15 @@
-import { IClient } from './clients_model';
+import { IUser } from '../user/users_model';
 import { database } from '../../database/database';
 import { IQueryResponse } from '../../models/postgres_responses';
-// import { validate } from 'uuid';
 
 class ClientsRepository {
 
-    private table: string = 'clients';
+    private table: string = 'users';
 
-    public signup = async(user: IClient): Promise<IQueryResponse> => {
+    public signup = async(user: IUser): Promise<IQueryResponse> => {
 
         return database.query(
-            `insert into ${this.table}(name, email, password) values('${user.name}', '${user.email}', '${user.password}') RETURNING *`
+            `insert into ${this.table}(first_name, last_name, email, password, role) values('${user.first_name}', '${user.last_name}', '${user.email}', '${user.password}', 1) RETURNING *`
         )
         .then((value) => {
             return {
@@ -28,7 +27,7 @@ class ClientsRepository {
 
     public login = async(email: string): Promise<IQueryResponse> => {
 
-        return database.query(`SELECT * FROM ${this.table} WHERE email = '${email}'`)
+        return database.query(`SELECT * FROM ${this.table} WHERE email = '${email}' AND role = 1`)
         .then((value) => {
             if(value.rowCount === 0) return {
                 ok: false,
@@ -49,7 +48,7 @@ class ClientsRepository {
     
     public getAll = async(): Promise<IQueryResponse> => {
 
-        return database.query(`SELECT * FROM ${this.table}`)
+        return database.query(`SELECT * FROM ${this.table} WHERE role = 1`)
         .then((value) => {
             return {
                 ok: true,
@@ -66,11 +65,11 @@ class ClientsRepository {
 
     public getById = async(id: string): Promise<IQueryResponse> => {
 
-        return database.query(`SELECT * FROM ${this.table} WHERE id = '${id}'`)
+        return database.query(`SELECT * FROM ${this.table} WHERE id = '${id}' AND role = 1`)
         .then((value) => {
             if(value.rowCount === 0) return {
                 ok: false,
-                data: 'User not found'
+                data: 'Client not found'
             }
             else return {
                 ok: true,
@@ -85,15 +84,15 @@ class ClientsRepository {
         });
     }
 
-    public update = async(id: string, user: IClient): Promise<IQueryResponse> => {
+    public update = async(id: string, user: IUser): Promise<IQueryResponse> => {
 
-        return database.query(`UPDATE ${this.table} SET(name, email) = ('${user.name}', '${user.email}') WHERE id = '${id}'`)
+        return database.query(`UPDATE ${this.table} SET(first_name, last_name, email) = ('${user.first_name}', '${user.last_name}', '${user.email}') WHERE id = '${id}' AND role = 1 RETURNING *`)
 
         .then(async(value) => {
         
             if(value.rowCount === 0) return {
                 ok: false,
-                data: 'User not found'
+                data: 'Client not found'
             }
 
             const user = await this.getById(id);

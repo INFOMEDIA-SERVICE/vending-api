@@ -15,28 +15,39 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.userController = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const user_repository_1 = require("./user_repository");
+const auth_controller_1 = require("../../utils/auth_controller");
 class UserController {
     constructor() {
         this.signup = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const { username, email, password } = req.body;
-            if (username.match(' ')) {
+            const { first_name, last_name, email, password } = req.body;
+            if (!first_name || first_name.match(' ')) {
                 res.send({
                     ok: false,
-                    message: 'Invalid username'
+                    message: 'Invalid first_name'
+                });
+                return;
+            }
+            if (!last_name || last_name.match(' ')) {
+                res.send({
+                    ok: false,
+                    message: 'Invalid last_name'
                 });
                 return;
             }
             const newPass = bcryptjs_1.default.hashSync(password, 10);
             const response = yield user_repository_1.usersRepository.signup({
-                username,
+                first_name,
+                last_name,
                 email,
                 password: newPass
             });
             if (response.ok) {
                 delete response.data.password;
+                const token = auth_controller_1.authController.generateToken(response.data);
                 res.send({
                     ok: true,
-                    user: response.data
+                    user: response.data,
+                    token
                 });
             }
             else {
@@ -59,9 +70,11 @@ class UserController {
                     return;
                 }
                 delete response.data.password;
+                const token = auth_controller_1.authController.generateToken(response.data);
                 res.send({
                     ok: true,
-                    user: response.data
+                    user: response.data,
+                    token
                 });
             }
             else {

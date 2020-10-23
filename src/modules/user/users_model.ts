@@ -1,28 +1,12 @@
-// import {Table, Column, Model, DataType} from 'sequelize-typescript';
- 
-// @Table
-// class User extends Model<User> {
- 
-//   @Column(DataType.TEXT)
-//   username?: string;
-
-//   @Column(DataType.TEXT)
-//   email?: string;
-
-//   @Column(DataType.TEXT)
-//   password?: string;
-
-//   @Column(DataType.BOOLEAN)
-//   status?: boolean;
-
-// }
-
-// export default User;
-
 export interface IUser {
     id?: number
-    username: string
+    first_name: string
+    last_name: string
     email: string
     password: string
+    requests?: number
+    role?: number
     status?: boolean
+    created_at?: Date
+    updated_at?: Date
 }

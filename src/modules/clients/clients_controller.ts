@@ -2,26 +2,35 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import { IQueryResponse } from '../../models/postgres_responses';
 import {clientsRepository} from './clients_repository'
-import { IClient } from './clients_model';
+import { IUser } from '../user/users_model';
 
 class UserController {
 
     public signup = async(req: Request, res: Response):Promise<void> => {
 
-        const {name, email, password}: IClient = req.body;
+        const {first_name, last_name, email, password}: IUser = req.body;
 
-        if(name.match(' ')) {
+        if(!first_name || first_name.match(' ')) {
             res.send({
                 ok: false,
-                message: 'Invalid name'
+                message: 'Invalid first_name'
             });
             return;
         }
 
-        const newPass: string = bcrypt.hashSync(password, 10);
+        if(!last_name || last_name.match(' ')) {
+            res.send({
+                ok: false,
+                message: 'Invalid last_name'
+            });
+            return;
+        }
 
-        const response:IQueryResponse = await clientsRepository.signup({
-            name,
+        const newPass: string = bcrypt.hashSync(password, 15);
+
+        const response: IQueryResponse = await clientsRepository.signup({
+            first_name,
+            last_name,
             email,
             password: newPass
         });
@@ -30,7 +39,7 @@ class UserController {
             delete response.data.password;
             res.send({
                 ok: true,
-                client: response.data
+                user: response.data
             });
         } else {
             res.send({
@@ -84,24 +93,6 @@ class UserController {
             res.send({
                 ok: true,
                 clients: response.data
-            });
-        } else {
-            res.send({
-                ok: false,
-                message: response.data
-            });
-        }
-
-    };
-
-    public getCount = async(req: Request, res: Response):Promise<void> => {
-        
-        const response = await clientsRepository.getCount();
-
-        if(response.ok) {
-            res.send({
-                ok: true,
-                count: response.data
             });
         } else {
             res.send({

@@ -24,8 +24,8 @@ CREATE TABLE IF NOT EXISTS vendings(
 
 CREATE TABLE IF NOT EXISTS users(
     id varchar(64) NOT NULL DEFAULT uuid_generate_v4(),
-    first_name text NOT NULL CHECK (username <> ''),
-    last_name text NOT NULL CHECK (username <> ''),
+    first_name text NOT NULL CHECK (first_name <> ''),
+    last_name text NOT NULL CHECK (last_name <> ''),
     email text NOT NULL UNIQUE,
     password text NOT NULL,
     requests int NOT NULL DEFAULT 0,

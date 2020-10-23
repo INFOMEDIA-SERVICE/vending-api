@@ -18,17 +18,25 @@ const clients_repository_1 = require("./clients_repository");
 class UserController {
     constructor() {
         this.signup = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const { name, email, password } = req.body;
-            if (name.match(' ')) {
+            const { first_name, last_name, email, password } = req.body;
+            if (!first_name || first_name.match(' ')) {
                 res.send({
                     ok: false,
-                    message: 'Invalid name'
+                    message: 'Invalid first_name'
                 });
                 return;
             }
-            const newPass = bcryptjs_1.default.hashSync(password, 10);
+            if (!last_name || last_name.match(' ')) {
+                res.send({
+                    ok: false,
+                    message: 'Invalid last_name'
+                });
+                return;
+            }
+            const newPass = bcryptjs_1.default.hashSync(password, 15);
             const response = yield clients_repository_1.clientsRepository.signup({
-                name,
+                first_name,
+                last_name,
                 email,
                 password: newPass
             });
@@ -36,7 +44,7 @@ class UserController {
                 delete response.data.password;
                 res.send({
                     ok: true,
-                    client: response.data
+                    user: response.data
                 });
             }
             else {
@@ -81,21 +89,6 @@ class UserController {
                 res.send({
                     ok: true,
                     clients: response.data
-                });
-            }
-            else {
-                res.send({
-                    ok: false,
-                    message: response.data
-                });
-            }
-        });
-        this.getCount = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const response = yield clients_repository_1.clientsRepository.getCount();
-            if (response.ok) {
-                res.send({
-                    ok: true,
-                    count: response.data
                 });
             }
             else {

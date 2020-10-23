@@ -3,17 +3,26 @@ import bcrypt from 'bcryptjs';
 import { IQueryResponse } from '../../models/postgres_responses';
 import {usersRepository} from './user_repository'
 import { IUser } from './users_model';
+import { authController } from '../../utils/auth_controller';
 
 class UserController {
 
     public signup = async(req: Request, res: Response):Promise<void> => {
 
-        const {username, email, password}: IUser = req.body;
+        const {first_name, last_name, email, password}: IUser = req.body;
 
-        if(username.match(' ')) {
+        if(!first_name || first_name.match(' ')) {
             res.send({
                 ok: false,
-                message: 'Invalid username'
+                message: 'Invalid first_name'
+            });
+            return;
+        }
+
+        if(!last_name || last_name.match(' ')) {
+            res.send({
+                ok: false,
+                message: 'Invalid last_name'
             });
             return;
         }
@@ -21,16 +30,19 @@ class UserController {
         const newPass: string = bcrypt.hashSync(password, 10);
 
         const response:IQueryResponse = await usersRepository.signup({
-            username,
+            first_name,
+            last_name,
             email,
             password: newPass
         });
         
         if(response.ok) {
             delete response.data.password;
+            const token: string = authController.generateToken(response.data);
             res.send({
                 ok: true,
-                user: response.data
+                user: response.data,
+                token
             });
         } else {
             res.send({
@@ -59,10 +71,13 @@ class UserController {
             }
 
             delete response.data.password;
+
+            const token: string = authController.generateToken(response.data);
             
             res.send({
                 ok: true,
-                user: response.data
+                user: response.data,
+                token
             });
         } else {
             res.send({

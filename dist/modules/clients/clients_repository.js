@@ -11,12 +11,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.clientsRepository = void 0;
 const database_1 = require("../../database/database");
-// import { validate } from 'uuid';
 class ClientsRepository {
     constructor() {
-        this.table = 'clients';
+        this.table = 'users';
         this.signup = (user) => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`insert into ${this.table}(name, email, password) values('${user.name}', '${user.email}', '${user.password}') RETURNING *`)
+            return database_1.database.query(`insert into ${this.table}(first_name, last_name, email, password, role) values('${user.first_name}', '${user.last_name}', '${user.email}', '${user.password}', 1) RETURNING *`)
                 .then((value) => {
                 return {
                     ok: true,
@@ -31,7 +30,7 @@ class ClientsRepository {
             });
         });
         this.login = (email) => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`SELECT * FROM ${this.table} WHERE email = '${email}'`)
+            return database_1.database.query(`SELECT * FROM ${this.table} WHERE email = '${email}' AND role = 1`)
                 .then((value) => {
                 if (value.rowCount === 0)
                     return {
@@ -52,7 +51,7 @@ class ClientsRepository {
             });
         });
         this.getAll = () => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`SELECT * FROM ${this.table}`)
+            return database_1.database.query(`SELECT * FROM ${this.table} WHERE role = 1`)
                 .then((value) => {
                 return {
                     ok: true,
@@ -67,12 +66,12 @@ class ClientsRepository {
             });
         });
         this.getById = (id) => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`SELECT * FROM ${this.table} WHERE id = '${id}'`)
+            return database_1.database.query(`SELECT * FROM ${this.table} WHERE id = '${id}' AND role = 1`)
                 .then((value) => {
                 if (value.rowCount === 0)
                     return {
                         ok: false,
-                        data: 'User not found'
+                        data: 'Client not found'
                     };
                 else
                     return {
@@ -88,12 +87,12 @@ class ClientsRepository {
             });
         });
         this.update = (id, user) => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`UPDATE ${this.table} SET(name, email) = ('${user.name}', '${user.email}') WHERE id = '${id}'`)
+            return database_1.database.query(`UPDATE ${this.table} SET(first_name, last_name, email) = ('${user.first_name}', '${user.last_name}', '${user.email}') WHERE id = '${id}' AND role = 1 RETURNING *`)
                 .then((value) => __awaiter(this, void 0, void 0, function* () {
                 if (value.rowCount === 0)
                     return {
                         ok: false,
-                        data: 'User not found'
+                        data: 'Client not found'
                     };
                 const user = yield this.getById(id);
                 if (!user.ok)
