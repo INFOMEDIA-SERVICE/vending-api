@@ -103,12 +103,14 @@ class UserController {
                 });
             }
         });
-        this.getCount = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const response = yield user_repository_1.usersRepository.getCount();
+        this.me = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const user = req.body.user;
+            const response = yield user_repository_1.usersRepository.getById(user.id);
             if (response.ok) {
+                delete response.data.password;
                 res.send({
                     ok: true,
-                    count: response.data
+                    user: response.data
                 });
             }
             else {

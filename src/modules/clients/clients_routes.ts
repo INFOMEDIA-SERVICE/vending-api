@@ -7,7 +7,7 @@ const router:Router = Router();
 router.post('/', clientController.signup);
 router.post('/login', clientController.login);
 router.get('/', [authController.validateAdminToken], clientController.getAll);
-router.get('/:id', [], clientController.getById);
+router.get('/:id', [authController.validateAdminToken], clientController.getById);
 router.get('/user/me/', [authController.validateClientToken], clientController.me);
 router.put('/:id', [authController.validateClientToken], clientController.update);
 router.delete('/:id', [authController.validateAdminToken], clientController.delete);

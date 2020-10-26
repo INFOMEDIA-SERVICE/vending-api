@@ -65,7 +65,7 @@ class MachineController {
                 let order = {
                     // action: 'vend.reset',
                     action: 'vend.request',
-                    mid: 'STM32-12345678276Y87HS',
+                    mid: 'STM32-123456789432RFD',
                     tid: uuid_1.v4(),
                     credit: -1,
                     products

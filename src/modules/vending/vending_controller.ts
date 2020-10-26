@@ -1,7 +1,7 @@
 // import Vending from '../../models/vending_model';
 import {Request, Response} from 'express';
 import {vendingsRepository} from './vending_repository';
-import { IQueryResponse } from '../../models/postgres_responses';
+import { IQueryResponse } from '../../interfaces/postgres_responses';
 
 class VendingController {
 

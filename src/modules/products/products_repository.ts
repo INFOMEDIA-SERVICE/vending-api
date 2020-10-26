@@ -1,6 +1,6 @@
 import { IProduct } from './products_model';
 import { database } from '../../database/database';
-import { IQueryResponse } from '../../models/postgres_responses';
+import { IQueryResponse } from '../../interfaces/postgres_responses';
 
 class ProductsRepository {
 

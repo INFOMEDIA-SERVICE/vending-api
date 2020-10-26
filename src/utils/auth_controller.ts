@@ -43,6 +43,31 @@ class AuthController {
         });
     }
 
+    public validateAccess = (req: Request, res: Response, next: NextFunction) => {
+        
+        const token: string = req.headers.authorization + '';
+
+        return jwt.verify(token, process.env.TOKEN_KEY + '', (err) => {
+        
+            if(err) return res.send({
+                ok: false,
+                message: err.message
+            })
+
+            const user:IUser = jwt_decode(token);
+
+            req.body.user = user;
+
+            next();
+
+            // return {
+            //     ok: true,
+            //     user
+            // };
+    
+        });
+    }
+
     public validateClientToken = (req: Request, res: Response, next: NextFunction) => {
         
         const token: string = req.headers.authorization + '';

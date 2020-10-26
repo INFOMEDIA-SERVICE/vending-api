@@ -1,13 +1,14 @@
 import {Router} from 'express';
 import { productsController } from './products_controller';
+import { authController } from '../../utils/auth_controller';
 
 const router:Router = Router();
 
-router.get('/', productsController.getAll);
-router.get('/count', productsController.getCount);
-router.get('/:id', productsController.getById);
-router.post('/', productsController.create);
-router.put('/:id', productsController.update);
-router.delete('/:id', productsController.delete);
+router.get('/', [authController.validateAccess], productsController.getAll);
+router.get('/count', [authController.validateAccess], productsController.getCount);
+router.get('/:id', [authController.validateAccess], productsController.getById);
+router.post('/', [authController.validateAdminToken], productsController.create);
+router.put('/:id', [authController.validateAdminToken], productsController.update);
+router.delete('/:id', [authController.validateAdminToken], productsController.delete);
 
 export default router;

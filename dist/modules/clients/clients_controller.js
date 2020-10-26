@@ -116,7 +116,6 @@ class UserController {
         });
         this.me = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const user = req.body.user;
-            console.log(user);
             const response = yield clients_repository_1.clientsRepository.getById(user.id);
             if (response.ok) {
                 delete response.data.password;

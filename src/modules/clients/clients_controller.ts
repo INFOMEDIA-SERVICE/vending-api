@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
-import { IQueryResponse } from '../../models/postgres_responses';
+import { IQueryResponse } from '../../interfaces/postgres_responses';
 import {clientsRepository} from './clients_repository'
 import { IUser } from '../user/users_model';
 
@@ -126,9 +126,7 @@ class UserController {
 
         const user = req.body.user;
 
-        console.log(user);
-
-        const response = await clientsRepository.getById(user.id);
+        const response: IQueryResponse = await clientsRepository.getById(user.id);
 
         if(response.ok) {
             delete response.data.password;

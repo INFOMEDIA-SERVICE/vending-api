@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
-import { IQueryResponse } from '../../models/postgres_responses';
+import { IQueryResponse } from '../../interfaces/postgres_responses';
 import {usersRepository} from './user_repository'
 import { IUser } from './users_model';
 import { authController } from '../../utils/auth_controller';
@@ -109,14 +109,17 @@ class UserController {
 
     };
 
-    public getCount = async(req: Request, res: Response):Promise<void> => {
-        
-        const response = await usersRepository.getCount();
+    public me = async(req: Request, res: Response):Promise<void> => {
+
+        const user = req.body.user;
+
+        const response: IQueryResponse = await usersRepository.getById(user.id);
 
         if(response.ok) {
+            delete response.data.password;
             res.send({
                 ok: true,
-                count: response.data
+                user: response.data
             });
         } else {
             res.send({

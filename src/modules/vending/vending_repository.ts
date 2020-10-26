@@ -1,6 +1,6 @@
 import { IVending } from './vending_model';
 import { database } from '../../database/database';
-import { IQueryResponse } from '../../models/postgres_responses';
+import { IQueryResponse } from '../../interfaces/postgres_responses';
 
 class VendingRepository {
 

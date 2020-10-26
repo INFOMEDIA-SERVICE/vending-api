@@ -37,6 +37,23 @@ class AuthController {
                 // });
             });
         };
+        this.validateAccess = (req, res, next) => {
+            const token = req.headers.authorization + '';
+            return jsonwebtoken_1.default.verify(token, process.env.TOKEN_KEY + '', (err) => {
+                if (err)
+                    return res.send({
+                        ok: false,
+                        message: err.message
+                    });
+                const user = jwt_decode_1.default(token);
+                req.body.user = user;
+                next();
+                // return {
+                //     ok: true,
+                //     user
+                // };
+            });
+        };
         this.validateClientToken = (req, res, next) => {
             const token = req.headers.authorization + '';
             return jsonwebtoken_1.default.verify(token, process.env.TOKEN_KEY + '', (err) => {

@@ -1,4 +1,4 @@
-import { IQueryResponse } from 'models/postgres_responses';
+import { IQueryResponse } from 'interfaces/postgres_responses';
 import { database } from '../../database/database';
 
 class MachineRepository {
