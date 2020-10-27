@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.clientController = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const clients_repository_1 = require("./clients_repository");
-class UserController {
+class ClientsController {
     constructor() {
         this.signup = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { first_name, last_name, email, password } = req.body;
@@ -163,5 +163,5 @@ class UserController {
         });
     }
 }
-exports.clientController = new UserController;
+exports.clientController = new ClientsController;
 //# sourceMappingURL=clients_controller.js.map

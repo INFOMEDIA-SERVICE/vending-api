@@ -24,11 +24,12 @@ class AuthController {
                         message: err.message
                     });
                 const user = jwt_decode_1.default(token);
-                if (user.role !== 0)
-                    return res.send({
-                        ok: false,
-                        message: 'Rol inválido'
-                    });
+                if (user.role !== 2)
+                    if (user.role !== 0)
+                        return res.send({
+                            ok: false,
+                            message: 'Rol inválido'
+                        });
                 req.body.user = user;
                 next();
                 // return res.send({
@@ -63,11 +64,12 @@ class AuthController {
                         message: err.message
                     });
                 const user = jwt_decode_1.default(token);
-                if (user.role !== 1)
-                    return res.send({
-                        ok: false,
-                        message: 'Rol inválido'
-                    });
+                if (user.role !== 2)
+                    if (user.role !== 1)
+                        return res.send({
+                            ok: false,
+                            message: 'Rol inválido'
+                        });
                 req.body.user = user;
                 next();
                 // return {

@@ -111,26 +111,9 @@ class ClientsRepository {
         });
     }
 
-    public getCount = async(): Promise<IQueryResponse> => {
-
-        return database.query(`SELECT * FROM ${this.table}`)
-        .then((value) => {
-            return {
-                ok: true,
-                data: value.rowCount
-            }
-        })
-        .catch((err) => {
-            return {
-                ok: false,
-                data: err.message
-            }
-        });
-    }
-
     public delete = async(id: string): Promise<IQueryResponse> => {
 
-        return database.query(`delete from ${this.table} WHERE id = '${id}'`)
+        return database.query(`delete from ${this.table} WHERE id = '${id}' AND role = 1`)
         .then((value) => {
             if(value.rowCount === 0) return {
                 ok: false,

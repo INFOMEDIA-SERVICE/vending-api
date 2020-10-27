@@ -4,7 +4,7 @@ import { IQueryResponse } from '../../interfaces/postgres_responses';
 import {clientsRepository} from './clients_repository'
 import { IUser } from '../user/users_model';
 
-class UserController {
+class ClientsController {
 
     public signup = async(req: Request, res: Response):Promise<void> => {
 
@@ -179,4 +179,4 @@ class UserController {
     };
 }
 
-export const clientController = new UserController;
+export const clientController = new ClientsController;

@@ -15,7 +15,7 @@ class UsersRepository {
     constructor() {
         this.table = 'users';
         this.signup = (user) => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`insert into ${this.table}(first_name, last_name, email, password) values('${user.first_name}', '${user.last_name}', '${user.email}', '${user.password}') RETURNING *`)
+            return database_1.database.query(`insert into ${this.table}(first_name, last_name, email, password, role) values('${user.first_name}', '${user.last_name}', '${user.email}', '${user.password}, 0') RETURNING *`)
                 .then((value) => {
                 return {
                     ok: true,
@@ -30,7 +30,7 @@ class UsersRepository {
             });
         });
         this.login = (email) => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`SELECT * FROM ${this.table} WHERE email = '${email}'`)
+            return database_1.database.query(`SELECT * FROM ${this.table} WHERE email = '${email}' AND role = 0`)
                 .then((value) => {
                 if (value.rowCount === 0)
                     return {
@@ -51,7 +51,7 @@ class UsersRepository {
             });
         });
         this.getAll = () => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`SELECT * FROM ${this.table}`)
+            return database_1.database.query(`SELECT * FROM ${this.table} AND role = 0`)
                 .then((value) => {
                 return {
                     ok: true,
@@ -66,7 +66,7 @@ class UsersRepository {
             });
         });
         this.getById = (id) => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`SELECT * FROM ${this.table} WHERE id = '${id}'`)
+            return database_1.database.query(`SELECT * FROM ${this.table} WHERE id = '${id}' AND role = 0`)
                 .then((value) => {
                 if (value.rowCount === 0)
                     return {
@@ -106,23 +106,8 @@ class UsersRepository {
                 };
             });
         });
-        this.getCount = () => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`SELECT * FROM ${this.table}`)
-                .then((value) => {
-                return {
-                    ok: true,
-                    data: value.rowCount
-                };
-            })
-                .catch((err) => {
-                return {
-                    ok: false,
-                    data: err.message
-                };
-            });
-        });
         this.delete = (id) => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`delete from ${this.table} WHERE id = '${id}'`)
+            return database_1.database.query(`delete from ${this.table} WHERE id = '${id}' AND role = 0`)
                 .then((value) => {
                 if (value.rowCount === 0)
                     return {

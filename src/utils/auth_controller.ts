@@ -18,15 +18,15 @@ class AuthController {
         const token: string = req.headers.authorization + '';
 
         return jwt.verify(token, process.env.TOKEN_KEY + '', (err) => {
-        
+
             if(err) return res.send({
                 ok: false,
                 message: err.message
             });
 
-            const user:IUser = jwt_decode(token);
+            const user: IUser = jwt_decode(token);
 
-            if(user.role !== 0) return res.send({
+            if(user.role !== 2) if(user.role !== 0) return res.send({
                 ok: false,
                 message: 'Rol inválido'
             });
@@ -54,7 +54,7 @@ class AuthController {
                 message: err.message
             })
 
-            const user:IUser = jwt_decode(token);
+            const user: IUser = jwt_decode(token);
 
             req.body.user = user;
 
@@ -79,9 +79,9 @@ class AuthController {
                 message: err.message
             })
 
-            const user:IUser = jwt_decode(token);
+            const user: IUser = jwt_decode(token);
 
-            if(user.role !== 1) return res.send({
+            if(user.role !== 2) if(user.role !== 1) return res.send({
                 ok: false,
                 message: 'Rol inválido'
             });
@@ -109,7 +109,7 @@ class AuthController {
                 message: err.message
             });
 
-            const user:IUser = jwt_decode(token);
+            const user: IUser = jwt_decode(token);
 
             if(user.role !== 1) return res.send({
                 ok: false,

@@ -9,6 +9,7 @@ const machine_routes_1 = __importDefault(require("./modules/machine/machine_rout
 const products_routes_1 = __importDefault(require("./modules/products/products_routes"));
 const vending_routes_1 = __importDefault(require("./modules/vending/vending_routes"));
 const user_routes_1 = __importDefault(require("./modules/user/user_routes"));
+const admin_routes_1 = __importDefault(require("./modules/admin/admin_routes"));
 const clients_routes_1 = __importDefault(require("./modules/clients/clients_routes"));
 const http_1 = __importDefault(require("http"));
 const path_1 = __importDefault(require("path"));
@@ -22,9 +23,11 @@ app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: false }));
 // Routes
 app.use('/api/users', user_routes_1.default);
+app.use('/api/users', user_routes_1.default);
 app.use('/api/clients', clients_routes_1.default);
 app.use('/api/vendings', vending_routes_1.default);
 app.use('/api/products', products_routes_1.default);
 app.use('/api/machine', machine_routes_1.default);
+app.use('/api/users', admin_routes_1.default);
 exports.default = app;
 //# sourceMappingURL=app.js.map

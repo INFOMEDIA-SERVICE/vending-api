@@ -9,7 +9,7 @@ class UsersRepository {
     public signup = async(user: IUser): Promise<IQueryResponse> => {
 
         return database.query(
-            `insert into ${this.table}(first_name, last_name, email, password) values('${user.first_name}', '${user.last_name}', '${user.email}', '${user.password}') RETURNING *`
+            `insert into ${this.table}(first_name, last_name, email, password, role) values('${user.first_name}', '${user.last_name}', '${user.email}', '${user.password}, 0') RETURNING *`
         )
         .then((value) => {
             return {
@@ -27,7 +27,7 @@ class UsersRepository {
 
     public login = async(email: string): Promise<IQueryResponse> => {
 
-        return database.query(`SELECT * FROM ${this.table} WHERE email = '${email}'`)
+        return database.query(`SELECT * FROM ${this.table} WHERE email = '${email}' AND role = 0`)
         .then((value) => {
             if(value.rowCount === 0) return {
                 ok: false,
@@ -48,7 +48,7 @@ class UsersRepository {
     
     public getAll = async(): Promise<IQueryResponse> => {
 
-        return database.query(`SELECT * FROM ${this.table}`)
+        return database.query(`SELECT * FROM ${this.table} AND role = 0`)
         .then((value) => {
             return {
                 ok: true,
@@ -65,7 +65,7 @@ class UsersRepository {
 
     public getById = async(id: string): Promise<IQueryResponse> => {
 
-        return database.query(`SELECT * FROM ${this.table} WHERE id = '${id}'`)
+        return database.query(`SELECT * FROM ${this.table} WHERE id = '${id}' AND role = 0`)
         .then((value) => {
             if(value.rowCount === 0) return {
                 ok: false,
@@ -108,26 +108,9 @@ class UsersRepository {
         });
     }
 
-    public getCount = async(): Promise<IQueryResponse> => {
-
-        return database.query(`SELECT * FROM ${this.table}`)
-        .then((value) => {
-            return {
-                ok: true,
-                data: value.rowCount
-            }
-        })
-        .catch((err) => {
-            return {
-                ok: false,
-                data: err.message
-            }
-        });
-    }
-
     public delete = async(id: string): Promise<IQueryResponse> => {
 
-        return database.query(`delete from ${this.table} WHERE id = '${id}'`)
+        return database.query(`delete from ${this.table} WHERE id = '${id}' AND role = 0`)
         .then((value) => {
             if(value.rowCount === 0) return {
                 ok: false,
