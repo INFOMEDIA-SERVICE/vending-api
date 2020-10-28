@@ -27,7 +27,7 @@ dotenv_1.default.config();
 const app_1 = __importStar(require("./app"));
 const main = () => {
     app_1.server.listen(app_1.default.get('port'));
-    require('./modules/socket/socket_routes');
+    require('./modules/machine/machine_routes');
     console.log(`Server on port ${app_1.default.get('port')}`);
 };
 main();

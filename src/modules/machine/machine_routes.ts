@@ -1,9 +1,22 @@
-import {Router} from 'express';
-import {machineController} from './machine_controller';
+import ws from 'ws'
+import { server } from '../../app';
+import { Request } from 'express';
+import url from 'url';
+import { socketController } from './machine_controller';
 
-const router:Router = Router();
+const wsServer: ws.Server = new ws.Server({ noServer: true });
 
-// router.get('/', userController.method);
-router.post('/dispense', machineController.dispense);
+wsServer.on('connection', socketController.onConnect);
 
-export default router;
+server.on('upgrade', (req: Request, socket, head) => {
+
+    const pathname: string = url.parse(req.url).pathname + '';
+    
+    if(pathname === '/vending/') {
+
+        wsServer.handleUpgrade(req, socket, head, socket => {
+            wsServer.emit('connection', socket, req);
+        });
+
+    }
+});

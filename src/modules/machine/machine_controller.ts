@@ -1,12 +1,22 @@
+import ws from 'ws';
 import mqtt from 'mqtt';
-import {Request, Response} from 'express';
-import { IQueryResponse } from '../../interfaces/postgres_responses';
+import { Request } from 'express';
+import { ISocketUser, socketUsers } from './machine_model';
+import EventEmitter from 'events';
 
-class MachineController {
+interface IMessage {
+    type?: number
+    data?: any
+}
+
+interface IProduct {
+    name: string
+    item: number
+}
+
+class SocketController {
 
     private topic: string = 'infomedia/vmc/novaventas/vmc0003';
-
-    private sucessProducts = [];
 
     private options: mqtt.IClientOptions = {
         clientId: 'infomedia-vmc0003',
@@ -14,37 +24,71 @@ class MachineController {
         password: 'infomedia',
         port: 10110
     };
-    
-    public dispense = async(req: Request, res: Response): Promise<void> => {
 
-        // await machineRepository.updateClientsRequest('');
+    public onConnect = async(socket: ws, req: Request): Promise<void> => {
 
-        const data: any[] = req.body.data;
+        console.log('User connected');
+        socket.on('message', (data) => this.onMessage(socket, data, req));
+
+    };
+
+    private onMessage = async(socket: ws, data: ws.Data, req: Request): Promise<void> => {
+
+        const message: IMessage = JSON.parse(data.toString());
+
+        switch (message.type) {
+            case 0: this.saveUser(socket, message); break;
+            case 1: this.dispense(socket, message); break;
+            default:
+                socket.send(JSON.stringify({
+                    type: -1,
+                    message: 'Type not found'
+                }));
+            break;
+        }
+    };
+
+    public dispense = async(socket: ws, message: IMessage): Promise<void> => {
 
         const client: mqtt.MqttClient = mqtt.connect('mqtt://iot.infomediaservice.com', this.options);
 
         client.subscribe(`${this.topic}`);
 
-        client.on('connect', async() => {
-            
-            const response: IQueryResponse = await this.dispenseSecuense(client, res, '15');
+        client.on('connect', () => {
 
-            res.send(response);
+            const products: IProduct[] = message.data;
+
+            // eventEmitter.on('event', () => {
+            //     console.log('event emitted!');
+            // });
+            // eventEmitter.emit('event');
+
+            for (let i = 0; i < products.length; i++) {
+
+                const product: IProduct = products[i];
+                
+                this.dispenseSecuense(client, socket, product, i === products.length - 1);
+
+            }
             
         });
     };
 
-    private dispenseSecuense = async(client: mqtt.MqttClient, res: Response, product: string): Promise<IQueryResponse> => {
-
-        let status: IQueryResponse = {
-            ok: true
-        };
+    private dispenseSecuense = (client: mqtt.MqttClient, socket: ws, product: IProduct, isLast: boolean) => {
 
         // STARTING
 
         client.publish(`${this.topic}`, 'vmstart');
 
-        client.on('message', async(data, message) => {
+        client.on('message', (_, message) => {
+
+            if(message.toString() === 'vmstart') {
+                return;
+            }
+
+            if(message.toString() === 'vmdeny') {
+                return;
+            }
 
             const response = JSON.parse(message.toString());
 
@@ -52,128 +96,84 @@ class MachineController {
 
             switch (response.action) {
 
-                case 'session.active': 
-                    status = {ok: true};
-                    client.publish(`${this.topic}`, `vmkey=${product}`);
+                case 'session.active':
+                    socket.send(JSON.stringify({
+                        type: 0,
+                        data: 'machine started'
+                    }));
+                    client.publish(`${this.topic}`, `vmkey=${product.item}`);
                 break;
-                case 'session.status': 
-                    status = {ok: false, data: 'The machine is busy'};
+
+                case 'session.status':
+                    client.end();
+                    socket.send(JSON.stringify({
+                        type: -1,
+                        data: 'the machine is busy'
+                    }));
                 break;
-            
-                default: status = {ok: false, data: 'Error to connect with machine'}; break;
+
+                case 'vend.request': 
+                    socket.send(JSON.stringify({
+                        type: 0,
+                        data: 'approving sale'
+                    }));
+                    client.publish(`${this.topic}`, `vmok`);
+                break;
+
+                case 'vend.approved':
+                    socket.send(JSON.stringify({
+                        type: 0,
+                        data: 'sale approved'
+                    }));
+                break;
+
+                case 'vend.fails': 
+                    socket.send(JSON.stringify({
+                        type: 0,
+                        data: `product ${product.name} not dispensed`
+                    }));
+                break;
+
+                case 'vend.sucess': 
+                    socket.send(JSON.stringify({
+                        type: 0,
+                        data: 'successful sale'
+                    }));
+                break;
+
+                default:
+
+                    client.end();
+                    
+                    if(isLast) socket.send(JSON.stringify({
+                        type: 0,
+                        data: 'sale finished'
+                    }));
+
+                break;
             }
+
+            return true;
         });
 
-        // // SENDING PRODUCTS
-
-        // if(!status.ok) return status;
-
-        await new Promise(resolve => setTimeout(resolve, 5000));
-        
-        return status;
     };
 
-    private start = (client: mqtt.MqttClient) => {
+    private saveUser = async(socket:ws, message:IMessage):Promise<void> => {
 
-        client.publish(`${this.topic}`, 'vmstart');
+        const user:ISocketUser = {
+            client: socket,
+            userId: message.data.userId,
+            userName: message.data.userName
+        };
 
-        return client.on('message', (data, message) => {
-            return JSON.parse(message.toString());
-        });
-    }
-
-    private selectProducts = (client: mqtt.MqttClient, products: string[]) => {
-        client.publish(`${this.topic}`, `vmkey=${products[0]}`);
-        return client.on('message', (data, message) => {
-            return JSON.parse(message.toString());
-        });
+        socketUsers.addUser(user);
     }
 }
 
-export const machineController = new MachineController;
- 
+export const socketController = new SocketController;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// let connected: boolean = false;
-
-//             console.log('CONNECTED');
-
-//             let products: object[] = [];
-
-//             data.forEach(product => {
-//                 products.push({
-//                     item: product.item,
-//                     qty: product.quantity
-//                 });
-//             });
-
-//             let order = {
-//                 // action: 'vend.reset',
-//                 action: 'vend.request',
-//                 mid: 'STM32-123456789JVKJVHJjuidwW',
-//                 tid: uuidv4(),
-//                 credit: -1,
-//                 products
-//             };
-
-//             client.publish(`${this.topic}`, JSON.stringify(order), {qos: 1, retain: true});
-//             client.subscribe([
-//                 `${this.topic}`,
-//                 // 'infomedia/vmc/machinewallet/vmc0003/cless'
-//             ]);
-
-//             // setTimeout(() => {
-
-//             //     if(!connected) res.send({
-//             //         ok: false,
-//             //         message: 'The machine is off'
-//             //     })
-//             // }, 3000);
-    
-//             client.on('message', (topic: string, message: Buffer) => {
-
-//                 console.log('CONNECTED TO', topic);
-//                 console.log(message.toString());
-//                 // console.log(packet);
-
-//                 // if (topic === 'infomedia/vmc/machinewallet/vmc0003/vend') {
-
-//                 //     connected = true;
-                    
-//                 //     console.log('CONNECTED TO TOPIC');
-//                 //     console.log(message.toString());
-//                 //     console.log(packet.cmd);
-
-//                 //     // client.publish('infomedia/vmc/machinewallet/vmc0003/vend', JSON.stringify({action: 'session.status'}))
-
-//                 //     // client.end();
-//                 // }
-//             });
+/*
+    type:
+        -1: Error
+        0: new Connection || Save || OK
+*/

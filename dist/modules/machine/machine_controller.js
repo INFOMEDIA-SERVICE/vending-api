@@ -12,109 +12,132 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.machineController = void 0;
+exports.socketController = void 0;
 const mqtt_1 = __importDefault(require("mqtt"));
-class MachineController {
+const machine_model_1 = require("./machine_model");
+class SocketController {
     constructor() {
         this.topic = 'infomedia/vmc/novaventas/vmc0003';
-        this.sucessProducts = [];
         this.options = {
             clientId: 'infomedia-vmc0003',
             username: 'infomedia',
             password: 'infomedia',
             port: 10110
         };
-        this.dispense = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            // await machineRepository.updateClientsRequest('');
-            const data = req.body.data;
+        this.onConnect = (socket, req) => __awaiter(this, void 0, void 0, function* () {
+            console.log('User connected');
+            socket.on('message', (data) => this.onMessage(socket, data, req));
+        });
+        this.onMessage = (socket, data, req) => __awaiter(this, void 0, void 0, function* () {
+            const message = JSON.parse(data.toString());
+            switch (message.type) {
+                case 0:
+                    this.saveUser(socket, message);
+                    break;
+                case 1:
+                    this.dispense(socket, message);
+                    break;
+                default:
+                    socket.send(JSON.stringify({
+                        type: -1,
+                        message: 'Type not found'
+                    }));
+                    break;
+            }
+        });
+        this.dispense = (socket, message) => __awaiter(this, void 0, void 0, function* () {
             const client = mqtt_1.default.connect('mqtt://iot.infomediaservice.com', this.options);
             client.subscribe(`${this.topic}`);
-            client.on('connect', () => __awaiter(this, void 0, void 0, function* () {
-                const response = yield this.dispenseSecuense(client, res, '15');
-                res.send(response);
-            }));
+            client.on('connect', () => {
+                const products = message.data;
+                // eventEmitter.on('event', () => {
+                //     console.log('event emitted!');
+                // });
+                // eventEmitter.emit('event');
+                for (let i = 0; i < products.length; i++) {
+                    const product = products[i];
+                    this.dispenseSecuense(client, socket, product, i === products.length - 1);
+                }
+            });
         });
-        this.dispenseSecuense = (client, res, product) => __awaiter(this, void 0, void 0, function* () {
-            let status = {
-                ok: true
-            };
+        this.dispenseSecuense = (client, socket, product, isLast) => {
             // STARTING
             client.publish(`${this.topic}`, 'vmstart');
-            client.on('message', (data, message) => __awaiter(this, void 0, void 0, function* () {
+            client.on('message', (_, message) => {
+                if (message.toString() === 'vmstart') {
+                    return;
+                }
+                if (message.toString() === 'vmdeny') {
+                    return;
+                }
                 const response = JSON.parse(message.toString());
                 console.log(response);
                 switch (response.action) {
                     case 'session.active':
-                        status = { ok: true };
-                        client.publish(`${this.topic}`, `vmkey=${product}`);
+                        socket.send(JSON.stringify({
+                            type: 0,
+                            data: 'machine started'
+                        }));
+                        client.publish(`${this.topic}`, `vmkey=${product.item}`);
                         break;
                     case 'session.status':
-                        status = { ok: false, data: 'The machine is busy' };
+                        client.end();
+                        socket.send(JSON.stringify({
+                            type: -1,
+                            data: 'the machine is busy'
+                        }));
+                        break;
+                    case 'vend.request':
+                        socket.send(JSON.stringify({
+                            type: 0,
+                            data: 'approving sale'
+                        }));
+                        client.publish(`${this.topic}`, `vmok`);
+                        break;
+                    case 'vend.approved':
+                        socket.send(JSON.stringify({
+                            type: 0,
+                            data: 'sale approved'
+                        }));
+                        break;
+                    case 'vend.fails':
+                        socket.send(JSON.stringify({
+                            type: 0,
+                            data: `product ${product.name} not dispensed`
+                        }));
+                        break;
+                    case 'vend.sucess':
+                        socket.send(JSON.stringify({
+                            type: 0,
+                            data: 'successful sale'
+                        }));
                         break;
                     default:
-                        status = { ok: false, data: 'Error to connect with machine' };
+                        client.end();
+                        if (isLast)
+                            socket.send(JSON.stringify({
+                                type: 0,
+                                data: 'sale finished'
+                            }));
                         break;
                 }
-            }));
-            // // SENDING PRODUCTS
-            // if(!status.ok) return status;
-            yield new Promise(resolve => setTimeout(resolve, 5000));
-            return status;
+                return true;
+            });
+        };
+        this.saveUser = (socket, message) => __awaiter(this, void 0, void 0, function* () {
+            const user = {
+                client: socket,
+                userId: message.data.userId,
+                userName: message.data.userName
+            };
+            machine_model_1.socketUsers.addUser(user);
         });
-        this.start = (client) => {
-            client.publish(`${this.topic}`, 'vmstart');
-            return client.on('message', (data, message) => {
-                return JSON.parse(message.toString());
-            });
-        };
-        this.selectProducts = (client, products) => {
-            client.publish(`${this.topic}`, `vmkey=${products[0]}`);
-            return client.on('message', (data, message) => {
-                return JSON.parse(message.toString());
-            });
-        };
     }
 }
-exports.machineController = new MachineController;
-// let connected: boolean = false;
-//             console.log('CONNECTED');
-//             let products: object[] = [];
-//             data.forEach(product => {
-//                 products.push({
-//                     item: product.item,
-//                     qty: product.quantity
-//                 });
-//             });
-//             let order = {
-//                 // action: 'vend.reset',
-//                 action: 'vend.request',
-//                 mid: 'STM32-123456789JVKJVHJjuidwW',
-//                 tid: uuidv4(),
-//                 credit: -1,
-//                 products
-//             };
-//             client.publish(`${this.topic}`, JSON.stringify(order), {qos: 1, retain: true});
-//             client.subscribe([
-//                 `${this.topic}`,
-//                 // 'infomedia/vmc/machinewallet/vmc0003/cless'
-//             ]);
-//             // setTimeout(() => {
-//             //     if(!connected) res.send({
-//             //         ok: false,
-//             //         message: 'The machine is off'
-//             //     })
-//             // }, 3000);
-//             client.on('message', (topic: string, message: Buffer) => {
-//                 console.log('CONNECTED TO', topic);
-//                 console.log(message.toString());
-//                 // console.log(packet);
-//                 // if (topic === 'infomedia/vmc/machinewallet/vmc0003/vend') {
-//                 //     connected = true;
-//                 //     console.log('CONNECTED TO TOPIC');
-//                 //     console.log(message.toString());
-//                 //     console.log(packet.cmd);
-//                 //     // client.publish('infomedia/vmc/machinewallet/vmc0003/vend', JSON.stringify({action: 'session.status'}))
-//                 //     // client.end();
-//                 // }
-//             });
+exports.socketController = new SocketController;
+/*
+    type:
+        -1: Error
+        0: new Connection || Save || OK
+*/
 //# sourceMappingURL=machine_controller.js.map

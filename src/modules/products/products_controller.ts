@@ -6,7 +6,7 @@ class ProductsController {
 
     public create = async(req: Request, res: Response):Promise<void> => {
 
-        const response:IQueryResponse = await productsRepository.create(req.body);
+        const response: IQueryResponse = await productsRepository.create(req.body);
 
         if(response.ok) {
             res.send({
@@ -23,7 +23,7 @@ class ProductsController {
 
     public getAll = async(req: Request, res: Response):Promise<void> => {
 
-        const response = await productsRepository.getAll();
+        const response: IQueryResponse = await productsRepository.getAll();
 
         if(response.ok) {
             res.send({
@@ -41,7 +41,7 @@ class ProductsController {
 
     public getCount = async(req: Request, res: Response):Promise<void> => {
         
-        const response = await productsRepository.getCount();
+        const response: IQueryResponse = await productsRepository.getCount();
 
         if(response.ok) {
             res.send({
@@ -59,7 +59,7 @@ class ProductsController {
 
     public getById = async(req: Request, res: Response):Promise<void> => {
 
-        const response = await productsRepository.getById(req.params.id);
+        const response: IQueryResponse = await productsRepository.getById(req.params.id);
 
         if(response.ok) {
             res.send({
@@ -77,7 +77,7 @@ class ProductsController {
 
     public update = async(req: Request, res: Response):Promise<void> => {
 
-        const response:IQueryResponse = await productsRepository.update(req.params.id, req.body);
+        const response: IQueryResponse = await productsRepository.update(req.params.id, req.body);
 
         if(response.ok) {
             res.send({
@@ -94,7 +94,7 @@ class ProductsController {
 
     public delete = async(req: Request, res: Response):Promise<void> => {
 
-        const response:IQueryResponse = await productsRepository.delete(req.params.id);
+        const response: IQueryResponse = await productsRepository.delete(req.params.id);
 
         if(response.ok) {
             res.send({

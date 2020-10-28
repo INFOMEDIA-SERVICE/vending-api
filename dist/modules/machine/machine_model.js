@@ -22,4 +22,4 @@ class SocketUsers {
     }
 }
 exports.socketUsers = new SocketUsers();
-//# sourceMappingURL=socket_model.js.map
+//# sourceMappingURL=machine_model.js.map

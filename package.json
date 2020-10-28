@@ -12,6 +12,7 @@
     "license": "ISC",
     "dependencies": {
         "bcryptjs": "*",
+        "cors": "^2.8.5",
         "dotenv": "*",
         "express": "*",
         "jsonwebtoken": "*",
@@ -25,6 +26,7 @@
     },
     "devDependencies": {
         "@types/bcryptjs": "*",
+        "@types/cors": "^2.8.8",
         "@types/dotenv": "*",
         "@types/express": "*",
         "@types/jsonwebtoken": "*",
