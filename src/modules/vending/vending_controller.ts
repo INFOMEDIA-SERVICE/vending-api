@@ -15,7 +15,7 @@ class VendingController {
                 vending: response.data
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });
@@ -32,7 +32,7 @@ class VendingController {
                 products: response.data
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });
@@ -50,7 +50,7 @@ class VendingController {
                 vendings: response.data
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });
@@ -68,7 +68,7 @@ class VendingController {
                 count: response.data
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });
@@ -86,7 +86,7 @@ class VendingController {
                 vending: response.data
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });
@@ -104,7 +104,7 @@ class VendingController {
                 vending: response.data
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });
@@ -121,7 +121,7 @@ class VendingController {
                 message: 'Product deleted successfully'
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });

@@ -57,6 +57,7 @@ class SocketController {
             client.subscribe(`${this.topic}`);
             client.on('connect', () => {
                 const products = message.data.products;
+                console.log(products.length);
                 let counter = 0;
                 listener.on('next', () => {
                     if (counter < products.length) {

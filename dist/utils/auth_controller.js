@@ -19,20 +19,20 @@ class AuthController {
             const token = req.headers.authorization + '';
             return jsonwebtoken_1.default.verify(token, process.env.TOKEN_KEY + '', (err) => {
                 if (err)
-                    return res.send({
+                    return res.status(401).json({
                         ok: false,
                         message: err.message
                     });
                 const user = jwt_decode_1.default(token);
                 if (user.role !== 2)
                     if (user.role !== 0)
-                        return res.send({
+                        return res.status(401).json({
                             ok: false,
                             message: 'Rol inválido'
                         });
                 req.body.user = user;
                 next();
-                // return res.send({
+                // return res.status(401).json({
                 //     ok: true,
                 //     user
                 // });
@@ -42,7 +42,7 @@ class AuthController {
             const token = req.headers.authorization + '';
             return jsonwebtoken_1.default.verify(token, process.env.TOKEN_KEY + '', (err) => {
                 if (err)
-                    return res.send({
+                    return res.status(401).json({
                         ok: false,
                         message: err.message
                     });
@@ -59,14 +59,14 @@ class AuthController {
             const token = req.headers.authorization + '';
             return jsonwebtoken_1.default.verify(token, process.env.TOKEN_KEY + '', (err) => {
                 if (err)
-                    return res.send({
+                    return res.status(401).json({
                         ok: false,
                         message: err.message
                     });
                 const user = jwt_decode_1.default(token);
                 if (user.role !== 2)
                     if (user.role !== 1)
-                        return res.send({
+                        return res.status(401).json({
                             ok: false,
                             message: 'Rol inválido'
                         });
@@ -82,13 +82,13 @@ class AuthController {
             const token = req.headers.authorization + '';
             return jsonwebtoken_1.default.verify(token, process.env.TOKEN_KEY + '', (err) => {
                 if (err)
-                    return res.send({
+                    return res.status(401).json({
                         ok: false,
                         message: err.message
                     });
                 const user = jwt_decode_1.default(token);
                 if (user.role !== 2)
-                    return res.send({
+                    return res.status(401).json({
                         ok: false,
                         message: 'Rol inválido'
                     });

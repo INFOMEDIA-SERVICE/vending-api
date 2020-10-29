@@ -19,14 +19,14 @@ class AuthController {
 
         return jwt.verify(token, process.env.TOKEN_KEY + '', (err) => {
 
-            if(err) return res.send({
+            if(err) return res.status(401).json({
                 ok: false,
                 message: err.message
             });
 
             const user: IUser = jwt_decode(token);
 
-            if(user.role !== 2) if(user.role !== 0) return res.send({
+            if(user.role !== 2) if(user.role !== 0) return res.status(401).json({
                 ok: false,
                 message: 'Rol inválido'
             });
@@ -35,7 +35,7 @@ class AuthController {
 
             next();
     
-            // return res.send({
+            // return res.status(401).json({
             //     ok: true,
             //     user
             // });
@@ -49,7 +49,7 @@ class AuthController {
 
         return jwt.verify(token, process.env.TOKEN_KEY + '', (err) => {
         
-            if(err) return res.send({
+            if(err) return res.status(401).json({
                 ok: false,
                 message: err.message
             })
@@ -74,14 +74,14 @@ class AuthController {
 
         return jwt.verify(token, process.env.TOKEN_KEY + '', (err) => {
         
-            if(err) return res.send({
+            if(err) return res.status(401).json({
                 ok: false,
                 message: err.message
             })
 
             const user: IUser = jwt_decode(token);
 
-            if(user.role !== 2) if(user.role !== 1) return res.send({
+            if(user.role !== 2) if(user.role !== 1) return res.status(401).json({
                 ok: false,
                 message: 'Rol inválido'
             });
@@ -104,14 +104,14 @@ class AuthController {
 
         return jwt.verify(token, process.env.TOKEN_KEY + '', (err) => {
         
-            if(err) return res.send({
+            if(err) return res.status(401).json({
                 ok: false,
                 message: err.message
             });
 
             const user: IUser = jwt_decode(token);
 
-            if(user.role !== 2) return res.send({
+            if(user.role !== 2) return res.status(401).json({
                 ok: false,
                 message: 'Rol inválido'
             });

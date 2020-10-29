@@ -14,7 +14,7 @@ class ProductsController {
                 product: response.data
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });
@@ -31,25 +31,7 @@ class ProductsController {
                 products: response.data
             });
         } else {
-            res.send({
-                ok: false,
-                message: response.data
-            });
-        }
-
-    };
-
-    public getCount = async(req: Request, res: Response):Promise<void> => {
-        
-        const response: IQueryResponse = await productsRepository.getCount();
-
-        if(response.ok) {
-            res.send({
-                ok: true,
-                count: response.data
-            });
-        } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });
@@ -67,7 +49,7 @@ class ProductsController {
                 product: response.data
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });
@@ -85,7 +67,7 @@ class ProductsController {
                 product: response.data
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });
@@ -102,7 +84,7 @@ class ProductsController {
                 message: 'Product deleted successfully'
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });

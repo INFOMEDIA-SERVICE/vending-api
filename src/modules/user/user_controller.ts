@@ -12,7 +12,7 @@ class UserController {
         const {first_name, last_name, email, password}: IUser = req.body;
 
         if(!first_name || first_name.match(' ')) {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: 'Invalid first_name'
             });
@@ -20,7 +20,7 @@ class UserController {
         }
 
         if(!last_name || last_name.match(' ')) {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: 'Invalid last_name'
             });
@@ -45,7 +45,7 @@ class UserController {
                 token
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });
@@ -80,7 +80,7 @@ class UserController {
                 token
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });
@@ -101,7 +101,7 @@ class UserController {
                 users: response.data
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });
@@ -122,7 +122,7 @@ class UserController {
                 user: response.data
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });
@@ -141,7 +141,7 @@ class UserController {
                 user: response.data
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });
@@ -159,7 +159,7 @@ class UserController {
                 user: response.data
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });
@@ -176,7 +176,7 @@ class UserController {
                 message: 'User deleted successfully'
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });

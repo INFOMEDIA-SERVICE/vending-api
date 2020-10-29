@@ -68,6 +68,8 @@ class SocketController {
 
             const products: IProduct[] = message.data.products;
 
+            console.log(products.length);
+
             let counter = 0;
 
             listener.on('next', () => {

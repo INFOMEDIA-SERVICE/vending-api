@@ -15,7 +15,7 @@ class UsersRepository {
     constructor() {
         this.table = 'users';
         this.signup = (user) => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`insert into ${this.table}(first_name, last_name, email, password, role) values('${user.first_name}', '${user.last_name}', '${user.email}', '${user.password}, 0') RETURNING *`)
+            return database_1.database.query(`insert into ${this.table}(first_name, last_name, email, password, role) values('${user.first_name}', '${user.last_name}', '${user.email}', '${user.password}', 0) RETURNING *`)
                 .then((value) => {
                 return {
                     ok: true,
@@ -23,6 +23,7 @@ class UsersRepository {
                 };
             })
                 .catch((err) => {
+                console.log(err);
                 return {
                     ok: false,
                     data: err.message

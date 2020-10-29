@@ -51,7 +51,7 @@ class AdminController {
                 });
             }
             else {
-                res.send({
+                res.status(400).json({
                     ok: false,
                     message: response.data
                 });
@@ -78,7 +78,7 @@ class AdminController {
                 });
             }
             else {
-                res.send({
+                res.status(400).json({
                     ok: false,
                     message: response.data
                 });
@@ -97,7 +97,7 @@ class AdminController {
                 });
             }
             else {
-                res.send({
+                res.status(400).json({
                     ok: false,
                     message: response.data
                 });
@@ -113,7 +113,7 @@ class AdminController {
                 });
             }
             else {
-                res.send({
+                res.status(400).json({
                     ok: false,
                     message: response.data
                 });
@@ -130,7 +130,7 @@ class AdminController {
                 });
             }
             else {
-                res.send({
+                res.status(400).json({
                     ok: false,
                     message: response.data
                 });
@@ -145,7 +145,7 @@ class AdminController {
                 });
             }
             else {
-                res.send({
+                res.status(400).json({
                     ok: false,
                     message: response.data
                 });
@@ -160,7 +160,7 @@ class AdminController {
                 });
             }
             else {
-                res.send({
+                res.status(400).json({
                     ok: false,
                     message: response.data
                 });

@@ -21,14 +21,14 @@ class UserController {
         this.signup = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { first_name, last_name, email, password } = req.body;
             if (!first_name || first_name.match(' ')) {
-                res.send({
+                res.status(400).json({
                     ok: false,
                     message: 'Invalid first_name'
                 });
                 return;
             }
             if (!last_name || last_name.match(' ')) {
-                res.send({
+                res.status(400).json({
                     ok: false,
                     message: 'Invalid last_name'
                 });
@@ -51,7 +51,7 @@ class UserController {
                 });
             }
             else {
-                res.send({
+                res.status(400).json({
                     ok: false,
                     message: response.data
                 });
@@ -78,7 +78,7 @@ class UserController {
                 });
             }
             else {
-                res.send({
+                res.status(400).json({
                     ok: false,
                     message: response.data
                 });
@@ -97,7 +97,7 @@ class UserController {
                 });
             }
             else {
-                res.send({
+                res.status(400).json({
                     ok: false,
                     message: response.data
                 });
@@ -114,7 +114,7 @@ class UserController {
                 });
             }
             else {
-                res.send({
+                res.status(400).json({
                     ok: false,
                     message: response.data
                 });
@@ -130,7 +130,7 @@ class UserController {
                 });
             }
             else {
-                res.send({
+                res.status(400).json({
                     ok: false,
                     message: response.data
                 });
@@ -145,7 +145,7 @@ class UserController {
                 });
             }
             else {
-                res.send({
+                res.status(400).json({
                     ok: false,
                     message: response.data
                 });
@@ -160,7 +160,7 @@ class UserController {
                 });
             }
             else {
-                res.send({
+                res.status(400).json({
                     ok: false,
                     message: response.data
                 });

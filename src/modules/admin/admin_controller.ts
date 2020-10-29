@@ -47,7 +47,7 @@ class AdminController {
                 token
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });
@@ -82,7 +82,7 @@ class AdminController {
                 token
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });
@@ -103,7 +103,7 @@ class AdminController {
                 admins: response.data
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });
@@ -122,7 +122,7 @@ class AdminController {
                 client: response.data
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });
@@ -143,7 +143,7 @@ class AdminController {
                 client: response.data
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });
@@ -161,7 +161,7 @@ class AdminController {
                 client: response.data
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });
@@ -178,7 +178,7 @@ class AdminController {
                 message: 'Admin deleted successfully'
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });

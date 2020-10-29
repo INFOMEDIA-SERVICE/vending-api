@@ -11,7 +11,7 @@ class ClientsController {
         const {first_name, last_name, email, password}: IUser = req.body;
 
         if(!first_name || first_name.match(' ')) {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: 'Invalid first_name'
             });
@@ -19,7 +19,7 @@ class ClientsController {
         }
 
         if(!last_name || last_name.match(' ')) {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: 'Invalid last_name'
             });
@@ -42,7 +42,7 @@ class ClientsController {
                 user: response.data
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });
@@ -74,7 +74,7 @@ class ClientsController {
                 client: response.data
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });
@@ -95,7 +95,7 @@ class ClientsController {
                 clients: response.data
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });
@@ -114,7 +114,7 @@ class ClientsController {
                 client: response.data
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });
@@ -135,7 +135,7 @@ class ClientsController {
                 client: response.data
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });
@@ -153,7 +153,7 @@ class ClientsController {
                 client: response.data
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });
@@ -170,7 +170,7 @@ class ClientsController {
                 message: 'User deleted successfully'
             });
         } else {
-            res.send({
+            res.status(400).json({
                 ok: false,
                 message: response.data
             });

@@ -22,7 +22,7 @@ class VendingController {
                 });
             }
             else {
-                res.send({
+                res.status(400).json({
                     ok: false,
                     message: response.data
                 });
@@ -37,7 +37,7 @@ class VendingController {
                 });
             }
             else {
-                res.send({
+                res.status(400).json({
                     ok: false,
                     message: response.data
                 });
@@ -52,7 +52,7 @@ class VendingController {
                 });
             }
             else {
-                res.send({
+                res.status(400).json({
                     ok: false,
                     message: response.data
                 });
@@ -67,7 +67,7 @@ class VendingController {
                 });
             }
             else {
-                res.send({
+                res.status(400).json({
                     ok: false,
                     message: response.data
                 });
@@ -82,7 +82,7 @@ class VendingController {
                 });
             }
             else {
-                res.send({
+                res.status(400).json({
                     ok: false,
                     message: response.data
                 });
@@ -97,7 +97,7 @@ class VendingController {
                 });
             }
             else {
-                res.send({
+                res.status(400).json({
                     ok: false,
                     message: response.data
                 });
@@ -112,7 +112,7 @@ class VendingController {
                 });
             }
             else {
-                res.send({
+                res.status(400).json({
                     ok: false,
                     message: response.data
                 });

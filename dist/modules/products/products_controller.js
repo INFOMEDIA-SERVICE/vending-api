@@ -22,7 +22,7 @@ class ProductsController {
                 });
             }
             else {
-                res.send({
+                res.status(400).json({
                     ok: false,
                     message: response.data
                 });
@@ -37,22 +37,7 @@ class ProductsController {
                 });
             }
             else {
-                res.send({
-                    ok: false,
-                    message: response.data
-                });
-            }
-        });
-        this.getCount = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const response = yield products_repository_1.productsRepository.getCount();
-            if (response.ok) {
-                res.send({
-                    ok: true,
-                    count: response.data
-                });
-            }
-            else {
-                res.send({
+                res.status(400).json({
                     ok: false,
                     message: response.data
                 });
@@ -67,7 +52,7 @@ class ProductsController {
                 });
             }
             else {
-                res.send({
+                res.status(400).json({
                     ok: false,
                     message: response.data
                 });
@@ -82,7 +67,7 @@ class ProductsController {
                 });
             }
             else {
-                res.send({
+                res.status(400).json({
                     ok: false,
                     message: response.data
                 });
@@ -97,7 +82,7 @@ class ProductsController {
                 });
             }
             else {
-                res.send({
+                res.status(400).json({
                     ok: false,
                     message: response.data
                 });

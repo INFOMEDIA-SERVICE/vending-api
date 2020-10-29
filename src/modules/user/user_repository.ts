@@ -9,7 +9,7 @@ class UsersRepository {
     public signup = async(user: IUser): Promise<IQueryResponse> => {
 
         return database.query(
-            `insert into ${this.table}(first_name, last_name, email, password, role) values('${user.first_name}', '${user.last_name}', '${user.email}', '${user.password}, 0') RETURNING *`
+            `insert into ${this.table}(first_name, last_name, email, password, role) values('${user.first_name}', '${user.last_name}', '${user.email}', '${user.password}', 0) RETURNING *`
         )
         .then((value) => {
             return {
@@ -18,6 +18,7 @@ class UsersRepository {
             }
         })
         .catch((err) => {
+            console.log(err);
             return {
                 ok: false,
                 data: err.message
