@@ -15,6 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.socketController = void 0;
 const mqtt_1 = __importDefault(require("mqtt"));
 const machine_model_1 = require("./machine_model");
+const events_1 = require("events");
+const timers_1 = require("timers");
+class Emitter extends events_1.EventEmitter {
+}
 class SocketController {
     constructor() {
         this.topic = 'infomedia/vmc/novaventas/vmc0003';
@@ -46,21 +50,27 @@ class SocketController {
             }
         });
         this.dispense = (socket, message) => __awaiter(this, void 0, void 0, function* () {
-            const client = mqtt_1.default.connect('mqtt://iot.infomediaservice.com', this.options);
+            const listener = new Emitter();
+            let client = mqtt_1.default.connect('mqtt://iot.infomediaservice.com', this.options);
             client.subscribe(`${this.topic}`);
             client.on('connect', () => {
-                const products = message.data;
-                // eventEmitter.on('event', () => {
-                //     console.log('event emitted!');
-                // });
-                // eventEmitter.emit('event');
-                for (let i = 0; i < products.length; i++) {
-                    const product = products[i];
-                    this.dispenseSecuense(client, socket, product, i === products.length - 1);
-                }
+                const products = message.data.products;
+                let counter = 0;
+                listener.on('next', () => {
+                    console.log(`Product #${counter + 1}`);
+                    if (counter < products.length) {
+                        if (counter > 0) {
+                            client = mqtt_1.default.connect('mqtt://iot.infomediaservice.com', this.options);
+                            client.subscribe(`${this.topic}`);
+                        }
+                        this.dispenseSecuense(client, socket, products[counter], listener, counter === products.length - 1);
+                        counter++;
+                    }
+                });
+                listener.emit('next');
             });
         });
-        this.dispenseSecuense = (client, socket, product, isLast) => {
+        this.dispenseSecuense = (client, socket, product, listener, isLast) => {
             // STARTING
             client.publish(`${this.topic}`, 'vmstart');
             client.on('message', (_, message) => {
@@ -81,7 +91,7 @@ class SocketController {
                         client.publish(`${this.topic}`, `vmkey=${product.item}`);
                         break;
                     case 'session.status':
-                        client.end();
+                        // client.end();
                         socket.send(JSON.stringify({
                             type: -1,
                             data: 'the machine is busy'
@@ -112,13 +122,18 @@ class SocketController {
                             data: 'successful sale'
                         }));
                         break;
-                    default:
+                    case 'session.closed':
                         client.end();
+                        timers_1.setTimeout(() => {
+                            listener.emit('next');
+                        }, 3000);
                         if (isLast)
                             socket.send(JSON.stringify({
                                 type: 0,
                                 data: 'sale finished'
                             }));
+                        break;
+                    default:
                         break;
                 }
                 return true;

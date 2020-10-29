@@ -2,7 +2,8 @@ import ws from 'ws';
 import mqtt from 'mqtt';
 import { Request } from 'express';
 import { ISocketUser, socketUsers } from './machine_model';
-import EventEmitter from 'events';
+import { EventEmitter } from 'events';
+import { setTimeout } from 'timers';
 
 interface IMessage {
     type?: number
@@ -13,6 +14,8 @@ interface IProduct {
     name: string
     item: number
 }
+
+class Emitter extends EventEmitter {}
 
 class SocketController {
 
@@ -50,31 +53,48 @@ class SocketController {
 
     public dispense = async(socket: ws, message: IMessage): Promise<void> => {
 
-        const client: mqtt.MqttClient = mqtt.connect('mqtt://iot.infomediaservice.com', this.options);
+        const listener: Emitter = new Emitter();
+
+        let client: mqtt.MqttClient = mqtt.connect('mqtt://iot.infomediaservice.com', this.options);
 
         client.subscribe(`${this.topic}`);
 
         client.on('connect', () => {
 
-            const products: IProduct[] = message.data;
+            const products: IProduct[] = message.data.products;
 
-            // eventEmitter.on('event', () => {
-            //     console.log('event emitted!');
-            // });
-            // eventEmitter.emit('event');
+            let counter = 0;
 
-            for (let i = 0; i < products.length; i++) {
+            listener.on('next', () => {
 
-                const product: IProduct = products[i];
-                
-                this.dispenseSecuense(client, socket, product, i === products.length - 1);
+                console.log(`Product #${counter+1}`);
 
-            }
-            
+                if(counter < products.length) {
+
+                    if(counter > 0) {
+
+                        client = mqtt.connect('mqtt://iot.infomediaservice.com', this.options);
+
+                        client.subscribe(`${this.topic}`);
+                    }
+                    
+                    this.dispenseSecuense(
+                        client,
+                        socket,
+                        products[counter],
+                        listener,
+                        counter === products.length - 1
+                    );
+
+                    counter++;
+                }
+            });
+
+            listener.emit('next');
         });
     };
 
-    private dispenseSecuense = (client: mqtt.MqttClient, socket: ws, product: IProduct, isLast: boolean) => {
+    private dispenseSecuense = (client: mqtt.MqttClient, socket: ws, product: IProduct, listener: Emitter, isLast: boolean) => {
 
         // STARTING
 
@@ -105,7 +125,7 @@ class SocketController {
                 break;
 
                 case 'session.status':
-                    client.end();
+                    // client.end();
                     socket.send(JSON.stringify({
                         type: -1,
                         data: 'the machine is busy'
@@ -127,29 +147,37 @@ class SocketController {
                     }));
                 break;
 
-                case 'vend.fails': 
+                case 'vend.fails':
                     socket.send(JSON.stringify({
                         type: 0,
                         data: `product ${product.name} not dispensed`
                     }));
                 break;
 
-                case 'vend.sucess': 
+                case 'vend.sucess':
                     socket.send(JSON.stringify({
                         type: 0,
                         data: 'successful sale'
                     }));
                 break;
 
-                default:
+                case 'session.closed':
 
                     client.end();
+                    
+                    setTimeout(() => {
+                        listener.emit('next');
+                    }, 3000);
                     
                     if(isLast) socket.send(JSON.stringify({
                         type: 0,
                         data: 'sale finished'
                     }));
+                break;
 
+                default:
+
+                    
                 break;
             }
 
