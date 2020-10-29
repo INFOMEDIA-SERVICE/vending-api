@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import { IQueryResponse } from '../../interfaces/postgres_responses';
 import { adminsRepository } from './admin_repository';
 import { IUser } from '../user/users_model';
+import { authController } from '../../utils/auth_controller';
 
 class AdminController {
 
@@ -34,12 +35,16 @@ class AdminController {
             email,
             password: newPass
         });
+
+        
         
         if(response.ok) {
             delete response.data.password;
+            const token: string = authController.generateToken(response.data);
             res.send({
                 ok: true,
-                user: response.data
+                user: response.data,
+                token
             });
         } else {
             res.send({
@@ -68,10 +73,13 @@ class AdminController {
             }
 
             delete response.data.password;
+
+            const token: string = authController.generateToken(response.data);
             
             res.send({
                 ok: true,
-                client: response.data
+                user: response.data,
+                token
             });
         } else {
             res.send({

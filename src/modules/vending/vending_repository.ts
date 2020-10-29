@@ -10,8 +10,7 @@ class VendingRepository {
 
         return database.query(
             `insert into ${this.table}(name, machine_id) values('${vending.name}', '${vending.machine_id}') RETURNING *`
-        )
-        .then((value) => {
+        ).then((value) => {
             return {
                 ok: true,
                 data: value.rows[0]
@@ -27,8 +26,9 @@ class VendingRepository {
 
     public getVendingProducts = async(id: string): Promise<IQueryResponse> => {
 
-        return database.query(`SELECT * FROM products WHERE machine_id = '${id}'`)
-        .then((value) => {
+        return database.query(
+            `SELECT * FROM products WHERE machine_id = '${id}' AND status = true`
+        ).then((value) => {
             return {
                 ok: true,
                 data: value.rows
@@ -44,8 +44,9 @@ class VendingRepository {
 
     public getAll = async(): Promise<IQueryResponse> => {
 
-        return database.query(`SELECT * FROM ${this.table}`)
-        .then((value) => {
+        return database.query(
+            `SELECT * FROM ${this.table} WHERE status = true`
+        ).then((value) => {
             return {
                 ok: true,
                 data: value.rows
@@ -61,8 +62,9 @@ class VendingRepository {
 
     public getById = async(id: string): Promise<IQueryResponse> => {
 
-        return database.query(`SELECT * FROM ${this.table} WHERE id = '${id}'`)
-        .then((value) => {
+        return database.query(
+            `SELECT * FROM ${this.table} WHERE id = '${id}' AND status = true`
+        ).then((value) => {
             if(value.rowCount === 0) return {
                 ok: false,
                 data: 'User not found'
@@ -82,9 +84,9 @@ class VendingRepository {
 
     public update = async(id: string, vending: IVending): Promise<IQueryResponse> => {
 
-        return database.query(`UPDATE ${this.table} SET(name, machine_id) = ('${vending.name}', '${vending.machine_id}') WHERE id = '${id}' RETURNING *`)
-
-        .then(async(value) => {
+        return database.query(
+            `UPDATE ${this.table} SET(name, machine_id) = ('${vending.name}', '${vending.machine_id}') WHERE id = '${id}' AND status = true RETURNING *`
+        ).then(async(value) => {
         
             if(value.rowCount === 0) return {
                 ok: false,
@@ -94,23 +96,6 @@ class VendingRepository {
             return {
                 ok: true,
                 data: value.rows[0]
-            }
-        })
-        .catch((err) => {
-            return {
-                ok: false,
-                data: err.message
-            }
-        });
-    }
-
-    public getCount = async(): Promise<IQueryResponse> => {
-
-        return database.query(`SELECT * FROM ${this.table}`)
-        .then((value) => {
-            return {
-                ok: true,
-                data: value.rowCount
             }
         })
         .catch((err) => {

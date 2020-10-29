@@ -3,8 +3,11 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE IF NOT EXISTS products(
     id varchar(64) NOT NULL DEFAULT uuid_generate_v4(),
     name text NOT NULL CHECK (name <> ''),
-    price BIGINT NOT NULL,
+    price integer NOT NULL,
     image text,
+    description text,
+    quantity integer DEFAULT 0,
+    item text NOT NULL,
     machine_id TEXT NOT NULL CHECK (machine_id <> ''),
     status BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT NOW(),

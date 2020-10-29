@@ -52,13 +52,15 @@ class SocketController {
         this.dispense = (socket, message) => __awaiter(this, void 0, void 0, function* () {
             const listener = new Emitter();
             let client = mqtt_1.default.connect('mqtt://iot.infomediaservice.com', this.options);
+            const machineId = message.data.machineId;
+            client.publish(`${this.topic}`, `{"action":"send","id":${machineId},"data":"vmkey=12","format":"text"}`);
             client.subscribe(`${this.topic}`);
             client.on('connect', () => {
                 const products = message.data.products;
                 let counter = 0;
                 listener.on('next', () => {
-                    console.log(`Product #${counter + 1}`);
                     if (counter < products.length) {
+                        console.log(`Product #${counter + 1}`);
                         if (counter > 0) {
                             client = mqtt_1.default.connect('mqtt://iot.infomediaservice.com', this.options);
                             client.subscribe(`${this.topic}`);
@@ -126,7 +128,7 @@ class SocketController {
                         client.end();
                         timers_1.setTimeout(() => {
                             listener.emit('next');
-                        }, 3000);
+                        }, 1000);
                         if (isLast)
                             socket.send(JSON.stringify({
                                 type: 0,

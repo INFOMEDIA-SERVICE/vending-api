@@ -111,7 +111,7 @@ class AuthController {
 
             const user: IUser = jwt_decode(token);
 
-            if(user.role !== 1) return res.send({
+            if(user.role !== 2) return res.send({
                 ok: false,
                 message: 'Rol inválido'
             });

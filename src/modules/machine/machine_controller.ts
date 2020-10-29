@@ -28,6 +28,7 @@ class SocketController {
         port: 10110
     };
 
+
     public onConnect = async(socket: ws, req: Request): Promise<void> => {
 
         console.log('User connected');
@@ -57,6 +58,10 @@ class SocketController {
 
         let client: mqtt.MqttClient = mqtt.connect('mqtt://iot.infomediaservice.com', this.options);
 
+        const machineId: string = message.data.machineId;
+
+        client.publish(`${this.topic}`, `{"action":"send","id":${machineId},"data":"vmkey=12","format":"text"}`);
+
         client.subscribe(`${this.topic}`);
 
         client.on('connect', () => {
@@ -66,10 +71,10 @@ class SocketController {
             let counter = 0;
 
             listener.on('next', () => {
-
-                console.log(`Product #${counter+1}`);
-
+                
                 if(counter < products.length) {
+
+                    console.log(`Product #${counter+1}`);
 
                     if(counter > 0) {
 
@@ -167,7 +172,7 @@ class SocketController {
                     
                     setTimeout(() => {
                         listener.emit('next');
-                    }, 3000);
+                    }, 1000);
                     
                     if(isLast) socket.send(JSON.stringify({
                         type: 0,

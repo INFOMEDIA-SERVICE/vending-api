@@ -87,7 +87,7 @@ class AuthController {
                         message: err.message
                     });
                 const user = jwt_decode_1.default(token);
-                if (user.role !== 1)
+                if (user.role !== 2)
                     return res.send({
                         ok: false,
                         message: 'Rol inválido'

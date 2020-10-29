@@ -9,7 +9,7 @@ class ProductsRepository {
     public create = async(product: IProduct): Promise<IQueryResponse> => {
 
         return database.query(
-            `insert into ${this.table}(name, price, image, machine_id) values('${product.name}', ${product.price}, '${product.image}', '${product.machine_id}') RETURNING *`
+            `insert into ${this.table}(name, price, image, quantity, description, item, machine_id) values('${product.name}', ${product.price}, '${product.image}', ${product.quantity}, '${product.description}', '${product.item}', '${product.machine_id}') RETURNING *`
         )
         .then((value) => {
             return {
@@ -27,8 +27,9 @@ class ProductsRepository {
 
     public getAll = async(): Promise<IQueryResponse> => {
 
-        return database.query(`SELECT * FROM ${this.table}`)
-        .then((value) => {
+        return database.query(
+            `SELECT * FROM ${this.table} WHERE status = true`
+        ).then((value) => {
             return {
                 ok: true,
                 data: value.rows
@@ -65,20 +66,14 @@ class ProductsRepository {
 
     public update = async(id: string, product: IProduct): Promise<IQueryResponse> => {
 
-        return database.query(`UPDATE ${this.table} SET(name, price, machine_id) = ('${product.name}', ${product.price}, '${product.machine_id}') WHERE id = '${id}' RETURNING *`)
-
-        .then(async(value) => {
+        return database.query(
+            `UPDATE ${this.table} SET(name, price, image, quantity, description, item, machine_id) = ('${product.name}', ${product.price}, '${product.image}', ${product.quantity}, '${product.description}', '${product.item}', '${product.machine_id}') WHERE id = '${id}' RETURNING *`
+        ).then(async(value) => {
         
             if(value.rowCount === 0) return {
                 ok: false,
-                data: 'User not found'
+                data: 'Product not found'
             }
-
-            // const user = await this.getById(id);
-            // if(!user.ok) return user;
-
-            console.log(value.rows[0]);
-
             return {
                 ok: true,
                 data: value.rows[0]
@@ -92,27 +87,11 @@ class ProductsRepository {
         });
     }
 
-    public getCount = async(): Promise<IQueryResponse> => {
-
-        return database.query(`SELECT * FROM ${this.table}`)
-        .then((value) => {
-            return {
-                ok: true,
-                data: value.rowCount
-            }
-        })
-        .catch((err) => {
-            return {
-                ok: false,
-                data: err.message
-            }
-        });
-    }
-
     public delete = async(id: string): Promise<IQueryResponse> => {
 
-        return database.query(`delete from ${this.table} WHERE id = '${id}'`)
-        .then((value) => {
+        return database.query(
+            `delete from ${this.table} WHERE id = '${id}'`
+        ).then((value) => {
             if(value.rowCount === 0) return {
                 ok: false,
                 data: 'User not found'
