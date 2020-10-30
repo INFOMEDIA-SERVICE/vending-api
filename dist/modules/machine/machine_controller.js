@@ -17,6 +17,7 @@ const mqtt_1 = __importDefault(require("mqtt"));
 const machine_model_1 = require("./machine_model");
 const events_1 = require("events");
 const timers_1 = require("timers");
+const machine_repository_1 = require("./machine_repository");
 class Emitter extends events_1.EventEmitter {
 }
 class SocketController {
@@ -50,6 +51,14 @@ class SocketController {
             }
         });
         this.dispense = (socket, message) => __awaiter(this, void 0, void 0, function* () {
+            const userId = message.data.userId;
+            const userResponse = yield machine_repository_1.machineRepository.update(userId);
+            if (!userResponse.ok) {
+                return socket.send(JSON.stringify({
+                    type: -1,
+                    data: `${userResponse.data}`
+                }));
+            }
             const listener = new Emitter();
             let client = mqtt_1.default.connect('mqtt://iot.infomediaservice.com', this.options);
             const machineId = message.data.machineId;
@@ -122,7 +131,7 @@ class SocketController {
                     case 'vend.sucess':
                         socket.send(JSON.stringify({
                             type: 0,
-                            data: 'successful sale'
+                            data: `product ${product.name} dispensed`
                         }));
                         break;
                     case 'session.closed':

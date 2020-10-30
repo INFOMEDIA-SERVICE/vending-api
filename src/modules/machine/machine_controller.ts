@@ -4,6 +4,7 @@ import { Request } from 'express';
 import { ISocketUser, socketUsers } from './machine_model';
 import { EventEmitter } from 'events';
 import { setTimeout } from 'timers';
+import { machineRepository } from './machine_repository';
 
 interface IMessage {
     type?: number
@@ -53,6 +54,17 @@ class SocketController {
     };
 
     public dispense = async(socket: ws, message: IMessage): Promise<void> => {
+
+        const userId: string = message.data.userId;
+
+        const userResponse = await machineRepository.update(userId);
+
+        if(!userResponse.ok) {
+            return socket.send(JSON.stringify({
+                type: -1,
+                data: `${userResponse.data}`
+            }));
+        }
 
         const listener: Emitter = new Emitter();
 
@@ -164,7 +176,7 @@ class SocketController {
                 case 'vend.sucess':
                     socket.send(JSON.stringify({
                         type: 0,
-                        data: 'successful sale'
+                        data: `product ${product.name} dispensed`
                     }));
                 break;
 
