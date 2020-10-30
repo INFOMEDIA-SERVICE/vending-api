@@ -19,13 +19,13 @@ class Emitter extends EventEmitter {}
 
 class SocketController {
 
-    private topic: string = 'infomedia/vmc/novaventas/vmc0003';
+    private topic: string = process.env.MACHINE_TOPIC || '';
 
     private options: mqtt.IClientOptions = {
-        clientId: 'infomedia-vmc0003',
-        username: 'infomedia',
-        password: 'infomedia',
-        port: 10110
+        clientId: process.env.MQTT_CLIENTID,
+        username: process.env.MQTT_USERNAME,
+        password: process.env.MQTT_PASSWORD,
+        port: parseInt(process.env.MQTT_PORT || '') || 10110
     };
 
 

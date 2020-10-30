@@ -21,12 +21,12 @@ class Emitter extends events_1.EventEmitter {
 }
 class SocketController {
     constructor() {
-        this.topic = 'infomedia/vmc/novaventas/vmc0003';
+        this.topic = process.env.MACHINE_TOPIC || '';
         this.options = {
-            clientId: 'infomedia-vmc0003',
-            username: 'infomedia',
-            password: 'infomedia',
-            port: 10110
+            clientId: process.env.MQTT_CLIENTID,
+            username: process.env.MQTT_USERNAME,
+            password: process.env.MQTT_PASSWORD,
+            port: parseInt(process.env.MQTT_PORT || '') || 10110
         };
         this.onConnect = (socket, req) => __awaiter(this, void 0, void 0, function* () {
             console.log('User connected');
