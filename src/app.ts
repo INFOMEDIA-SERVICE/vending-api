@@ -11,8 +11,7 @@ const app: Application = express();
 
 export let server: http.Server = http.createServer(app);
 
-app.set('port', 3000);
-// app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 3004);
 
 // Middelwares
 
