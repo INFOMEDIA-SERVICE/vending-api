@@ -6,6 +6,7 @@ exports.database = new pg_1.Pool({
     user: process.env.POSTGRESS_USER,
     database: process.env.POSTGRESS_DATABASE,
     host: process.env.POSTGRESS_HOST,
-    password: process.env.POSTGRESS_PASSWORD
+    password: process.env.POSTGRESS_PASSWORD,
+    port: parseInt(process.env.POSTGRESS_PORT || '')
 });
 //# sourceMappingURL=database.js.map

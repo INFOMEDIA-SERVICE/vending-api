@@ -11,7 +11,8 @@ const app: Application = express();
 
 export let server: http.Server = http.createServer(app);
 
-app.set('port', process.env.PORT || 3000);
+app.set('port', 3000);
+// app.set('port', process.env.PORT || 3000);
 
 // Middelwares
 
@@ -35,3 +36,10 @@ export default app;
 // POSTGRESS_DATABASE='vendings'
 // POSTGRESS_HOST='localhost'
 // POSTGRESS_PASSWORD='37375930'
+
+
+// POSTGRESS_USER='smartinfo_web'
+// POSTGRESS_DATABASE='smartinfo_vending'
+// POSTGRESS_HOST='127.0.0.1'
+// POSTGRESS_PASSWORD='smartinfo.04'
+// POSTGRESS_PORT=5432

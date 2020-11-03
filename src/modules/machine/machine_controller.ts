@@ -12,6 +12,7 @@ interface IMessage {
 }
 
 interface IProduct {
+    id: string
     name: string
     item: number
 }
@@ -57,7 +58,7 @@ class SocketController {
 
         const userId: string = message.data.userId;
 
-        const userResponse = await machineRepository.update(userId);
+        const userResponse = await machineRepository.updateRequests(userId);
 
         if(!userResponse.ok) {
             return socket.send(JSON.stringify({
@@ -183,6 +184,8 @@ class SocketController {
                 case 'session.closed':
 
                     client.end();
+                    
+                    machineRepository.editProduct(product.id);
                     
                     setTimeout(() => {
                         listener.emit('next');

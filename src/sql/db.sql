@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS vendings(
     id varchar(64) NOT NULL DEFAULT uuid_generate_v4(),
     name text NOT NULL CHECK (name <> ''),
     machine_id TEXT NOT NULL UNIQUE CHECK (machine_id <> ''),
+    errors integer DEFAULT 0,
+    dispended integer DEFAULT 0,
     status BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),

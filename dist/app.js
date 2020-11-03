@@ -14,7 +14,8 @@ const http_1 = __importDefault(require("http"));
 const cors_1 = __importDefault(require("cors"));
 const app = express_1.default();
 exports.server = http_1.default.createServer(app);
-app.set('port', process.env.PORT || 3000);
+app.set('port', 3000);
+// app.set('port', process.env.PORT || 3000);
 // Middelwares
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: false }));
@@ -27,4 +28,13 @@ app.use('/api/vendings', vending_routes_1.default);
 app.use('/api/products', products_routes_1.default);
 app.use('/api/users', admin_routes_1.default);
 exports.default = app;
+// POSTGRESS_USER='postgres'
+// POSTGRESS_DATABASE='vendings'
+// POSTGRESS_HOST='localhost'
+// POSTGRESS_PASSWORD='37375930'
+// POSTGRESS_USER='smartinfo_web'
+// POSTGRESS_DATABASE='smartinfo_vending'
+// POSTGRESS_HOST='127.0.0.1'
+// POSTGRESS_PASSWORD='smartinfo.04'
+// POSTGRESS_PORT=5432
 //# sourceMappingURL=app.js.map

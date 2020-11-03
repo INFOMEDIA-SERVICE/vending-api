@@ -52,7 +52,7 @@ class SocketController {
         });
         this.dispense = (socket, message) => __awaiter(this, void 0, void 0, function* () {
             const userId = message.data.userId;
-            const userResponse = yield machine_repository_1.machineRepository.update(userId);
+            const userResponse = yield machine_repository_1.machineRepository.updateRequests(userId);
             if (!userResponse.ok) {
                 return socket.send(JSON.stringify({
                     type: -1,
@@ -136,6 +136,7 @@ class SocketController {
                         break;
                     case 'session.closed':
                         client.end();
+                        machine_repository_1.machineRepository.editProduct(product.id);
                         timers_1.setTimeout(() => {
                             listener.emit('next');
                         }, 1000);
