@@ -14,8 +14,7 @@ const http_1 = __importDefault(require("http"));
 const cors_1 = __importDefault(require("cors"));
 const app = express_1.default();
 exports.server = http_1.default.createServer(app);
-app.set('port', 3000);
-// app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 3004);
 // Middelwares
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: false }));
