@@ -39,6 +39,5 @@ export default app;
 
 // POSTGRESS_USER='smartinfo_web'
 // POSTGRESS_DATABASE='smartinfo_vending'
-// POSTGRESS_HOST='127.0.0.1'
+// POSTGRESS_HOST='localhost'
 // POSTGRESS_PASSWORD='smartinfo.04'
-// POSTGRESS_PORT=5432

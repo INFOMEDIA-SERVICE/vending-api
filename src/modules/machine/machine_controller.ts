@@ -77,6 +77,8 @@ class SocketController {
 
         client.subscribe(`${this.topic}`);
 
+        console.log(message.data.products);
+
         client.on('connect', () => {
 
             const products: IProduct[] = message.data.products;

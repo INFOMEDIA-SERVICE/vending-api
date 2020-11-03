@@ -64,6 +64,7 @@ class SocketController {
             const machineId = message.data.machineId;
             client.publish(`${this.topic}`, `{"action":"send","id":${machineId},"data":"vmkey=12","format":"text"}`);
             client.subscribe(`${this.topic}`);
+            console.log(message.data.products);
             client.on('connect', () => {
                 const products = message.data.products;
                 console.log(products.length);
