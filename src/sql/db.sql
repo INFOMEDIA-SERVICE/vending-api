@@ -38,17 +38,3 @@ CREATE TABLE IF NOT EXISTS users(
     updated_at TIMESTAMP DEFAULT NOW(),
     constraint pk_users primary key(id)
 );
-
--- CREATE TABLE IF NOT EXISTS clients(
---     id varchar(64) NOT NULL DEFAULT uuid_generate_v4(),
---     name text NOT NULL CHECK (name <> ''),
---     email text NOT NULL UNIQUE,
---     password text NOT NULL,
---     requests int NOT NULL DEFAULT 0,
---     status BOOLEAN DEFAULT true,
---     created_at TIMESTAMP DEFAULT NOW(),
---     updated_at TIMESTAMP DEFAULT NOW(),
---     constraint pk_clients primary key(id)
--- );
-
-SELECT * FROM products;

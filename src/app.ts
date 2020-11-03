@@ -29,3 +29,9 @@ app.use('/api/products', productsRoutes);
 app.use('/api/users', adminRoutes);
 
 export default app;
+
+
+// POSTGRESS_USER='postgres'
+// POSTGRESS_DATABASE='vendings'
+// POSTGRESS_HOST='localhost'
+// POSTGRESS_PASSWORD='37375930'
