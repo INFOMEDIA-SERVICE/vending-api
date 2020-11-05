@@ -60,7 +60,7 @@ class ClientsController {
             let pass = await bcrypt.compare(password, response.data.password);
 
             if(!pass) {
-                res.send({
+                res.status(400).json({
                     ok: false,
                     message: 'Email or Password does\'not match'
                 });

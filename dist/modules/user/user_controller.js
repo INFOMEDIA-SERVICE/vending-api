@@ -63,7 +63,7 @@ class UserController {
             if (response.ok) {
                 let pass = yield bcryptjs_1.default.compare(password, response.data.password);
                 if (!pass) {
-                    res.send({
+                    res.status(400).json({
                         ok: false,
                         message: 'Email or Password does\'not match'
                     });

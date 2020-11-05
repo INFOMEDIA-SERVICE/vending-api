@@ -28,7 +28,7 @@ class AuthController {
 
             if(user.role !== 2) if(user.role !== 0) return res.status(401).json({
                 ok: false,
-                message: 'Rol inválido'
+                message: 'insufficient privileges'
             });
 
             req.body.user = user;
@@ -83,7 +83,7 @@ class AuthController {
 
             if(user.role !== 2) if(user.role !== 1) return res.status(401).json({
                 ok: false,
-                message: 'Rol inválido'
+                message: 'insufficient privileges'
             });
 
             req.body.user = user;
@@ -113,7 +113,7 @@ class AuthController {
 
             if(user.role !== 2) return res.status(401).json({
                 ok: false,
-                message: 'Rol inválido'
+                message: 'insufficient privileges'
             });
 
             req.body.user = user;
