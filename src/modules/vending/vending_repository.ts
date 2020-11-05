@@ -27,7 +27,7 @@ class VendingRepository {
     public getVendingProducts = async(id: string): Promise<IQueryResponse> => {
 
         return database.query(
-            `SELECT * FROM products WHERE machine_id = '${id}' AND status = true`
+            `SELECT * FROM products WHERE machine_id = '${id}' AND status = true AND quantity > 0`
         ).then((value) => {
             return {
                 ok: true,

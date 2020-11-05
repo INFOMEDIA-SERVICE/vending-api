@@ -48,7 +48,9 @@ class SocketController {
             default:
                 socket.send(JSON.stringify({
                     type: -1,
-                    message: 'Type not found'
+                    data: {
+                        message: 'Type not found'
+                    }
                 }));
             break;
         }
@@ -63,7 +65,9 @@ class SocketController {
         if(!userResponse.ok) {
             return socket.send(JSON.stringify({
                 type: -1,
-                data: `${userResponse.data}`
+                data: {
+                    message: `${userResponse.data}`
+                }
             }));
         }
 
@@ -141,7 +145,9 @@ class SocketController {
                 case 'session.active':
                     socket.send(JSON.stringify({
                         type: 0,
-                        data: 'machine started'
+                        data: {
+                            message: 'machine started'
+                        }
                     }));
                     client.publish(`${this.topic}`, `vmkey=${product.item}`);
                 break;
@@ -150,14 +156,18 @@ class SocketController {
                     // client.end();
                     socket.send(JSON.stringify({
                         type: -1,
-                        data: 'the machine is busy'
+                        data: {
+                            message: 'the machine is busy'
+                        }
                     }));
                 break;
 
                 case 'vend.request': 
                     socket.send(JSON.stringify({
                         type: 0,
-                        data: 'approving sale'
+                        data: {
+                            message: 'approving sale'
+                        }
                     }));
                     client.publish(`${this.topic}`, `vmok`);
                 break;
@@ -165,21 +175,39 @@ class SocketController {
                 case 'vend.approved':
                     socket.send(JSON.stringify({
                         type: 0,
-                        data: 'sale approved'
+                        data: {
+                            message: 'sale approved'
+                        }
+                    }));
+                break;
+
+                case 'session.timeout':
+                    socket.send(JSON.stringify({
+                        type: -1,
+                        data: {
+                            product,
+                            message: `machine is off`
+                        }
                     }));
                 break;
 
                 case 'vend.fails':
                     socket.send(JSON.stringify({
-                        type: 0,
-                        data: `product ${product.name} not dispensed`
+                        type: -1,
+                        data: {
+                            product,
+                            message: `product ${product.name} not dispensed`
+                        }
                     }));
                 break;
 
                 case 'vend.sucess':
                     socket.send(JSON.stringify({
                         type: 0,
-                        data: `product ${product.name} dispensed`
+                        data: {
+                            product,
+                            message: `product ${product.name} dispensed`
+                        }
                     }));
                 break;
 
@@ -195,14 +223,14 @@ class SocketController {
                     
                     if(isLast) socket.send(JSON.stringify({
                         type: 0,
-                        data: 'sale finished'
+                        data: {
+                            message: 'sale finished'
+                        }
                     }));
+
                 break;
 
-                default:
-
-                    
-                break;
+                default: break;
             }
 
             return true;

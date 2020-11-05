@@ -29,7 +29,7 @@ class VendingRepository {
             });
         });
         this.getVendingProducts = (id) => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`SELECT * FROM products WHERE machine_id = '${id}' AND status = true`).then((value) => {
+            return database_1.database.query(`SELECT * FROM products WHERE machine_id = '${id}' AND status = true AND quantity > 0`).then((value) => {
                 return {
                     ok: true,
                     data: value.rows
