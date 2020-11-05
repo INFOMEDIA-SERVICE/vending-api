@@ -26,7 +26,7 @@ class ClientsController {
             return;
         }
 
-        const newPass: string = bcrypt.hashSync(password, 15);
+        const newPass: string = bcrypt.hashSync(password || '', 15);
 
         const response: IQueryResponse = await clientsRepository.signup({
             first_name,

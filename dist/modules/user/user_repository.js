@@ -8,9 +8,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.usersRepository = void 0;
 const database_1 = require("../../database/database");
+const firebase_admin_1 = __importDefault(require("firebase-admin"));
 class UsersRepository {
     constructor() {
         this.table = 'users';
@@ -48,6 +52,32 @@ class UsersRepository {
                 return {
                     ok: false,
                     data: err.message
+                };
+            });
+        });
+        this.googleAuth = (token) => __awaiter(this, void 0, void 0, function* () {
+            return firebase_admin_1.default.auth().verifyIdToken(token).then((decodedToken) => __awaiter(this, void 0, void 0, function* () {
+                const response = yield this.login(decodedToken.email || 'jyrdc');
+                if (!response.ok)
+                    return {
+                        ok: false,
+                        data: 'User not found'
+                    };
+                const user = response.data;
+                // this.signup({
+                //     first_name: `${decodedToken}`,
+                //     last_name: '',
+                //     uid: `${decodedToken.uid}`,
+                //     email: `${decodedToken.email}`
+                // })
+                return {
+                    ok: true,
+                    data: user
+                };
+            })).catch(function (error) {
+                return {
+                    ok: false,
+                    data: error.message
                 };
             });
         });

@@ -1,6 +1,7 @@
 import { IUser } from './users_model';
 import { database } from '../../database/database';
 import { IQueryResponse } from '../../interfaces/postgres_responses';
+import admin from 'firebase-admin';
 
 class UsersRepository {
 
@@ -44,6 +45,39 @@ class UsersRepository {
                 ok: false,
                 data: err.message
             }
+        });
+    }
+
+    public googleAuth = async(token: string): Promise<IQueryResponse> => {
+
+        return admin.auth().verifyIdToken(token).then( async(decodedToken) => {
+            
+            const response: IQueryResponse = await this.login(decodedToken.email || 'jyrdc');
+
+            if(!response.ok) return {
+                ok: false,
+                data: 'User not found'
+            };
+
+            const user: IUser = response.data;
+
+            // this.signup({
+            //     first_name: `${decodedToken}`,
+            //     last_name: '',
+            //     uid: `${decodedToken.uid}`,
+            //     email: `${decodedToken.email}`
+            // })
+
+            return {
+                ok: true,
+                data: user
+            };
+            
+        }).catch(function(error) {
+            return {
+                ok: false,
+                data: error.message
+            };
         });
     }
     

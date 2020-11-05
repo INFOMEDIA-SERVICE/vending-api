@@ -34,7 +34,7 @@ class UserController {
                 });
                 return;
             }
-            const newPass = bcryptjs_1.default.hashSync(password, 10);
+            const newPass = bcryptjs_1.default.hashSync(password || '', 10);
             const response = yield user_repository_1.usersRepository.signup({
                 first_name,
                 last_name,
@@ -75,6 +75,25 @@ class UserController {
                     ok: true,
                     user: response.data,
                     token
+                });
+            }
+            else {
+                res.status(400).json({
+                    ok: false,
+                    message: response.data
+                });
+            }
+        });
+        this.googleAuth = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { token } = req.body;
+            const response = yield user_repository_1.usersRepository.googleAuth(token);
+            if (response.ok) {
+                delete response.data.password;
+                const jwtToken = auth_controller_1.authController.generateToken(response.data);
+                res.send({
+                    ok: true,
+                    user: response.data,
+                    token: jwtToken
                 });
             }
             else {

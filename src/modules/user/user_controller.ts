@@ -7,7 +7,7 @@ import { authController } from '../../utils/auth_controller';
 
 class UserController {
 
-    public signup = async(req: Request, res: Response):Promise<void> => {
+    public signup = async(req: Request, res: Response): Promise<void> => {
 
         const {first_name, last_name, email, password}: IUser = req.body;
 
@@ -27,7 +27,7 @@ class UserController {
             return;
         }
 
-        const newPass: string = bcrypt.hashSync(password, 10);
+        const newPass: string = bcrypt.hashSync(password || '', 10);
 
         const response:IQueryResponse = await usersRepository.signup({
             first_name,
@@ -52,7 +52,7 @@ class UserController {
         }
     }
 
-    public login = async(req: Request, res: Response):Promise<void> => {
+    public login = async(req: Request, res: Response): Promise<void> => {
 
         const {email, password} = req.body;
 
@@ -87,7 +87,33 @@ class UserController {
         }
     }
 
-    public getAll = async(req: Request, res: Response):Promise<void> => {
+    public googleAuth = async(req: Request, res: Response): Promise<void> => {
+
+        const { token } = req.body;
+
+        const response: IQueryResponse = await usersRepository.googleAuth(token);
+
+        if(response.ok) {
+
+            delete response.data.password;
+
+            const jwtToken: string = authController.generateToken(response.data);
+            
+            res.send({
+                ok: true,
+                user: response.data,
+                token: jwtToken
+            });
+
+        } else {
+            res.status(400).json({
+                ok: false,
+                message: response.data
+            });
+        }
+    }
+
+    public getAll = async(req: Request, res: Response): Promise<void> => {
 
         const response = await usersRepository.getAll();
 
@@ -109,7 +135,7 @@ class UserController {
 
     };
 
-    public me = async(req: Request, res: Response):Promise<void> => {
+    public me = async(req: Request, res: Response): Promise<void> => {
 
         const user = req.body.user;
 
@@ -130,7 +156,7 @@ class UserController {
 
     };
 
-    public getById = async(req: Request, res: Response):Promise<void> => {
+    public getById = async(req: Request, res: Response): Promise<void> => {
 
         const response = await usersRepository.getById(req.params.id);
 
@@ -149,7 +175,7 @@ class UserController {
 
     };
 
-    public update = async(req: Request, res: Response):Promise<void> => {
+    public update = async(req: Request, res: Response): Promise<void> => {
 
         const response:IQueryResponse = await usersRepository.update(req.params.id, req.body);
 
@@ -166,7 +192,7 @@ class UserController {
         }
     };
 
-    public delete = async(req: Request, res: Response):Promise<void> => {
+    public delete = async(req: Request, res: Response): Promise<void> => {
 
         const response:IQueryResponse = await usersRepository.delete(req.params.id);
 

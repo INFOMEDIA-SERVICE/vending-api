@@ -33,7 +33,7 @@ class ClientsController {
                 });
                 return;
             }
-            const newPass = bcryptjs_1.default.hashSync(password, 15);
+            const newPass = bcryptjs_1.default.hashSync(password || '', 15);
             const response = yield clients_repository_1.clientsRepository.signup({
                 first_name,
                 last_name,

@@ -27,7 +27,7 @@ class AdminController {
             return;
         }
 
-        const newPass: string = bcrypt.hashSync(password, 15);
+        const newPass: string = bcrypt.hashSync(password || '', 15);
 
         const response: IQueryResponse = await adminsRepository.signup({
             first_name,

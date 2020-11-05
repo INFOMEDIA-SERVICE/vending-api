@@ -34,7 +34,7 @@ class AdminController {
                 });
                 return;
             }
-            const newPass = bcryptjs_1.default.hashSync(password, 15);
+            const newPass = bcryptjs_1.default.hashSync(password || '', 15);
             const response = yield admin_repository_1.adminsRepository.signup({
                 first_name,
                 last_name,

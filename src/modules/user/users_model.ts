@@ -3,7 +3,8 @@ export interface IUser {
     first_name: string
     last_name: string
     email: string
-    password: string
+    uid?: string
+    password?: string
     requests?: number
     role?: number
     status?: boolean
