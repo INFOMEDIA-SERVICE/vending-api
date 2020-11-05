@@ -23,14 +23,6 @@ class SocketController {
 
     private topic: string = process.env.MACHINE_TOPIC || '';
 
-    private options: mqtt.IClientOptions = {
-        clientId: process.env.MQTT_CLIENTID,
-        username: process.env.MQTT_USERNAME,
-        password: process.env.MQTT_PASSWORD,
-        port: parseInt(process.env.MQTT_PORT || '') || 10110
-    };
-
-
     public onConnect = async(socket: ws, req: Request): Promise<void> => {
 
         console.log('User connected');
@@ -58,6 +50,15 @@ class SocketController {
 
     public dispense = async(socket: ws, message: IMessage): Promise<void> => {
 
+        const machineId: string = message.data.machineId;
+
+        const options: mqtt.IClientOptions = {
+            clientId: `${process.env.MQTT_CLIENTID}:${machineId}`,
+            username: process.env.MQTT_USERNAME,
+            password: process.env.MQTT_PASSWORD,
+            port: parseInt(process.env.MQTT_PORT || '') || 10110
+        };
+
         const userId: string = message.data.userId;
 
         const userResponse = await machineRepository.updateRequests(userId);
@@ -73,11 +74,9 @@ class SocketController {
 
         const listener: Emitter = new Emitter();
 
-        let client: mqtt.MqttClient = mqtt.connect('mqtt://iot.infomediaservice.com', this.options);
+        let client: mqtt.MqttClient = mqtt.connect('mqtt://iot.infomediaservice.com', options);
 
-        const machineId: string = message.data.machineId;
-
-        client.publish(`${this.topic}`, `{"action":"send","id":${machineId},"data":"vmkey=12","format":"text"}`);
+        // client.publish(`${this.topic}`, `{"action":"send","id":${machineId},"data":"vmkey=12","format":"text"}`);
 
         client.subscribe(`${this.topic}`);
 
@@ -86,8 +85,6 @@ class SocketController {
         client.on('connect', () => {
 
             const products: IProduct[] = message.data.products;
-
-            console.log(products.length);
 
             let counter = 0;
 
@@ -99,7 +96,7 @@ class SocketController {
 
                     if(counter > 0) {
 
-                        client = mqtt.connect('mqtt://iot.infomediaservice.com', this.options);
+                        client = mqtt.connect('mqtt://iot.infomediaservice.com', options);
 
                         client.subscribe(`${this.topic}`);
                     }

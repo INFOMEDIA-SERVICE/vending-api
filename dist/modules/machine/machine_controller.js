@@ -23,12 +23,6 @@ class Emitter extends events_1.EventEmitter {
 class SocketController {
     constructor() {
         this.topic = process.env.MACHINE_TOPIC || '';
-        this.options = {
-            clientId: process.env.MQTT_CLIENTID,
-            username: process.env.MQTT_USERNAME,
-            password: process.env.MQTT_PASSWORD,
-            port: parseInt(process.env.MQTT_PORT || '') || 10110
-        };
         this.onConnect = (socket, req) => __awaiter(this, void 0, void 0, function* () {
             console.log('User connected');
             socket.on('message', (data) => this.onMessage(socket, data, req));
@@ -53,6 +47,13 @@ class SocketController {
             }
         });
         this.dispense = (socket, message) => __awaiter(this, void 0, void 0, function* () {
+            const machineId = message.data.machineId;
+            const options = {
+                clientId: `${process.env.MQTT_CLIENTID}:${machineId}`,
+                username: process.env.MQTT_USERNAME,
+                password: process.env.MQTT_PASSWORD,
+                port: parseInt(process.env.MQTT_PORT || '') || 10110
+            };
             const userId = message.data.userId;
             const userResponse = yield machine_repository_1.machineRepository.updateRequests(userId);
             if (!userResponse.ok) {
@@ -64,20 +65,18 @@ class SocketController {
                 }));
             }
             const listener = new Emitter();
-            let client = mqtt_1.default.connect('mqtt://iot.infomediaservice.com', this.options);
-            const machineId = message.data.machineId;
-            client.publish(`${this.topic}`, `{"action":"send","id":${machineId},"data":"vmkey=12","format":"text"}`);
+            let client = mqtt_1.default.connect('mqtt://iot.infomediaservice.com', options);
+            // client.publish(`${this.topic}`, `{"action":"send","id":${machineId},"data":"vmkey=12","format":"text"}`);
             client.subscribe(`${this.topic}`);
             console.log(message.data.products);
             client.on('connect', () => {
                 const products = message.data.products;
-                console.log(products.length);
                 let counter = 0;
                 listener.on('next', () => {
                     if (counter < products.length) {
                         console.log(`Product #${counter + 1}`);
                         if (counter > 0) {
-                            client = mqtt_1.default.connect('mqtt://iot.infomediaservice.com', this.options);
+                            client = mqtt_1.default.connect('mqtt://iot.infomediaservice.com', options);
                             client.subscribe(`${this.topic}`);
                         }
                         this.dispenseSecuense(client, socket, products[counter], listener, counter === products.length - 1);
