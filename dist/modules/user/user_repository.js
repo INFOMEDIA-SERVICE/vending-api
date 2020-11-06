@@ -55,8 +55,9 @@ class UsersRepository {
                 };
             });
         });
-        this.googleAuth = (token) => __awaiter(this, void 0, void 0, function* () {
+        this.googleLogin = (token) => __awaiter(this, void 0, void 0, function* () {
             return firebase_admin_1.default.auth().verifyIdToken(token).then((decodedToken) => __awaiter(this, void 0, void 0, function* () {
+                console.log(decodedToken.name);
                 const response = yield this.login(decodedToken.email || 'jyrdc');
                 if (!response.ok)
                     return {
@@ -64,12 +65,46 @@ class UsersRepository {
                         data: 'User not found'
                     };
                 const user = response.data;
-                // this.signup({
-                //     first_name: `${decodedToken}`,
-                //     last_name: '',
-                //     uid: `${decodedToken.uid}`,
-                //     email: `${decodedToken.email}`
-                // })
+                return {
+                    ok: true,
+                    data: user
+                };
+            })).catch(function (error) {
+                return {
+                    ok: false,
+                    data: error.message
+                };
+            });
+        });
+        this.googleSignup = (token) => __awaiter(this, void 0, void 0, function* () {
+            return firebase_admin_1.default.auth().verifyIdToken(token).then((decodedToken) => __awaiter(this, void 0, void 0, function* () {
+                const name = decodedToken.name + '';
+                const cuttedName = name.split(' ');
+                let first_name;
+                let last_name;
+                if (cuttedName.length == 2) {
+                    first_name = cuttedName[0];
+                    last_name = cuttedName[1];
+                }
+                else if (cuttedName.length == 3) {
+                    first_name = cuttedName[0];
+                    last_name = cuttedName[1] + cuttedName[2];
+                }
+                else {
+                    first_name = cuttedName[0];
+                    last_name = cuttedName[1];
+                }
+                const response = yield this.signup({
+                    email: decodedToken.email || '',
+                    first_name,
+                    last_name,
+                });
+                if (!response.ok)
+                    return {
+                        ok: false,
+                        data: 'User already exists'
+                    };
+                const user = response.data;
                 return {
                     ok: true,
                     data: user

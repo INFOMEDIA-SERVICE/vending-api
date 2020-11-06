@@ -48,9 +48,11 @@ class UsersRepository {
         });
     }
 
-    public googleAuth = async(token: string): Promise<IQueryResponse> => {
+    public googleLogin = async(token: string): Promise<IQueryResponse> => {
 
         return admin.auth().verifyIdToken(token).then( async(decodedToken) => {
+
+            console.log(decodedToken.name);
             
             const response: IQueryResponse = await this.login(decodedToken.email || 'jyrdc');
 
@@ -61,12 +63,55 @@ class UsersRepository {
 
             const user: IUser = response.data;
 
-            // this.signup({
-            //     first_name: `${decodedToken}`,
-            //     last_name: '',
-            //     uid: `${decodedToken.uid}`,
-            //     email: `${decodedToken.email}`
-            // })
+            return {
+                ok: true,
+                data: user
+            };
+            
+        }).catch(function(error) {
+            return {
+                ok: false,
+                data: error.message
+            };
+        });
+    }
+
+    public googleSignup = async(token: string): Promise<IQueryResponse> => {
+
+        return admin.auth().verifyIdToken(token).then( async(decodedToken) => {
+
+            const name: string = decodedToken.name + '';
+
+            const cuttedName: string[] = name.split(' ');
+
+            let first_name: string;
+            let last_name: string;
+
+            if(cuttedName.length == 2) {
+                first_name = cuttedName[0];
+                last_name = cuttedName[1];
+            }
+            else if(cuttedName.length == 3) {
+                first_name = cuttedName[0];
+                last_name = cuttedName[1] + cuttedName[2];
+            }
+            else {
+                first_name = cuttedName[0];
+                last_name = cuttedName[1];
+            }
+            
+            const response: IQueryResponse = await this.signup({
+                email: decodedToken.email || '',
+                first_name,
+                last_name,
+            });
+
+            if(!response.ok) return {
+                ok: false,
+                data: 'User already exists'
+            };
+
+            const user: IUser = response.data;
 
             return {
                 ok: true,

@@ -84,9 +84,28 @@ class UserController {
                 });
             }
         });
-        this.googleAuth = (req, res) => __awaiter(this, void 0, void 0, function* () {
+        this.googleLogin = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { token } = req.body;
-            const response = yield user_repository_1.usersRepository.googleAuth(token);
+            const response = yield user_repository_1.usersRepository.googleLogin(token);
+            if (response.ok) {
+                delete response.data.password;
+                const jwtToken = auth_controller_1.authController.generateToken(response.data);
+                res.send({
+                    ok: true,
+                    user: response.data,
+                    token: jwtToken
+                });
+            }
+            else {
+                res.status(400).json({
+                    ok: false,
+                    message: response.data
+                });
+            }
+        });
+        this.googleSignup = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { token } = req.body;
+            const response = yield user_repository_1.usersRepository.googleSignup(token);
             if (response.ok) {
                 delete response.data.password;
                 const jwtToken = auth_controller_1.authController.generateToken(response.data);

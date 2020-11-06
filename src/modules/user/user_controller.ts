@@ -87,11 +87,37 @@ class UserController {
         }
     }
 
-    public googleAuth = async(req: Request, res: Response): Promise<void> => {
+    public googleLogin = async(req: Request, res: Response): Promise<void> => {
 
         const { token } = req.body;
 
-        const response: IQueryResponse = await usersRepository.googleAuth(token);
+        const response: IQueryResponse = await usersRepository.googleLogin(token);
+
+        if(response.ok) {
+
+            delete response.data.password;
+
+            const jwtToken: string = authController.generateToken(response.data);
+            
+            res.send({
+                ok: true,
+                user: response.data,
+                token: jwtToken
+            });
+
+        } else {
+            res.status(400).json({
+                ok: false,
+                message: response.data
+            });
+        }
+    }
+
+    public googleSignup = async(req: Request, res: Response): Promise<void> => {
+
+        const { token } = req.body;
+
+        const response: IQueryResponse = await usersRepository.googleSignup(token);
 
         if(response.ok) {
 
