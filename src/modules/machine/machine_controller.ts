@@ -125,6 +125,10 @@ class SocketController {
 
         client.on('message', (_, message) => {
 
+            if(message.toString().toLowerCase().includes('date')) {
+                return;
+            }
+            
             if(message.toString() === 'vmstart') {
                 return;
             }

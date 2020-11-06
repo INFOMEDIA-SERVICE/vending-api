@@ -90,6 +90,9 @@ class SocketController {
             // STARTING
             client.publish(`${this.topic}`, 'vmstart');
             client.on('message', (_, message) => {
+                if (message.toString().toLowerCase().includes('date')) {
+                    return;
+                }
                 if (message.toString() === 'vmstart') {
                     return;
                 }
