@@ -4,6 +4,7 @@ import vendingRoutes from './modules/vending/vending_routes';
 import usersRoutes from './modules/user/user_routes';
 import adminRoutes from './modules/admin/admin_routes';
 import clientsRoutes from './modules/clients/clients_routes';
+import servicesRoutes from './modules/services/services_routes';
 import http from 'http';
 import cors from 'cors';
 
@@ -26,6 +27,7 @@ app.use('/api/users', usersRoutes);
 app.use('/api/clients', clientsRoutes);
 app.use('/api/vendings', vendingRoutes);
 app.use('/api/products', productsRoutes);
+app.use('/api/services', servicesRoutes);
 app.use('/api/users', adminRoutes);
 
 export default app;

@@ -10,6 +10,7 @@ const vending_routes_1 = __importDefault(require("./modules/vending/vending_rout
 const user_routes_1 = __importDefault(require("./modules/user/user_routes"));
 const admin_routes_1 = __importDefault(require("./modules/admin/admin_routes"));
 const clients_routes_1 = __importDefault(require("./modules/clients/clients_routes"));
+const services_routes_1 = __importDefault(require("./modules/services/services_routes"));
 const http_1 = __importDefault(require("http"));
 const cors_1 = __importDefault(require("cors"));
 const app = express_1.default();
@@ -25,6 +26,7 @@ app.use('/api/users', user_routes_1.default);
 app.use('/api/clients', clients_routes_1.default);
 app.use('/api/vendings', vending_routes_1.default);
 app.use('/api/products', products_routes_1.default);
+app.use('/api/services', services_routes_1.default);
 app.use('/api/users', admin_routes_1.default);
 exports.default = app;
 // POSTGRESS_USER='postgres'

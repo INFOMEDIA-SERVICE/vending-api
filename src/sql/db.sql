@@ -21,10 +21,12 @@ CREATE TABLE IF NOT EXISTS vendings(
     machine_id TEXT NOT NULL UNIQUE CHECK (machine_id <> ''),
     errors integer DEFAULT 0,
     dispended integer DEFAULT 0,
+    requests integer DEFAULT 0,
     status BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
     constraint pk_vendings primary key(id)
+    constraint fk_user_id FOREIGN KEY (products) REFERENCES products (id)
 );
 
 CREATE TABLE IF NOT EXISTS users(
@@ -40,3 +42,21 @@ CREATE TABLE IF NOT EXISTS users(
     updated_at TIMESTAMP DEFAULT NOW(),
     constraint pk_users primary key(id)
 );
+
+CREATE TABLE IF NOT EXISTS services(
+    id varchar(64) NOT NULL DEFAULT uuid_generate_v4(),
+    machine_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    products text[],
+    success boolean default true,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    constraint pk_services primary key(id)
+);
+
+INSERT INTO services(machine_id, user_id, products, success) VALUES(
+    'STM32-1234567891',
+    '4a141b23-22e8-4807-b653-fe4615fb8687',
+    '{"9253f8c3-7988-43c2-a933-27964e5219a0", "9253f8c3-7988-43c2-a933-27964e5219a0"}',
+    true
+) RETURNING *;
