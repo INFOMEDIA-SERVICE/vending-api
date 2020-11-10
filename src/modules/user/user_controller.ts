@@ -218,6 +218,23 @@ class UserController {
         }
     };
 
+    public updateStatus = async(req: Request, res: Response): Promise<void> => {
+
+        const response: IQueryResponse = await usersRepository.updateStatus(req.params.id, req.body);
+
+        if(response.ok) {
+            res.send({
+                ok: true,
+                user: response.data
+            });
+        } else {
+            res.status(400).json({
+                ok: false,
+                message: response.data
+            });
+        }
+    };
+
     public delete = async(req: Request, res: Response): Promise<void> => {
 
         const response:IQueryResponse = await usersRepository.delete(req.params.id);

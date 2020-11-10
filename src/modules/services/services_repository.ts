@@ -105,6 +105,28 @@ class ServicesRepository {
         });
     }
 
+    public getByUserId = async(id: string): Promise<IQueryResponse> => {
+
+        return database.query(
+            `SELECT * FROM ${this.table} WHERE user_id = '${id}'`
+        ).then((value) => {
+            if(value.rowCount === 0) return {
+                ok: false,
+                data: 'User not found'
+            }
+            else return {
+                ok: true,
+                data: value.rows[0]
+            }
+        })
+        .catch((err) => {
+            return {
+                ok: false,
+                data: err.message
+            }
+        });
+    }
+
     public update = async(id: string, service: IService): Promise<IQueryResponse> => {
 
         return database.query(

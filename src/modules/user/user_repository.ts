@@ -188,6 +188,30 @@ class UsersRepository {
         });
     }
 
+    public updateStatus = async(id: string, status: boolean): Promise<IQueryResponse> => {
+
+        return database.query(`UPDATE ${this.table} SET status = ${status} WHERE id = '${id}' RETURNING *`)
+
+        .then(async(value) => {
+        
+            if(value.rowCount === 0) return {
+                ok: false,
+                data: 'User not found'
+            }
+
+            return {
+                ok: true,
+                data: value.rows[0]
+            }
+        })
+        .catch((err) => {
+            return {
+                ok: false,
+                data: err.message
+            }
+        });
+    }
+
     public delete = async(id: string): Promise<IQueryResponse> => {
 
         return database.query(`delete from ${this.table} WHERE id = '${id}' AND role = 0 RETURNING *`)

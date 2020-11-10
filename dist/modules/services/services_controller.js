@@ -90,6 +90,23 @@ class ServiceController {
                 });
             }
         });
+        this.me = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const user = req.body.user;
+            const response = yield services_repository_1.servicesRepository.getByUserId(user.id);
+            if (response.ok) {
+                delete response.data.password;
+                res.send({
+                    ok: true,
+                    user: response.data
+                });
+            }
+            else {
+                res.status(400).json({
+                    ok: false,
+                    message: response.data
+                });
+            }
+        });
         this.update = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const response = yield services_repository_1.servicesRepository.update(req.params.id, req.body);
             if (response.ok) {

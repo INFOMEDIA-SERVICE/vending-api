@@ -99,6 +99,27 @@ class ServiceController {
 
     };
 
+    public me = async(req: Request, res: Response): Promise<void> => {
+
+        const user = req.body.user;
+
+        const response: IQueryResponse = await servicesRepository.getByUserId(user.id);
+
+        if(response.ok) {
+            delete response.data.password;
+            res.send({
+                ok: true,
+                user: response.data
+            });
+        } else {
+            res.status(400).json({
+                ok: false,
+                message: response.data
+            });
+        }
+
+    };
+
     public update = async(req: Request, res: Response): Promise<void> => {
 
         const response: IQueryResponse = await servicesRepository.update(req.params.id, req.body);

@@ -34,12 +34,6 @@ class AuthController {
             req.body.user = user;
 
             next();
-    
-            // return res.status(401).json({
-            //     ok: true,
-            //     user
-            // });
-    
         });
     }
 
@@ -59,12 +53,6 @@ class AuthController {
             req.body.user = user;
 
             next();
-
-            // return {
-            //     ok: true,
-            //     user
-            // };
-    
         });
     }
 
@@ -89,12 +77,6 @@ class AuthController {
             req.body.user = user;
 
             next();
-
-            // return {
-            //     ok: true,
-            //     user
-            // };
-    
         });
     }
 
@@ -119,12 +101,24 @@ class AuthController {
             req.body.user = user;
             
             next();
+        });
+    }
 
-            // return {
-            //     ok: true,
-            //     user
-            // };
-    
+    public validateSocketAccess = (token: string | undefined) => {
+
+        return jwt.verify(token || '', process.env.TOKEN_KEY + '', (err) => {
+
+            if(err) return {
+                ok: false,
+                message: err.message
+            };
+
+            const user: IUser = jwt_decode(token || '');
+            
+            return {
+                ok: true,
+                user
+            };
         });
     }
 }

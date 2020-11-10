@@ -172,6 +172,26 @@ class UsersRepository {
                 };
             });
         });
+        this.updateStatus = (id, status) => __awaiter(this, void 0, void 0, function* () {
+            return database_1.database.query(`UPDATE ${this.table} SET status = ${status} WHERE id = '${id}' RETURNING *`)
+                .then((value) => __awaiter(this, void 0, void 0, function* () {
+                if (value.rowCount === 0)
+                    return {
+                        ok: false,
+                        data: 'User not found'
+                    };
+                return {
+                    ok: true,
+                    data: value.rows[0]
+                };
+            }))
+                .catch((err) => {
+                return {
+                    ok: false,
+                    data: err.message
+                };
+            });
+        });
         this.delete = (id) => __awaiter(this, void 0, void 0, function* () {
             return database_1.database.query(`delete from ${this.table} WHERE id = '${id}' AND role = 0 RETURNING *`)
                 .then((value) => {

@@ -5,6 +5,7 @@ import { ISocketUser, socketUsers } from './machine_model';
 import { EventEmitter } from 'events';
 import { setTimeout } from 'timers';
 import { machineRepository } from './machine_repository';
+import { authController } from '../../utils/auth_controller';
 
 interface IMessage {
     type?: number
@@ -33,6 +34,17 @@ class SocketController {
     private onMessage = async(socket: ws, data: ws.Data, req: Request): Promise<void> => {
 
         const message: IMessage = JSON.parse(data.toString());
+
+        const auth: any = authController.validateSocketAccess(message.data.token);
+
+        if(!auth.ok) return socket.send(JSON.stringify({
+            type: -1,
+            data: {
+                message: auth.message
+            }
+        }));
+
+        console.log(auth);
 
         switch (message.type) {
             case 0: this.saveUser(socket, message); break;
@@ -76,11 +88,12 @@ class SocketController {
 
         let client: mqtt.MqttClient = mqtt.connect('mqtt://iot.infomediaservice.com', options);
 
-        // client.publish(`${this.topic}`, `{"action":"send","id":${machineId},"data":"vmkey=12","format":"text"}`);
-
         client.subscribe(`${this.topic}`);
 
-        console.log(message.data.products);
+        console.log({
+            products: message.data.products,
+            userId: message.data.userId
+        });
 
         client.on('connect', () => {
 
@@ -154,7 +167,6 @@ class SocketController {
                 break;
 
                 case 'session.status':
-                    // client.end();
                     socket.send(JSON.stringify({
                         type: -1,
                         data: {
@@ -233,8 +245,6 @@ class SocketController {
 
                 default: break;
             }
-
-            return true;
         });
 
     };
@@ -257,4 +267,5 @@ export const socketController = new SocketController;
     type:
         -1: Error
         0: new Connection || Save || OK
+        1: Error
 */

@@ -8,10 +8,14 @@ router.post('/', userController.signup);
 router.post('/login', userController.login);
 router.post('/login/google/', userController.googleLogin);
 router.post('/signup/google/', userController.googleSignup);
-router.get('/', [authController.validateAdminToken], userController.getAll);
 router.get('/me', [authController.validateUserToken], userController.me);
-router.get('/:id', [authController.validateAdminToken], userController.getById);
 router.put('/:id', [authController.validateUserToken], userController.update);
-router.delete('/:id', [authController.validateAdminToken], userController.delete);
+router.delete('/:id', [authController.validateUserToken], userController.delete);
+
+// ADMIN
+
+router.patch('/:id', [authController.validateAdminToken], userController.updateStatus);
+router.get('/', [authController.validateAdminToken], userController.getAll);
+router.get('/:id', [authController.validateAdminToken], userController.getById);
 
 export default router;

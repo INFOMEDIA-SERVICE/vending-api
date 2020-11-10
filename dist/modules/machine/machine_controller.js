@@ -18,6 +18,7 @@ const machine_model_1 = require("./machine_model");
 const events_1 = require("events");
 const timers_1 = require("timers");
 const machine_repository_1 = require("./machine_repository");
+const auth_controller_1 = require("../../utils/auth_controller");
 class Emitter extends events_1.EventEmitter {
 }
 class SocketController {
@@ -29,6 +30,15 @@ class SocketController {
         });
         this.onMessage = (socket, data, req) => __awaiter(this, void 0, void 0, function* () {
             const message = JSON.parse(data.toString());
+            const auth = auth_controller_1.authController.validateSocketAccess(message.data.token);
+            if (!auth.ok)
+                return socket.send(JSON.stringify({
+                    type: -1,
+                    data: {
+                        message: auth.message
+                    }
+                }));
+            console.log(auth);
             switch (message.type) {
                 case 0:
                     this.saveUser(socket, message);
@@ -66,9 +76,11 @@ class SocketController {
             }
             const listener = new Emitter();
             let client = mqtt_1.default.connect('mqtt://iot.infomediaservice.com', options);
-            // client.publish(`${this.topic}`, `{"action":"send","id":${machineId},"data":"vmkey=12","format":"text"}`);
             client.subscribe(`${this.topic}`);
-            console.log(message.data.products);
+            console.log({
+                products: message.data.products,
+                userId: message.data.userId
+            });
             client.on('connect', () => {
                 const products = message.data.products;
                 let counter = 0;
@@ -112,7 +124,6 @@ class SocketController {
                         client.publish(`${this.topic}`, `vmkey=${product.item}`);
                         break;
                     case 'session.status':
-                        // client.end();
                         socket.send(JSON.stringify({
                             type: -1,
                             data: {
@@ -180,7 +191,6 @@ class SocketController {
                         break;
                     default: break;
                 }
-                return true;
             });
         };
         this.saveUser = (socket, message) => __awaiter(this, void 0, void 0, function* () {
@@ -198,5 +208,6 @@ exports.socketController = new SocketController;
     type:
         -1: Error
         0: new Connection || Save || OK
+        1: Error
 */
 //# sourceMappingURL=machine_controller.js.map

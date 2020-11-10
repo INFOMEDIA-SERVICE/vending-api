@@ -32,10 +32,6 @@ class AuthController {
                         });
                 req.body.user = user;
                 next();
-                // return res.status(401).json({
-                //     ok: true,
-                //     user
-                // });
             });
         };
         this.validateAccess = (req, res, next) => {
@@ -49,10 +45,6 @@ class AuthController {
                 const user = jwt_decode_1.default(token);
                 req.body.user = user;
                 next();
-                // return {
-                //     ok: true,
-                //     user
-                // };
             });
         };
         this.validateClientToken = (req, res, next) => {
@@ -72,10 +64,6 @@ class AuthController {
                         });
                 req.body.user = user;
                 next();
-                // return {
-                //     ok: true,
-                //     user
-                // };
             });
         };
         this.validateAdminToken = (req, res, next) => {
@@ -94,10 +82,20 @@ class AuthController {
                     });
                 req.body.user = user;
                 next();
-                // return {
-                //     ok: true,
-                //     user
-                // };
+            });
+        };
+        this.validateSocketAccess = (token) => {
+            return jsonwebtoken_1.default.verify(token || '', process.env.TOKEN_KEY + '', (err) => {
+                if (err)
+                    return {
+                        ok: false,
+                        message: err.message
+                    };
+                const user = jwt_decode_1.default(token || '');
+                return {
+                    ok: true,
+                    user
+                };
             });
         };
     }

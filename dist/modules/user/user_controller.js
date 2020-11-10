@@ -189,6 +189,21 @@ class UserController {
                 });
             }
         });
+        this.updateStatus = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const response = yield user_repository_1.usersRepository.updateStatus(req.params.id, req.body);
+            if (response.ok) {
+                res.send({
+                    ok: true,
+                    user: response.data
+                });
+            }
+            else {
+                res.status(400).json({
+                    ok: false,
+                    message: response.data
+                });
+            }
+        });
         this.delete = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const response = yield user_repository_1.usersRepository.delete(req.params.id);
             if (response.ok) {
