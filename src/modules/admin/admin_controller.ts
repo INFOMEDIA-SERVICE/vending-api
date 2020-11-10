@@ -7,7 +7,7 @@ import { authController } from '../../utils/auth_controller';
 
 class AdminController {
 
-    public signup = async(req: Request, res: Response):Promise<void> => {
+    public signup = async(req: Request, res: Response): Promise<void> => {
 
         const {first_name, last_name, email, password}: IUser = req.body;
 
@@ -54,7 +54,7 @@ class AdminController {
         }
     }
 
-    public login = async(req: Request, res: Response):Promise<void> => {
+    public login = async(req: Request, res: Response): Promise<void> => {
 
         const {email, password} = req.body;
 
@@ -89,7 +89,7 @@ class AdminController {
         }
     }
 
-    public getAll = async(req: Request, res: Response):Promise<void> => {
+    public getAll = async(req: Request, res: Response): Promise<void> => {
 
         const response = await adminsRepository.getAll();
 
@@ -111,7 +111,7 @@ class AdminController {
 
     };
 
-    public getById = async(req: Request, res: Response):Promise<void> => {
+    public getById = async(req: Request, res: Response): Promise<void> => {
 
         const response = await adminsRepository.getById(req.params.id);
 
@@ -130,7 +130,7 @@ class AdminController {
 
     };
 
-    public me = async(req: Request, res: Response):Promise<void> => {
+    public me = async(req: Request, res: Response): Promise<void> => {
 
         const user = req.body.user;
 
@@ -151,7 +151,7 @@ class AdminController {
 
     };
 
-    public update = async(req: Request, res: Response):Promise<void> => {
+    public update = async(req: Request, res: Response): Promise<void> => {
 
         const response:IQueryResponse = await adminsRepository.update(req.params.id, req.body);
 
@@ -168,7 +168,7 @@ class AdminController {
         }
     };
 
-    public delete = async(req: Request, res: Response):Promise<void> => {
+    public delete = async(req: Request, res: Response): Promise<void> => {
 
         const response:IQueryResponse = await adminsRepository.delete(req.params.id);
 

@@ -190,12 +190,14 @@ class UsersRepository {
 
     public delete = async(id: string): Promise<IQueryResponse> => {
 
-        return database.query(`delete from ${this.table} WHERE id = '${id}' AND role = 0`)
+        return database.query(`delete from ${this.table} WHERE id = '${id}' AND role = 0 RETURNING *`)
         .then((value) => {
+
             if(value.rowCount === 0) return {
                 ok: false,
                 data: 'User not found'
             }
+            
             else return {
                 ok: true,
                 data: value.rows[0]

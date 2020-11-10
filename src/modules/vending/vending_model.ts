@@ -1,6 +1,6 @@
 
 export interface IVending {
-    id?: number
+    id?: string
     name: string
     machine_id: string
     status?: boolean

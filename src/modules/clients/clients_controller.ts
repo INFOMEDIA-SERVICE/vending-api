@@ -6,7 +6,7 @@ import { IUser } from '../user/users_model';
 
 class ClientsController {
 
-    public signup = async(req: Request, res: Response):Promise<void> => {
+    public signup = async(req: Request, res: Response): Promise<void> => {
 
         const {first_name, last_name, email, password}: IUser = req.body;
 
@@ -49,7 +49,7 @@ class ClientsController {
         }
     }
 
-    public login = async(req: Request, res: Response):Promise<void> => {
+    public login = async(req: Request, res: Response): Promise<void> => {
 
         const {email, password} = req.body;
 
@@ -81,7 +81,7 @@ class ClientsController {
         }
     }
 
-    public getAll = async(req: Request, res: Response):Promise<void> => {
+    public getAll = async(req: Request, res: Response): Promise<void> => {
 
         const response = await clientsRepository.getAll();
 
@@ -103,7 +103,7 @@ class ClientsController {
 
     };
 
-    public getById = async(req: Request, res: Response):Promise<void> => {
+    public getById = async(req: Request, res: Response): Promise<void> => {
 
         const response = await clientsRepository.getById(req.params.id);
 
@@ -122,7 +122,7 @@ class ClientsController {
 
     };
 
-    public me = async(req: Request, res: Response):Promise<void> => {
+    public me = async(req: Request, res: Response): Promise<void> => {
 
         const user = req.body.user;
 
@@ -143,7 +143,7 @@ class ClientsController {
 
     };
 
-    public update = async(req: Request, res: Response):Promise<void> => {
+    public update = async(req: Request, res: Response): Promise<void> => {
 
         const response:IQueryResponse = await clientsRepository.update(req.params.id, req.body);
 
@@ -160,7 +160,7 @@ class ClientsController {
         }
     };
 
-    public delete = async(req: Request, res: Response):Promise<void> => {
+    public delete = async(req: Request, res: Response): Promise<void> => {
 
         const response:IQueryResponse = await clientsRepository.delete(req.params.id);
 

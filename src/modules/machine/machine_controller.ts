@@ -239,7 +239,7 @@ class SocketController {
 
     };
 
-    private saveUser = async(socket:ws, message:IMessage):Promise<void> => {
+    private saveUser = async(socket:ws, message:IMessage): Promise<void> => {
 
         const user:ISocketUser = {
             client: socket,

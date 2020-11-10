@@ -1,11 +1,12 @@
 
 export interface IService {
-    id?: number
+    id?: string
     user_id: string
     machine_id: string
-    products: string[]
+    products: any[]
     success?: boolean
     status?: boolean
+    value?: number
     created_at?: Date
     updated_at?: Date    
 };

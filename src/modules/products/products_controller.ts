@@ -4,7 +4,7 @@ import { IQueryResponse } from '../../interfaces/postgres_responses';
 
 class ProductsController {
 
-    public create = async(req: Request, res: Response):Promise<void> => {
+    public create = async(req: Request, res: Response): Promise<void> => {
 
         const response: IQueryResponse = await productsRepository.create(req.body);
 
@@ -21,7 +21,7 @@ class ProductsController {
         }
     };
 
-    public getAll = async(req: Request, res: Response):Promise<void> => {
+    public getAll = async(req: Request, res: Response): Promise<void> => {
 
         const response: IQueryResponse = await productsRepository.getAll();
 
@@ -39,7 +39,7 @@ class ProductsController {
 
     };
 
-    public getById = async(req: Request, res: Response):Promise<void> => {
+    public getById = async(req: Request, res: Response): Promise<void> => {
 
         const response: IQueryResponse = await productsRepository.getById(req.params.id);
 
@@ -57,7 +57,7 @@ class ProductsController {
 
     };
 
-    public update = async(req: Request, res: Response):Promise<void> => {
+    public update = async(req: Request, res: Response): Promise<void> => {
 
         const response: IQueryResponse = await productsRepository.update(req.params.id, req.body);
 
@@ -74,7 +74,7 @@ class ProductsController {
         }
     };
 
-    public delete = async(req: Request, res: Response):Promise<void> => {
+    public delete = async(req: Request, res: Response): Promise<void> => {
 
         const response: IQueryResponse = await productsRepository.delete(req.params.id);
 

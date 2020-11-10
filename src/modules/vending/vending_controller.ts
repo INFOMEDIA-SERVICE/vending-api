@@ -5,7 +5,7 @@ import { IQueryResponse } from '../../interfaces/postgres_responses';
 
 class VendingController {
 
-    public create = async(req: Request, res: Response):Promise<void> => {
+    public create = async(req: Request, res: Response): Promise<void> => {
 
         const response:IQueryResponse = await vendingsRepository.create(req.body);
 
@@ -22,7 +22,7 @@ class VendingController {
         }
     };
 
-    public getVendingProducts = async(req: Request, res: Response):Promise<void> => {
+    public getVendingProducts = async(req: Request, res: Response): Promise<void> => {
 
         const response = await vendingsRepository.getVendingProducts(req.params.id);
 
@@ -40,7 +40,7 @@ class VendingController {
 
     };
 
-    public getAll = async(req: Request, res: Response):Promise<void> => {
+    public getAll = async(req: Request, res: Response): Promise<void> => {
 
         const response = await vendingsRepository.getAll();
 
@@ -58,7 +58,7 @@ class VendingController {
 
     };
 
-    public getCount = async(req: Request, res: Response):Promise<void> => {
+    public getCount = async(req: Request, res: Response): Promise<void> => {
         
         const response = await vendingsRepository.getAll();
 
@@ -76,7 +76,7 @@ class VendingController {
 
     };
 
-    public getById = async(req: Request, res: Response):Promise<void> => {
+    public getById = async(req: Request, res: Response): Promise<void> => {
 
         const response = await vendingsRepository.getById(req.params.id);
 
@@ -94,7 +94,7 @@ class VendingController {
 
     };
 
-    public update = async(req: Request, res: Response):Promise<void> => {
+    public update = async(req: Request, res: Response): Promise<void> => {
 
         const response:IQueryResponse = await vendingsRepository.update(req.params.id, req.body);
 
@@ -111,7 +111,7 @@ class VendingController {
         }
     };
 
-    public delete = async(req: Request, res: Response):Promise<void> => {
+    public delete = async(req: Request, res: Response): Promise<void> => {
 
         const response:IQueryResponse = await vendingsRepository.delete(req.params.id);
 

@@ -47,7 +47,8 @@ CREATE TABLE IF NOT EXISTS services(
     id varchar(64) NOT NULL DEFAULT uuid_generate_v4(),
     machine_id TEXT NOT NULL,
     user_id TEXT NOT NULL,
-    products text[],
+    products text[][],
+    value integer NOT NULL,
     success boolean default true,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
@@ -57,6 +58,8 @@ CREATE TABLE IF NOT EXISTS services(
 INSERT INTO services(machine_id, user_id, products, success) VALUES(
     'STM32-1234567891',
     '4a141b23-22e8-4807-b653-fe4615fb8687',
-    '{"9253f8c3-7988-43c2-a933-27964e5219a0", "9253f8c3-7988-43c2-a933-27964e5219a0"}',
+    '{{"id","9253f8c3-7988-43c2-a933-27964e5219a0","dispensed",true},{"id","9253f8c3-7988-43c2-a933-27964e5219a0","dispensed",true}}',
     true
 ) RETURNING *;
+
+

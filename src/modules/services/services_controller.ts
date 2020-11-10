@@ -4,15 +4,21 @@ import { IQueryResponse } from '../../interfaces/postgres_responses';
 
 class ServiceController {
 
-    public create = async(req: Request, res: Response):Promise<void> => {
+    public create = async(req: Request, res: Response): Promise<void> => {
+
+        req.body.products = this.parseObjectToSqlArray(req.body.products);
 
         const response: IQueryResponse = await servicesRepository.create(req.body);
 
         if(response.ok) {
+
+            response.data.products = this.parseListToObject(response.data.products);
+
             res.send({
                 ok: true,
                 service: response.data
             });
+
         } else {
             res.status(400).json({
                 ok: false,
@@ -21,7 +27,7 @@ class ServiceController {
         }
     };
 
-    public getServicesByUser = async(req: Request, res: Response):Promise<void> => {
+    public getServicesByUser = async(req: Request, res: Response): Promise<void> => {
 
         const response: IQueryResponse = await servicesRepository.getServicesByUser(req.params.id);
 
@@ -39,7 +45,7 @@ class ServiceController {
 
     };
 
-    public getServicesByMachine = async(req: Request, res: Response):Promise<void> => {
+    public getServicesByMachine = async(req: Request, res: Response): Promise<void> => {
 
         const response: IQueryResponse = await servicesRepository.getServicesByMachine(req.params.id);
 
@@ -57,7 +63,7 @@ class ServiceController {
 
     };
 
-    public getAll = async(req: Request, res: Response):Promise<void> => {
+    public getAll = async(req: Request, res: Response): Promise<void> => {
 
         const response: IQueryResponse = await servicesRepository.getAll();
 
@@ -75,7 +81,7 @@ class ServiceController {
 
     };
 
-    public getById = async(req: Request, res: Response):Promise<void> => {
+    public getById = async(req: Request, res: Response): Promise<void> => {
 
         const response: IQueryResponse = await servicesRepository.getById(req.params.id);
 
@@ -93,7 +99,7 @@ class ServiceController {
 
     };
 
-    public update = async(req: Request, res: Response):Promise<void> => {
+    public update = async(req: Request, res: Response): Promise<void> => {
 
         const response: IQueryResponse = await servicesRepository.update(req.params.id, req.body);
 
@@ -110,7 +116,7 @@ class ServiceController {
         }
     };
 
-    public delete = async(req: Request, res: Response):Promise<void> => {
+    public delete = async(req: Request, res: Response): Promise<void> => {
 
         const response: IQueryResponse = await servicesRepository.delete(req.params.id);
 
@@ -125,8 +131,38 @@ class ServiceController {
                 message: response.data
             });
         }
-
     };
+
+    private parseObjectToSqlArray = (value: any[]) => {
+        
+        let products;
+
+        for (let i = 0; i < value.length; i++) {
+            
+            if(i === 0) products = products ?? '' + '{';
+            products = products + `{"id","${value[i].id}","dispensed",${value[i].dispensed}}`;
+            if(i !== value.length-1) products = products + ',';
+            if(i === value.length-1) products = products + '}';
+            
+        }
+
+        return products
+    }
+
+    private parseListToObject = (value: any[]) => {
+        
+        let products: any[] = [];
+
+        value.forEach((p: any) => {
+            products.push({
+                id: p[1],
+                dispensed: Boolean(p[3])
+            });
+        });
+
+        return products;
+
+    }
 }
 
 export const servicesController: ServiceController = new ServiceController;

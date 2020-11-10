@@ -173,7 +173,7 @@ class UsersRepository {
             });
         });
         this.delete = (id) => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`delete from ${this.table} WHERE id = '${id}' AND role = 0`)
+            return database_1.database.query(`delete from ${this.table} WHERE id = '${id}' AND role = 0 RETURNING *`)
                 .then((value) => {
                 if (value.rowCount === 0)
                     return {

@@ -14,8 +14,10 @@ const services_repository_1 = require("./services_repository");
 class ServiceController {
     constructor() {
         this.create = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            req.body.products = this.parseObjectToSqlArray(req.body.products);
             const response = yield services_repository_1.servicesRepository.create(req.body);
             if (response.ok) {
+                response.data.products = this.parseListToObject(response.data.products);
                 res.send({
                     ok: true,
                     service: response.data
@@ -118,6 +120,29 @@ class ServiceController {
                 });
             }
         });
+        this.parseObjectToSqlArray = (value) => {
+            let products;
+            for (let i = 0; i < value.length; i++) {
+                if (i === 0)
+                    products = products !== null && products !== void 0 ? products : '' + '{';
+                products = products + `{"id","${value[i].id}","dispensed",${value[i].dispensed}}`;
+                if (i !== value.length - 1)
+                    products = products + ',';
+                if (i === value.length - 1)
+                    products = products + '}';
+            }
+            return products;
+        };
+        this.parseListToObject = (value) => {
+            let products = [];
+            value.forEach((p) => {
+                products.push({
+                    id: p[1],
+                    dispensed: Boolean(p[3])
+                });
+            });
+            return products;
+        };
     }
 }
 exports.servicesController = new ServiceController;
