@@ -83,12 +83,8 @@ class SocketController {
                 if(message.toString().toLowerCase().includes('date')) {
                     return;
                 }
-                
-                if(message.toString() === 'vmstart') {
-                    return;
-                }
 
-                if(message.toString() === 'vmdeny') {
+                if(message.toString().toLowerCase().includes('vm')) {
                     return;
                 }
 
@@ -98,12 +94,16 @@ class SocketController {
 
                 switch (response.action) {
 
-                    case 'session.idle': socket.send(JSON.stringify({
-                        type: 2,
-                        data: {
-                            message: 'machine is available'
-                        }
-                    }));
+                    case 'session.idle':
+                        
+                        client.end();
+
+                        socket.send(JSON.stringify({
+                            type: 2,
+                            data: {
+                                message: 'machine is available'
+                            }
+                        }));
 
                     default: break;
                 }
@@ -193,12 +193,8 @@ class SocketController {
             if(message.toString().toLowerCase().includes('date')) {
                 return;
             }
-            
-            if(message.toString() === 'vmstart') {
-                return;
-            }
 
-            if(message.toString() === 'vmdeny') {
+            if(message.toString().toLowerCase().includes('vm')) {
                 return;
             }
 
