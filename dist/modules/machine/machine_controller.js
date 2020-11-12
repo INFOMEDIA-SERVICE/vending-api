@@ -38,13 +38,15 @@ class SocketController {
                         message: auth.message
                     }
                 }));
-            console.log(auth);
             switch (message.type) {
                 case 0:
                     this.saveUser(socket, message);
                     break;
                 case 1:
                     this.dispense(socket, message);
+                    break;
+                case 2:
+                    this.verifyStatus(socket, message);
                     break;
                 default:
                     socket.send(JSON.stringify({
@@ -55,6 +57,42 @@ class SocketController {
                     }));
                     break;
             }
+        });
+        this.verifyStatus = (socket, message) => __awaiter(this, void 0, void 0, function* () {
+            const machineId = message.data.machineId;
+            const options = {
+                clientId: `${process.env.MQTT_CLIENTID}:${machineId}`,
+                username: process.env.MQTT_USERNAME,
+                password: process.env.MQTT_PASSWORD,
+                port: parseInt(process.env.MQTT_PORT || '') || 10110
+            };
+            let client = mqtt_1.default.connect('mqtt://iot.infomediaservice.com', options);
+            client.subscribe(`${this.topic}`);
+            client.on('connect', () => {
+                client.publish(`${this.topic}`, 'vmstatus');
+                client.on('message', (_, message) => {
+                    if (message.toString().toLowerCase().includes('date')) {
+                        return;
+                    }
+                    if (message.toString() === 'vmstart') {
+                        return;
+                    }
+                    if (message.toString() === 'vmdeny') {
+                        return;
+                    }
+                    const response = JSON.parse(message.toString());
+                    console.log(response);
+                    switch (response.action) {
+                        case 'session.idle': socket.send(JSON.stringify({
+                            type: 2,
+                            data: {
+                                message: 'machine is available'
+                            }
+                        }));
+                        default: break;
+                    }
+                });
+            });
         });
         this.dispense = (socket, message) => __awaiter(this, void 0, void 0, function* () {
             const machineId = message.data.machineId;

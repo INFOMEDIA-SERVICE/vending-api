@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS vendings(
     machine_id TEXT NOT NULL UNIQUE CHECK (machine_id <> ''),
     errors integer DEFAULT 0,
     dispended integer DEFAULT 0,
+    image text NOT NULL,
     requests integer DEFAULT 0,
     status BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT NOW(),

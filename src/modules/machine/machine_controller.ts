@@ -44,11 +44,10 @@ class SocketController {
             }
         }));
 
-        console.log(auth);
-
         switch (message.type) {
             case 0: this.saveUser(socket, message); break;
             case 1: this.dispense(socket, message); break;
+            case 2: this.verifyStatus(socket, message); break;
             default:
                 socket.send(JSON.stringify({
                     type: -1,
@@ -58,6 +57,59 @@ class SocketController {
                 }));
             break;
         }
+    };
+
+    public verifyStatus = async(socket: ws, message: IMessage): Promise<void> => {
+
+        const machineId: string = message.data.machineId;
+
+        const options: mqtt.IClientOptions = {
+            clientId: `${process.env.MQTT_CLIENTID}:${machineId}`,
+            username: process.env.MQTT_USERNAME,
+            password: process.env.MQTT_PASSWORD,
+            port: parseInt(process.env.MQTT_PORT || '') || 10110
+        };
+
+        let client: mqtt.MqttClient = mqtt.connect('mqtt://iot.infomediaservice.com', options);
+
+        client.subscribe(`${this.topic}`);
+
+        client.on('connect', () => {
+
+            client.publish(`${this.topic}`, 'vmstatus');
+
+            client.on('message', (_, message) => {
+
+                if(message.toString().toLowerCase().includes('date')) {
+                    return;
+                }
+                
+                if(message.toString() === 'vmstart') {
+                    return;
+                }
+
+                if(message.toString() === 'vmdeny') {
+                    return;
+                }
+
+                const response = JSON.parse(message.toString());
+
+                console.log(response);
+
+                switch (response.action) {
+
+                    case 'session.idle': socket.send(JSON.stringify({
+                        type: 2,
+                        data: {
+                            message: 'machine is available'
+                        }
+                    }));
+
+                    default: break;
+                }
+            });
+
+        });
     };
 
     public dispense = async(socket: ws, message: IMessage): Promise<void> => {
