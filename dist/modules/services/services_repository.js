@@ -15,7 +15,7 @@ class ServicesRepository {
     constructor() {
         this.table = 'services';
         this.create = (service) => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`insert into ${this.table}(user_id, machine_id, products, value, success) values('${service.user_id}', '${service.machine_id}', '${service.products}', ${service.value}, ${service.success}) RETURNING *`).then((value) => {
+            return database_1.database.query(`insert into ${this.table}(user_id, machine_id, products, reference, value, success) values('${service.user_id}', '${service.machine_id}', '${service.products}', '${service.reference}', ${service.value}, ${service.success}) RETURNING *`).then((value) => {
                 return {
                     ok: true,
                     data: value.rows[0]
@@ -121,7 +121,7 @@ class ServicesRepository {
                 if (value.rowCount === 0)
                     return {
                         ok: false,
-                        data: 'User not found'
+                        data: 'Service not found'
                     };
                 return {
                     ok: true,

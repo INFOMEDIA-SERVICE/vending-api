@@ -6,6 +6,7 @@ import { EventEmitter } from 'events';
 import { setTimeout } from 'timers';
 import { machineRepository } from './machine_repository';
 import { authController } from '../../utils/auth_controller';
+import { servicesController } from '../services/services_controller';
 
 interface IMessage {
     type?: number
@@ -16,6 +17,7 @@ interface IProduct {
     id: string
     name: string
     item: number
+    price: number
 }
 
 class Emitter extends EventEmitter {}
@@ -153,10 +155,12 @@ class SocketController {
 
             let counter = 0;
 
+            this.createService(listener, socket, machineId, userId);
+            
             listener.on('next', () => {
                 
                 if(counter < products.length) {
-
+                    
                     console.log(`Product #${counter+1}`);
 
                     if(counter > 0) {
@@ -182,9 +186,45 @@ class SocketController {
         });
     };
 
+    private createService = (listener: Emitter, socket: ws, machine_id: string, user_id: string) => {
+
+        let products: any[] = [];
+        let value: number = 0;
+
+        listener.on('addProduct', (data) => {
+            products.push(data);
+        });
+
+        listener.on('save', async() => {
+
+            products.forEach((p) => {
+                value += p.price || 0
+            });
+
+            const response = await servicesController.create({
+                machine_id,
+                user_id,
+                products,
+                value,
+                reference: (new Date()).getTime().toString(36) + Math.random().toString(36).slice(2),
+                success: value >= 0
+            });
+
+            return socket.send(JSON.stringify({
+                type: 0,
+                data: {
+                    message: 'sale summary',
+                    service: response.service
+                }
+            }));
+        });
+    }
+
     private dispenseSecuense = (client: mqtt.MqttClient, socket: ws, product: IProduct, listener: Emitter, isLast: boolean) => {
 
         // STARTING
+
+        let dispensed: boolean;
 
         client.publish(`${this.topic}`, 'vmstart');
 
@@ -253,6 +293,7 @@ class SocketController {
                 break;
 
                 case 'vend.fails':
+                    dispensed = false;
                     socket.send(JSON.stringify({
                         type: -1,
                         data: {
@@ -263,6 +304,7 @@ class SocketController {
                 break;
 
                 case 'vend.sucess':
+                    dispensed = true;
                     socket.send(JSON.stringify({
                         type: 0,
                         data: {
@@ -277,17 +319,26 @@ class SocketController {
                     client.end();
                     
                     machineRepository.editProduct(product.id);
+
+                    listener.emit('addProduct', {
+                        id: product.id,
+                        dispensed,
+                        price: product.price || 0
+                    });
+
+                    if(isLast) {
+                        listener.emit('save');
+                        socket.send(JSON.stringify({
+                            type: 0,
+                            data: {
+                                message: 'sale finished'
+                            }
+                        }));
+                    }
                     
                     setTimeout(() => {
                         listener.emit('next');
                     }, 1000);
-                    
-                    if(isLast) socket.send(JSON.stringify({
-                        type: 0,
-                        data: {
-                            message: 'sale finished'
-                        }
-                    }));
 
                 break;
 

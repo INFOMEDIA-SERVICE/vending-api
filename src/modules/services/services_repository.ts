@@ -9,7 +9,7 @@ class ServicesRepository {
     public create = async(service: IService): Promise<IQueryResponse> => {
 
         return database.query(
-            `insert into ${this.table}(user_id, machine_id, products, value, success) values('${service.user_id}', '${service.machine_id}', '${service.products}', ${service.value}, ${service.success}) RETURNING *`
+            `insert into ${this.table}(user_id, machine_id, products, reference, value, success) values('${service.user_id}', '${service.machine_id}', '${service.products}', '${service.reference}', ${service.value}, ${service.success}) RETURNING *`
         ).then((value) => {
 
             return {
@@ -135,7 +135,7 @@ class ServicesRepository {
         
             if(value.rowCount === 0) return {
                 ok: false,
-                data: 'User not found'
+                data: 'Service not found'
             }
 
             return {

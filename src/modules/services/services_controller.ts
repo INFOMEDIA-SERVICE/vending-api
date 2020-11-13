@@ -1,29 +1,30 @@
 import { Request, Response } from 'express';
 import { servicesRepository } from './services_repository';
 import { IQueryResponse } from '../../interfaces/postgres_responses';
+import { IService } from './services_model';
 
 class ServiceController {
 
-    public create = async(req: Request, res: Response): Promise<void> => {
+    public create = async(service: IService) => {
 
-        req.body.products = this.parseObjectToSqlArray(req.body.products);
+        service.products = this.parseObjectToSqlArray(service.products) + '';
 
-        const response: IQueryResponse = await servicesRepository.create(req.body);
+        const response: IQueryResponse = await servicesRepository.create(service);
 
         if(response.ok) {
 
             response.data.products = this.parseListToObject(response.data.products);
 
-            res.send({
+            return {
                 ok: true,
                 service: response.data
-            });
+            };
 
         } else {
-            res.status(400).json({
+            return {
                 ok: false,
                 message: response.data
-            });
+            };
         }
     };
 
@@ -154,14 +155,14 @@ class ServiceController {
         }
     };
 
-    private parseObjectToSqlArray = (value: any[]) => {
+    private parseObjectToSqlArray = (value: any[] | string) => {
         
         let products;
 
         for (let i = 0; i < value.length; i++) {
             
             if(i === 0) products = products ?? '' + '{';
-            products = products + `{"id","${value[i].id}","dispensed",${value[i].dispensed}}`;
+            products = products + `{"id","${value[i].id}","dispensed",${value[i].dispensed},"price",${value[i].price}}`;
             if(i !== value.length-1) products = products + ',';
             if(i === value.length-1) products = products + '}';
             
@@ -177,7 +178,8 @@ class ServiceController {
         value.forEach((p: any) => {
             products.push({
                 id: p[1],
-                dispensed: Boolean(p[3])
+                dispensed: Boolean(p[3]),
+                price: p[5]
             });
         });
 

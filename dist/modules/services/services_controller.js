@@ -13,21 +13,21 @@ exports.servicesController = void 0;
 const services_repository_1 = require("./services_repository");
 class ServiceController {
     constructor() {
-        this.create = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            req.body.products = this.parseObjectToSqlArray(req.body.products);
-            const response = yield services_repository_1.servicesRepository.create(req.body);
+        this.create = (service) => __awaiter(this, void 0, void 0, function* () {
+            service.products = this.parseObjectToSqlArray(service.products) + '';
+            const response = yield services_repository_1.servicesRepository.create(service);
             if (response.ok) {
                 response.data.products = this.parseListToObject(response.data.products);
-                res.send({
+                return {
                     ok: true,
                     service: response.data
-                });
+                };
             }
             else {
-                res.status(400).json({
+                return {
                     ok: false,
                     message: response.data
-                });
+                };
             }
         });
         this.getServicesByUser = (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -142,7 +142,7 @@ class ServiceController {
             for (let i = 0; i < value.length; i++) {
                 if (i === 0)
                     products = products !== null && products !== void 0 ? products : '' + '{';
-                products = products + `{"id","${value[i].id}","dispensed",${value[i].dispensed}}`;
+                products = products + `{"id","${value[i].id}","dispensed",${value[i].dispensed},"price",${value[i].price}}`;
                 if (i !== value.length - 1)
                     products = products + ',';
                 if (i === value.length - 1)
@@ -155,7 +155,8 @@ class ServiceController {
             value.forEach((p) => {
                 products.push({
                     id: p[1],
-                    dispensed: Boolean(p[3])
+                    dispensed: Boolean(p[3]),
+                    price: p[5]
                 });
             });
             return products;

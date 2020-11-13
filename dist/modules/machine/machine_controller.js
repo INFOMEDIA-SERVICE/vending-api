@@ -19,6 +19,7 @@ const events_1 = require("events");
 const timers_1 = require("timers");
 const machine_repository_1 = require("./machine_repository");
 const auth_controller_1 = require("../../utils/auth_controller");
+const services_controller_1 = require("../services/services_controller");
 class Emitter extends events_1.EventEmitter {
 }
 class SocketController {
@@ -121,6 +122,7 @@ class SocketController {
             client.on('connect', () => {
                 const products = message.data.products;
                 let counter = 0;
+                this.createService(listener, socket, machineId, userId);
                 listener.on('next', () => {
                     if (counter < products.length) {
                         console.log(`Product #${counter + 1}`);
@@ -135,8 +137,36 @@ class SocketController {
                 listener.emit('next');
             });
         });
+        this.createService = (listener, socket, machine_id, user_id) => {
+            let products = [];
+            let value = 0;
+            listener.on('addProduct', (data) => {
+                products.push(data);
+            });
+            listener.on('save', () => __awaiter(this, void 0, void 0, function* () {
+                products.forEach((p) => {
+                    value += p.price || 0;
+                });
+                const response = yield services_controller_1.servicesController.create({
+                    machine_id,
+                    user_id,
+                    products,
+                    value,
+                    reference: (new Date()).getTime().toString(36) + Math.random().toString(36).slice(2),
+                    success: value >= 0
+                });
+                return socket.send(JSON.stringify({
+                    type: 0,
+                    data: {
+                        message: 'sale summary',
+                        service: response.service
+                    }
+                }));
+            }));
+        };
         this.dispenseSecuense = (client, socket, product, listener, isLast) => {
             // STARTING
+            let dispensed;
             client.publish(`${this.topic}`, 'vmstart');
             client.on('message', (_, message) => {
                 if (message.toString().toLowerCase().includes('date')) {
@@ -192,6 +222,7 @@ class SocketController {
                         }));
                         break;
                     case 'vend.fails':
+                        dispensed = false;
                         socket.send(JSON.stringify({
                             type: -1,
                             data: {
@@ -201,6 +232,7 @@ class SocketController {
                         }));
                         break;
                     case 'vend.sucess':
+                        dispensed = true;
                         socket.send(JSON.stringify({
                             type: 0,
                             data: {
@@ -212,16 +244,23 @@ class SocketController {
                     case 'session.closed':
                         client.end();
                         machine_repository_1.machineRepository.editProduct(product.id);
-                        timers_1.setTimeout(() => {
-                            listener.emit('next');
-                        }, 1000);
-                        if (isLast)
+                        listener.emit('addProduct', {
+                            id: product.id,
+                            dispensed,
+                            price: product.price || 0
+                        });
+                        if (isLast) {
+                            listener.emit('save');
                             socket.send(JSON.stringify({
                                 type: 0,
                                 data: {
                                     message: 'sale finished'
                                 }
                             }));
+                        }
+                        timers_1.setTimeout(() => {
+                            listener.emit('next');
+                        }, 1000);
                         break;
                     default: break;
                 }
