@@ -319,7 +319,7 @@ class SocketController {
 
                     client.end();
                     
-                    machineRepository.editProduct(product.id);
+                    if(dispensed) machineRepository.editProduct(product.id);
 
                     listener.emit('addProduct', {
                         id: product.id,

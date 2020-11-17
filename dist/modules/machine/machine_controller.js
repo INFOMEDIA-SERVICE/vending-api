@@ -244,7 +244,8 @@ class SocketController {
                         break;
                     case 'session.closed':
                         client.end();
-                        machine_repository_1.machineRepository.editProduct(product.id);
+                        if (dispensed)
+                            machine_repository_1.machineRepository.editProduct(product.id);
                         listener.emit('addProduct', {
                             id: product.id,
                             dispensed,
