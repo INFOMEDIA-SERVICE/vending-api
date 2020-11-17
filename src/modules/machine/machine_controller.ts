@@ -7,6 +7,7 @@ import { setTimeout } from 'timers';
 import { machineRepository } from './machine_repository';
 import { authController } from '../../utils/auth_controller';
 import { servicesController } from '../services/services_controller';
+import { nanoid } from 'nanoid';
 
 interface IMessage {
     type?: number
@@ -206,7 +207,7 @@ class SocketController {
                 user_id,
                 products,
                 value,
-                reference: (new Date()).getTime().toString(36) + Math.random().toString(36).slice(2),
+                reference: nanoid(14),
                 success: value >= 0
             });
 
