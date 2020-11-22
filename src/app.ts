@@ -28,7 +28,7 @@ app.use('/api/clients', clientsRoutes);
 app.use('/api/vendings', vendingRoutes);
 app.use('/api/products', productsRoutes);
 app.use('/api/services', servicesRoutes);
-app.use('/api/users', adminRoutes);
+app.use('/api/admins', adminRoutes);
 
 export default app;
 

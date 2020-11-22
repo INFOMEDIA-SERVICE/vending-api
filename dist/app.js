@@ -27,7 +27,7 @@ app.use('/api/clients', clients_routes_1.default);
 app.use('/api/vendings', vending_routes_1.default);
 app.use('/api/products', products_routes_1.default);
 app.use('/api/services', services_routes_1.default);
-app.use('/api/users', admin_routes_1.default);
+app.use('/api/admins', admin_routes_1.default);
 exports.default = app;
 // POSTGRESS_USER='postgres'
 // POSTGRESS_DATABASE='vendings'

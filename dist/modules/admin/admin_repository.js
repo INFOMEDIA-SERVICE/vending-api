@@ -30,8 +30,7 @@ class AdminsRepository {
             });
         });
         this.login = (email) => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`SELECT * FROM ${this.table} WHERE email = '${email}' AND role = 2`)
-                .then((value) => {
+            return database_1.database.query(`SELECT * FROM ${this.table} WHERE email = '${email}' AND role = 2`).then((value) => {
                 if (value.rowCount === 0)
                     return {
                         ok: false,
@@ -71,7 +70,7 @@ class AdminsRepository {
                 if (value.rowCount === 0)
                     return {
                         ok: false,
-                        data: 'Client not found'
+                        data: 'User not found'
                     };
                 else
                     return {
@@ -92,7 +91,7 @@ class AdminsRepository {
                 if (value.rowCount === 0)
                     return {
                         ok: false,
-                        data: 'Client not found'
+                        data: 'User not found'
                     };
                 const user = yield this.getById(id);
                 if (!user.ok)

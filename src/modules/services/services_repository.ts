@@ -16,6 +16,7 @@ class ServicesRepository {
                 ok: true,
                 data: value.rows[0]
             }
+
         })
         .catch((err) => {
             return {
@@ -30,13 +31,15 @@ class ServicesRepository {
         return database.query(
             `SELECT * FROM ${this.table}`
         ).then((value) => {
+
             if(value.rowCount === 0) return {
-                ok: false,
-                data: 'User not found'
+                ok: true,
+                data: []
             }
+
             else return {
                 ok: true,
-                data: value.rows[0]
+                data: value.rows
             }
         })
         .catch((err) => {
@@ -90,7 +93,7 @@ class ServicesRepository {
         ).then((value) => {
             if(value.rowCount === 0) return {
                 ok: false,
-                data: 'User not found'
+                data: 'Service not found'
             }
             else return {
                 ok: true,
@@ -110,13 +113,15 @@ class ServicesRepository {
         return database.query(
             `SELECT * FROM ${this.table} WHERE user_id = '${id}'`
         ).then((value) => {
+
             if(value.rowCount === 0) return {
-                ok: false,
-                data: 'User not found'
+                ok: true,
+                data: []
             }
+
             else return {
                 ok: true,
-                data: value.rows[0]
+                data: value.rows
             }
         })
         .catch((err) => {
@@ -155,10 +160,12 @@ class ServicesRepository {
 
         return database.query(`delete from ${this.table} WHERE id = '${id}'`)
         .then((value) => {
+
             if(value.rowCount === 0) return {
                 ok: false,
-                data: 'User not found'
+                data: 'Service not found'
             }
+
             else return {
                 ok: true,
                 data: value.rows[0]

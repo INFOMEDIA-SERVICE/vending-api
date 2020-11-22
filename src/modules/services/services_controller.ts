@@ -33,6 +33,14 @@ class ServiceController {
         const response: IQueryResponse = await servicesRepository.getServicesByUser(req.params.id);
 
         if(response.ok) {
+
+            response.data.forEach((s: any) => {
+
+                s.products = this.parseListToObject(s.products);
+
+                return s;
+            });
+
             res.send({
                 ok: true,
                 services: response.data
@@ -51,6 +59,14 @@ class ServiceController {
         const response: IQueryResponse = await servicesRepository.getServicesByMachine(req.params.id);
 
         if(response.ok) {
+
+            response.data.forEach((s: any) => {
+
+                s.products = this.parseListToObject(s.products);
+
+                return s;
+            });
+
             res.send({
                 ok: true,
                 services: response.data
@@ -69,6 +85,14 @@ class ServiceController {
         const response: IQueryResponse = await servicesRepository.getAll();
 
         if(response.ok) {
+
+            response.data.forEach((s: any) => {
+
+                s.products = this.parseListToObject(s.products);
+
+                return s;
+            });
+
             res.send({
                 ok: true,
                 services: response.data
@@ -87,6 +111,9 @@ class ServiceController {
         const response: IQueryResponse = await servicesRepository.getById(req.params.id);
 
         if(response.ok) {
+
+            response.data.products = this.parseListToObject(response.data.products);
+
             res.send({
                 ok: true,
                 service: response.data
@@ -104,13 +131,22 @@ class ServiceController {
 
         const user = req.body.user;
 
+        console.log(user.id);
+
         const response: IQueryResponse = await servicesRepository.getByUserId(user.id);
 
         if(response.ok) {
-            delete response.data.password;
+
+            response.data.forEach((s: any) => {
+
+                s.products = this.parseListToObject(s.products);
+
+                return s;
+            });
+
             res.send({
                 ok: true,
-                user: response.data
+                services: response.data
             });
         } else {
             res.status(400).json({
@@ -126,6 +162,9 @@ class ServiceController {
         const response: IQueryResponse = await servicesRepository.update(req.params.id, req.body);
 
         if(response.ok) {
+
+            response.data.products = this.parseListToObject(response.data.products);
+
             res.send({
                 ok: true,
                 service: response.data

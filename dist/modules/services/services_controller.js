@@ -33,6 +33,10 @@ class ServiceController {
         this.getServicesByUser = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const response = yield services_repository_1.servicesRepository.getServicesByUser(req.params.id);
             if (response.ok) {
+                response.data.forEach((s) => {
+                    s.products = this.parseListToObject(s.products);
+                    return s;
+                });
                 res.send({
                     ok: true,
                     services: response.data
@@ -48,6 +52,10 @@ class ServiceController {
         this.getServicesByMachine = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const response = yield services_repository_1.servicesRepository.getServicesByMachine(req.params.id);
             if (response.ok) {
+                response.data.forEach((s) => {
+                    s.products = this.parseListToObject(s.products);
+                    return s;
+                });
                 res.send({
                     ok: true,
                     services: response.data
@@ -63,6 +71,10 @@ class ServiceController {
         this.getAll = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const response = yield services_repository_1.servicesRepository.getAll();
             if (response.ok) {
+                response.data.forEach((s) => {
+                    s.products = this.parseListToObject(s.products);
+                    return s;
+                });
                 res.send({
                     ok: true,
                     services: response.data
@@ -78,6 +90,7 @@ class ServiceController {
         this.getById = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const response = yield services_repository_1.servicesRepository.getById(req.params.id);
             if (response.ok) {
+                response.data.products = this.parseListToObject(response.data.products);
                 res.send({
                     ok: true,
                     service: response.data
@@ -92,12 +105,16 @@ class ServiceController {
         });
         this.me = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const user = req.body.user;
+            console.log(user.id);
             const response = yield services_repository_1.servicesRepository.getByUserId(user.id);
             if (response.ok) {
-                delete response.data.password;
+                response.data.forEach((s) => {
+                    s.products = this.parseListToObject(s.products);
+                    return s;
+                });
                 res.send({
                     ok: true,
-                    user: response.data
+                    services: response.data
                 });
             }
             else {
@@ -110,6 +127,7 @@ class ServiceController {
         this.update = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const response = yield services_repository_1.servicesRepository.update(req.params.id, req.body);
             if (response.ok) {
+                response.data.products = this.parseListToObject(response.data.products);
                 res.send({
                     ok: true,
                     service: response.data

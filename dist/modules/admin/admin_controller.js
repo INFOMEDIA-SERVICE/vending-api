@@ -87,9 +87,9 @@ class AdminController {
         this.getAll = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const response = yield admin_repository_1.adminsRepository.getAll();
             if (response.ok) {
-                response.data.forEach((client) => {
-                    delete client.password;
-                    return client;
+                response.data.forEach((user) => {
+                    delete user.password;
+                    return user;
                 });
                 res.send({
                     ok: true,
@@ -109,7 +109,7 @@ class AdminController {
                 delete response.data.password;
                 res.send({
                     ok: true,
-                    client: response.data
+                    user: response.data
                 });
             }
             else {
@@ -126,7 +126,7 @@ class AdminController {
                 delete response.data.password;
                 res.send({
                     ok: true,
-                    client: response.data
+                    user: response.data
                 });
             }
             else {
@@ -141,7 +141,7 @@ class AdminController {
             if (response.ok) {
                 res.send({
                     ok: true,
-                    client: response.data
+                    user: response.data
                 });
             }
             else {

@@ -32,13 +32,13 @@ class ServicesRepository {
             return database_1.database.query(`SELECT * FROM ${this.table}`).then((value) => {
                 if (value.rowCount === 0)
                     return {
-                        ok: false,
-                        data: 'User not found'
+                        ok: true,
+                        data: []
                     };
                 else
                     return {
                         ok: true,
-                        data: value.rows[0]
+                        data: value.rows
                     };
             })
                 .catch((err) => {
@@ -81,7 +81,7 @@ class ServicesRepository {
                 if (value.rowCount === 0)
                     return {
                         ok: false,
-                        data: 'User not found'
+                        data: 'Service not found'
                     };
                 else
                     return {
@@ -100,13 +100,13 @@ class ServicesRepository {
             return database_1.database.query(`SELECT * FROM ${this.table} WHERE user_id = '${id}'`).then((value) => {
                 if (value.rowCount === 0)
                     return {
-                        ok: false,
-                        data: 'User not found'
+                        ok: true,
+                        data: []
                     };
                 else
                     return {
                         ok: true,
-                        data: value.rows[0]
+                        data: value.rows
                     };
             })
                 .catch((err) => {
@@ -141,7 +141,7 @@ class ServicesRepository {
                 if (value.rowCount === 0)
                     return {
                         ok: false,
-                        data: 'User not found'
+                        data: 'Service not found'
                     };
                 else
                     return {
