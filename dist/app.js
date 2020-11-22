@@ -11,6 +11,7 @@ const user_routes_1 = __importDefault(require("./modules/user/user_routes"));
 const admin_routes_1 = __importDefault(require("./modules/admin/admin_routes"));
 const clients_routes_1 = __importDefault(require("./modules/clients/clients_routes"));
 const services_routes_1 = __importDefault(require("./modules/services/services_routes"));
+const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const http_1 = __importDefault(require("http"));
 const cors_1 = __importDefault(require("cors"));
 const app = express_1.default();
@@ -21,6 +22,8 @@ app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: false }));
 app.use(cors_1.default());
 // Routes
+let swaggerDocument = require('../swagger.json');
+app.use('/docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swaggerDocument));
 app.use('/api/users', user_routes_1.default);
 app.use('/api/users', user_routes_1.default);
 app.use('/api/clients', clients_routes_1.default);
@@ -29,12 +32,4 @@ app.use('/api/products', products_routes_1.default);
 app.use('/api/services', services_routes_1.default);
 app.use('/api/admins', admin_routes_1.default);
 exports.default = app;
-// POSTGRESS_USER='postgres'
-// POSTGRESS_DATABASE='vendings'
-// POSTGRESS_HOST='localhost'
-// POSTGRESS_PASSWORD='37375930'
-// POSTGRESS_USER='smartinfo_web'
-// POSTGRESS_DATABASE='smartinfo_vending'
-// POSTGRESS_HOST='localhost'
-// POSTGRESS_PASSWORD='smartinfo.04'
 //# sourceMappingURL=app.js.map

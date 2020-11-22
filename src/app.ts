@@ -5,8 +5,10 @@ import usersRoutes from './modules/user/user_routes';
 import adminRoutes from './modules/admin/admin_routes';
 import clientsRoutes from './modules/clients/clients_routes';
 import servicesRoutes from './modules/services/services_routes';
+import swaggerUi from 'swagger-ui-express';
 import http from 'http';
 import cors from 'cors';
+
 
 const app: Application = express();
 
@@ -22,6 +24,10 @@ app.use(cors());
 
 // Routes
 
+let swaggerDocument = require('../swagger.json');
+
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 app.use('/api/users', usersRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/clients', clientsRoutes);
@@ -31,15 +37,3 @@ app.use('/api/services', servicesRoutes);
 app.use('/api/admins', adminRoutes);
 
 export default app;
-
-
-// POSTGRESS_USER='postgres'
-// POSTGRESS_DATABASE='vendings'
-// POSTGRESS_HOST='localhost'
-// POSTGRESS_PASSWORD='37375930'
-
-
-// POSTGRESS_USER='smartinfo_web'
-// POSTGRESS_DATABASE='smartinfo_vending'
-// POSTGRESS_HOST='localhost'
-// POSTGRESS_PASSWORD='smartinfo.04'

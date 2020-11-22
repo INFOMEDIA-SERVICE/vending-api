@@ -1,0 +1,2698 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "API para realizar ordener a las máquinas expendedoras",
+    "version": "1.0.0",
+    "title": "Vending Machine - API",
+    "contact": {
+      "email": "correo@email.com"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "host": "your-domain.com",
+  "basePath": "/api/",
+  "tags": [
+    {
+      "name": "users",
+      "description": "Rutas de usuarios"
+    },
+    {
+      "name": "products",
+      "description": "Rutas de productos"
+    },
+    {
+      "name": "vendings",
+      "description": "Rutas de vendings"
+    },
+    {
+      "name": "Service",
+      "description": "Rutas de servicios"
+    },
+    {
+      "name": "admins",
+      "description": "Rutas de admins"
+    }
+  ],
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "paths": {
+    "/users/": {
+      "get": {
+        "tags": [
+          "admins"
+        ],
+        "summary": "Obtener todos los usuarios",
+        "description": "Retorna todos los usuarios\n",
+        "operationId": "getAllUsers",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Admin privileges",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuarios registrados",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "users": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/User"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Registrar un usuario",
+        "description": "Retorna al usuario registrado y el token\n",
+        "operationId": "postUser",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "properties": {
+                "first_name": {
+                  "type": "string",
+                  "example": "nombre"
+                },
+                "last_name": {
+                  "type": "string",
+                  "example": "apellido"
+                },
+                "email": {
+                  "type": "string",
+                  "example": "correo@email.com"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "password"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario registrado",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "user": {
+                  "$ref": "#/definitions/User"
+                },
+                "token": {
+                  "type": "string",
+                  "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/users/login": {
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Login de usuarios",
+        "description": "Retorna usuario y token\n",
+        "operationId": "loginUser",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "correo@email.com"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "password"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "user": {
+                  "$ref": "#/definitions/User"
+                },
+                "token": {
+                  "type": "string",
+                  "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/users/login/google": {
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Login de usuarios usando google",
+        "description": "Recibe firebase token, hace el login y retorna usuario y token\n",
+        "operationId": "loginUserWithGoogle",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "user": {
+                  "$ref": "#/definitions/User"
+                },
+                "token": {
+                  "type": "string",
+                  "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/users/signup/google": {
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Registro de usuarios usando google",
+        "description": "Recibe firebase token, hace el registro y retorna usuario y token\n",
+        "operationId": "signupUserWithGoogle",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "user": {
+                  "$ref": "#/definitions/User"
+                },
+                "token": {
+                  "type": "string",
+                  "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "tags": [
+          "admins"
+        ],
+        "summary": "Obtener usuario por id",
+        "description": "Retorna al usuario del id\n",
+        "operationId": "getUserById",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "User id.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "user": {
+                  "$ref": "#/definitions/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Editar usuario",
+        "description": "Retorna al usuario editado\n",
+        "operationId": "editUser",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "User id.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario editado",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "user": {
+                  "$ref": "#/definitions/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Eliminar usuario por id",
+        "description": "Retorna al usuario eliminado\n",
+        "operationId": "deleteUser",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "User id.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario eliminado",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "user": {
+                  "$ref": "#/definitions/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "admins"
+        ],
+        "summary": "Editar status del usuario",
+        "description": "Retorna usuario editado\n",
+        "operationId": "Update user stats",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "User id.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Admin privileges",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "properties": {
+                "status": {
+                  "type": "boolean",
+                  "example": true,
+                  "default": true
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Servicios del usuario que consulta",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "user": {
+                  "$ref": "#/definitions/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/users/me": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Obtener usuario que está haciendo la consulta",
+        "description": "Retorna al usuario que hace la consulta\n",
+        "operationId": "getMyUser",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario de la consulta",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "user": {
+                  "$ref": "#/definitions/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/products/": {
+      "get": {
+        "tags": [
+          "products"
+        ],
+        "summary": "Obtener todos los productos",
+        "description": "Retorna todos los productos disponibles\n",
+        "operationId": "getProducts",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de productos disponibles en la base de datos",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "products": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Product"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "admins"
+        ],
+        "summary": "Crear producto",
+        "description": "Retorna el producto creado\n",
+        "operationId": "createProduct",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Product"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Producto creado",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "product": {
+                  "$ref": "#/definitions/Product"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/products/{id}": {
+      "get": {
+        "tags": [
+          "products"
+        ],
+        "summary": "Obtener producto por id",
+        "description": "Retorna el producto del id\n",
+        "operationId": "getProductById",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id del producto",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Producto buscado",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "product": {
+                  "$ref": "#/definitions/Product"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "admins"
+        ],
+        "summary": "Editar producto",
+        "description": "Retorna el producto editado\n",
+        "operationId": "editProduct",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Product"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "User id.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Producto editado",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "product": {
+                  "$ref": "#/definitions/Product"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "admins"
+        ],
+        "summary": "Eliminar producto",
+        "description": "Retorna el producto eliminado\n",
+        "operationId": "deleteProduct",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Product id.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Producto eliminado",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "product": {
+                  "$ref": "#/definitions/Product"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/vendings": {
+      "get": {
+        "tags": [
+          "vendings"
+        ],
+        "summary": "Obtener todas las vendings disponibles",
+        "description": "Retorna las vendings disponibles\n",
+        "operationId": "getVendings",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vendings disponibles",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "vendings": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Vending"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "admins"
+        ],
+        "summary": "Crear nueva vending",
+        "description": "Retorna la vending creada\n",
+        "operationId": "createVending",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "Vending #1"
+                },
+                "image": {
+                  "type": "string",
+                  "example": "https://example.com/mypicture.jpg"
+                },
+                "machine_id": {
+                  "type": "string",
+                  "example": "STM32-1234567891"
+                }
+              }
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vending creada",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "vending": {
+                  "$ref": "#/definitions/Vending"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/vendings/{id}": {
+      "get": {
+        "tags": [
+          "vendings"
+        ],
+        "summary": "Obtener vending machine por id",
+        "description": "Retorna la vending requerida\n",
+        "operationId": "getVendingById",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "User id.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vending de la consulta",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "vending": {
+                  "$ref": "#/definitions/Vending"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "admins"
+        ],
+        "summary": "Editar vending",
+        "description": "Retorna la vending editada\n",
+        "operationId": "editVending",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Vending"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "User id.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vending editada",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "vending": {
+                  "$ref": "#/definitions/Vending"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "admins"
+        ],
+        "summary": "Eliminar Vending",
+        "description": "Retorna el vending eliminada\n",
+        "operationId": "deleteVending",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Vending id.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vending eliminada",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "vending": {
+                  "$ref": "#/definitions/Vending"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/vendings/{id}/products": {
+      "get": {
+        "tags": [
+          "vendings"
+        ],
+        "summary": "Obtener productos de la máquina",
+        "description": "Se recibe el id de la máquina y se retorna los productos disponibles de la misma\n",
+        "operationId": "getProductsByMachine",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id de la máquina",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de productos disponibles en la máquina",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "products": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Product"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/vendings/": {
+      "get": {
+        "tags": [
+          "vendings"
+        ],
+        "summary": "Ejecutar ordenes a la máquina",
+        "description": "Conexión web socket\nEjecutar ordenes a la máquina\nLas ordenes disponibles actualmente son dispensar productos y obtener el estado de la máquina\n\nLa orden de pedir el estado de la máquina se realiza con el \"type\" 2, el cuál devolverá un mensaje con el estado de la máquina (Si la respuesta nunca llega, significa que la máquina está apagada)\nLa orden de dispensar productos se realiza con el \"type\" 1 y se le envian los productos como en el ejemplo del body\n\ntype: Es la orden a ejecutar\ndata: Es el objeto que lleva todo el mensaje de la orden\n\nPara dispensar productos\nDentro de data debe ir una lista de productos con el key \"products\"\nLa lista de los productos será una lista de objetos que deberá llevar la siguiente estructura:\n\nid: ID del producto\nname: Nombre del producto\nitem: Es la ubicación del producto en la vending\nprice: Precio del producto\n\nAdemás de la lista de productos, el objeto \"data\" deberá contener lo siguiente\n\nmachineId: ID de la máquina, mismo id que devuelve el código QR\nuserId: ID del usuario que está haciendo la solicitud\ntoken: Token de acceso\n\nSi todo está marchando bien, el socket le devolverá un \"type\": 0\nDe lo contrario, la respuesta será un \"type\": -1\n\n\n\nPATH: ws://yourdomain.com/vending/\n",
+        "operationId": "ordersToMachine",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": 1
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "products": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/definitions/SocketProduct"
+                      }
+                    },
+                    "machineId": {
+                      "type": "string",
+                      "example": "STM32-1234567891"
+                    },
+                    "userId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "token": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vendings disponibles",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": 1
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "products": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/definitions/SocketProduct"
+                      }
+                    },
+                    "machineId": {
+                      "type": "string",
+                      "example": "STM32-1234567891"
+                    },
+                    "userId": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": -1
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "product": {
+                      "$ref": "#/definitions/SocketProduct"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "product De toditos not dispensed"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error message",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": -1
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "jwt must be provided"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/services/{id}": {
+      "get": {
+        "tags": [
+          "Service"
+        ],
+        "summary": "Obtener servicio por id",
+        "description": "Retorna el servicio requerido\n",
+        "operationId": "getServiceById",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID del servicio",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Servicio de la consulta",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "service": {
+                  "$ref": "#/definitions/Service"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "admins"
+        ],
+        "summary": "Editar servicio",
+        "description": "Retorna el servicio editado\n",
+        "operationId": "editService",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID del servicio",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Admin privileges",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Servicio editado",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "Service": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Service"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "admins"
+        ],
+        "summary": "Eliminar servicio",
+        "description": "Retorna el servicio eliminado\n",
+        "operationId": "deleteService",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID del servicio",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Admin privileges",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Servicio eliminado",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "Service": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Service"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/services/me": {
+      "get": {
+        "tags": [
+          "Service"
+        ],
+        "summary": "Obtener servicios del usuario que consulta",
+        "description": "Retorna los servicios del usuario que hace la consulta\n",
+        "operationId": "getMyService",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Servicios del usuario que consulta",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "Service": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Service"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/services": {
+      "get": {
+        "tags": [
+          "admins"
+        ],
+        "summary": "Obtener todos los servicios",
+        "description": "Retorna todos los servicios\n",
+        "operationId": "getAllService",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Admin privileges",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Servicios del usuario que consulta",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "Service": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Service"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/services/users/{id}": {
+      "get": {
+        "tags": [
+          "admins"
+        ],
+        "summary": "Obtener todos los servicios por usuario",
+        "description": "Retorna todos los servicios del usuario\n",
+        "operationId": "getAllUserService",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID del usuario",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Admin privileges",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Servicios del usuario",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "Service": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Service"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/services/vendings/{id}": {
+      "get": {
+        "tags": [
+          "admins"
+        ],
+        "summary": "Obtener todos los servicios por vending",
+        "description": "Retorna todos los servicios de la vending\n",
+        "operationId": "getAllVendingsService",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID de la vending",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Admin privileges",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Servicios de la vending",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "Service": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Service"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/admins/": {
+      "get": {
+        "tags": [
+          "admins"
+        ],
+        "summary": "Obtener todos los admins",
+        "description": "Retorna todos los usuarios\n",
+        "operationId": "getAllAdmins",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Admin privileges",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuarios registrados",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "users": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/User"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "admins"
+        ],
+        "summary": "Registrar un Admin",
+        "description": "Retorna al usuario registrado y el token\n",
+        "operationId": "createAdmin",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "properties": {
+                "first_name": {
+                  "type": "string",
+                  "example": "nombre"
+                },
+                "last_name": {
+                  "type": "string",
+                  "example": "apellido"
+                },
+                "email": {
+                  "type": "string",
+                  "example": "correo@email.com"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "password"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario registrado",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "user": {
+                  "$ref": "#/definitions/User"
+                },
+                "token": {
+                  "type": "string",
+                  "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/admins/login": {
+      "post": {
+        "tags": [
+          "admins"
+        ],
+        "summary": "Login de admins",
+        "description": "Retorna usuario y token\n",
+        "operationId": "loginAdmins",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "correo@email.com"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "password"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "user": {
+                  "$ref": "#/definitions/User"
+                },
+                "token": {
+                  "type": "string",
+                  "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/admins/{id}": {
+      "get": {
+        "tags": [
+          "admins"
+        ],
+        "summary": "Obtener admin por id",
+        "description": "Retorna al usuario del id\n",
+        "operationId": "getAdminById",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "User id.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "user": {
+                  "$ref": "#/definitions/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "admins"
+        ],
+        "summary": "Editar admin",
+        "description": "Retorna al usuario editado\n",
+        "operationId": "editAdmin",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "User id.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario editado",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "user": {
+                  "$ref": "#/definitions/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "admins"
+        ],
+        "summary": "Eliminar admin por id",
+        "description": "Retorna al usuario eliminado\n",
+        "operationId": "deleteAdmin",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "User id.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario eliminado",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "user": {
+                  "$ref": "#/definitions/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "admins"
+        ],
+        "summary": "Editar status del admin",
+        "description": "Retorna usuario editado\n",
+        "operationId": "UpdateAdminStatus",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "User id.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Admin privileges",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "properties": {
+                "status": {
+                  "type": "boolean",
+                  "example": true,
+                  "default": true
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Servicios del usuario que consulta",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "user": {
+                  "$ref": "#/definitions/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/admins/me": {
+      "get": {
+        "tags": [
+          "admins"
+        ],
+        "summary": "Obtener admin que está haciendo la consulta",
+        "description": "Retorna al usuario que hace la consulta\n",
+        "operationId": "getMyAdminUser",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario de la consulta",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "user": {
+                  "$ref": "#/definitions/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    }
+  },
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "definitions": {
+    "Product": {
+      "type": "object",
+      "required": [
+        "description",
+        "image",
+        "item",
+        "machine_id",
+        "name",
+        "price",
+        "quantity"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "example": "d290f1ee-6c54-4b01-90e6-d701748f0851"
+        },
+        "name": {
+          "type": "string",
+          "example": "De toditos de limón"
+        },
+        "price": {
+          "type": "number",
+          "format": "integer",
+          "example": 15000
+        },
+        "image": {
+          "type": "string",
+          "example": "https://example.com/mypicture.jpg"
+        },
+        "item": {
+          "type": "string",
+          "example": "15"
+        },
+        "description": {
+          "type": "string",
+          "example": "product description product description product description"
+        },
+        "quantity": {
+          "type": "number",
+          "format": "integer",
+          "example": 10
+        },
+        "machine_id": {
+          "type": "string",
+          "example": "STM32-1234567891"
+        },
+        "status": {
+          "type": "boolean",
+          "example": true,
+          "default": true
+        },
+        "created_at": {
+          "type": "string",
+          "format": "datetime",
+          "example": "2019-12-11T19:22:49.503Z"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "datetime",
+          "example": "2019-12-11T19:22:49.503Z"
+        }
+      }
+    },
+    "SocketProduct": {
+      "type": "object",
+      "required": [
+        "id",
+        "item",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "name": {
+          "type": "string",
+          "example": "De toditos natural"
+        },
+        "item": {
+          "type": "string",
+          "example": "27"
+        }
+      }
+    },
+    "User": {
+      "required": [
+        "email",
+        "first_name",
+        "last_name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "example": "d290f1ee-6c54-4b01-90e6-d701748f0851"
+        },
+        "first_name": {
+          "type": "string",
+          "example": "nombre"
+        },
+        "last_name": {
+          "type": "string",
+          "example": "apellido"
+        },
+        "email": {
+          "type": "string",
+          "format": "url",
+          "example": "correo@email.com"
+        },
+        "requests": {
+          "type": "number",
+          "format": "integer",
+          "example": 5
+        },
+        "status": {
+          "type": "boolean",
+          "example": true,
+          "default": true
+        },
+        "uid": {
+          "type": "string",
+          "example": "d290f1ee-6c54-4b01-90e6-d701748f0851"
+        },
+        "password": {
+          "type": "string",
+          "example": "password"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "datetime",
+          "example": "2019-12-11T19:22:49.503Z"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "datetime",
+          "example": "2019-12-11T19:22:49.503Z"
+        }
+      }
+    },
+    "Vending": {
+      "type": "object",
+      "required": [
+        "image",
+        "machine_id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "example": "d290f1ee-6c54-4b01-90e6-d701748f0851"
+        },
+        "name": {
+          "type": "string",
+          "example": "Vending #1"
+        },
+        "image": {
+          "type": "string",
+          "example": "https://example.com/mypicture.jpg"
+        },
+        "machine_id": {
+          "type": "string",
+          "example": "STM32-1234567891"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "datetime",
+          "example": "2019-12-11T19:22:49.503Z"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "datetime",
+          "example": "2019-12-11T19:22:49.503Z"
+        }
+      }
+    },
+    "Service": {
+      "type": "object",
+      "required": [
+        "machine_id",
+        "products",
+        "user_id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "example": "d290f1ee-6c54-4b01-90e6-d701748f0851"
+        },
+        "products": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "dispensed": {
+                "type": "boolean",
+                "example": false,
+                "default": true
+              },
+              "price": {
+                "type": "number",
+                "example": 2200
+              }
+            }
+          }
+        },
+        "user_id": {
+          "type": "string",
+          "format": "uuid",
+          "example": "d290f1ee-6c54-4b01-90e6-d701748f0851"
+        },
+        "machine_id": {
+          "type": "string",
+          "example": "STM32-1234567891"
+        },
+        "reference": {
+          "type": "string",
+          "example": "u89cd701748f0851"
+        },
+        "value": {
+          "type": "number",
+          "example": 10000
+        },
+        "success": {
+          "type": "boolean",
+          "example": true,
+          "default": true
+        },
+        "created_at": {
+          "type": "string",
+          "format": "datetime",
+          "example": "2019-12-11T19:22:49.503Z"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "datetime",
+          "example": "2019-12-11T19:22:49.503Z"
+        }
+      }
+    },
+    "ErrorResponse": {
+      "required": [
+        "message",
+        "ok"
+      ],
+      "properties": {
+        "ok": {
+          "type": "boolean",
+          "default": false
+        },
+        "message": {
+          "type": "string",
+          "example": "Error message"
+        }
+      }
+    }
+  }
+}
