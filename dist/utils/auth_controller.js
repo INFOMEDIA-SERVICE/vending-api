@@ -13,7 +13,9 @@ class AuthController {
                 email: user.email,
                 role: user.role,
                 id: user.id
-            }, process.env.TOKEN_KEY + '');
+            }, process.env.TOKEN_KEY + '', {
+                expiresIn: process.env.TOKEN_DURATION
+            });
         };
         this.validateUserToken = (req, res, next) => {
             const token = req.headers.authorization + '';

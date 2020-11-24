@@ -10,7 +10,12 @@ class AuthController {
             email: user.email,
             role: user.role,
             id: user.id
-        }, process.env.TOKEN_KEY + '');
+        }, 
+        process.env.TOKEN_KEY + '',
+        {
+            expiresIn: process.env.TOKEN_DURATION
+        }
+        );
     }
 
     public validateUserToken = (req: Request, res: Response, next: NextFunction) => {
