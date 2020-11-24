@@ -56,12 +56,3 @@ CREATE TABLE IF NOT EXISTS services(
     updated_at TIMESTAMP DEFAULT NOW(),
     constraint pk_services primary key(id)
 );
-
-INSERT INTO services(machine_id, user_id, products, success) VALUES(
-    'STM32-1234567891',
-    '4a141b23-22e8-4807-b653-fe4615fb8687',
-    '{{"id","9253f8c3-7988-43c2-a933-27964e5219a0","dispensed",true},{"id","9253f8c3-7988-43c2-a933-27964e5219a0","dispensed",true}}',
-    true
-) RETURNING *;
-
-
