@@ -22,7 +22,7 @@ app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: false }));
 app.use(cors_1.default());
 // Routes
-let swaggerDocument = require('../swagger.json');
+const swaggerDocument = require('../swagger.json');
 app.use('/docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swaggerDocument));
 app.use('/api/users', user_routes_1.default);
 app.use('/api/users', user_routes_1.default);

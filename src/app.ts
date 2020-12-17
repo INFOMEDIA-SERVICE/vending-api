@@ -9,7 +9,6 @@ import swaggerUi from 'swagger-ui-express';
 import http from 'http';
 import cors from 'cors';
 
-
 const app: Application = express();
 
 export let server: http.Server = http.createServer(app);
@@ -24,7 +23,7 @@ app.use(cors());
 
 // Routes
 
-let swaggerDocument = require('../swagger.json');
+const swaggerDocument: any = require('../swagger.json');
 
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
