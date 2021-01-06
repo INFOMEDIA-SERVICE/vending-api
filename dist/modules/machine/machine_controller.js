@@ -20,7 +20,6 @@ const timers_1 = require("timers");
 const machine_repository_1 = require("./machine_repository");
 const auth_controller_1 = require("../../utils/auth_controller");
 const services_controller_1 = require("../services/services_controller");
-const nanoid_1 = require("nanoid");
 class Emitter extends events_1.EventEmitter {
 }
 class SocketController {
@@ -153,7 +152,6 @@ class SocketController {
                     user_id,
                     products,
                     value,
-                    reference: nanoid_1.nanoid(14),
                     success: value >= 0
                 });
                 return socket.send(JSON.stringify({
