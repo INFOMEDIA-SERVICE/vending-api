@@ -4,7 +4,7 @@ export interface IService {
     user_id: string
     machine_id: string
     products: any[] | string
-    reference: string
+    reference?: string
     success?: boolean
     status?: boolean
     value?: number

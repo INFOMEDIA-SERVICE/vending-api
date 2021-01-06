@@ -207,7 +207,6 @@ class SocketController {
                 user_id,
                 products,
                 value,
-                reference: nanoid(14),
                 success: value >= 0
             });
 
