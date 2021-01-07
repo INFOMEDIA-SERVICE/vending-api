@@ -9,7 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.vendingsController = void 0;
 const vending_repository_1 = require("./vending_repository");
 class VendingController {
     constructor() {

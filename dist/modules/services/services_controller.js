@@ -9,7 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.servicesController = void 0;
 const services_repository_1 = require("./services_repository");
 class ServiceController {
     constructor() {

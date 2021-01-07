@@ -44,11 +44,13 @@ CREATE TABLE IF NOT EXISTS users(
     constraint pk_users primary key(id)
 );
 
+CREATE SEQUENCE serial START 1001;
+
 CREATE TABLE IF NOT EXISTS services(
     id varchar(64) NOT NULL DEFAULT uuid_generate_v4(),
     machine_id TEXT NOT NULL,
     user_id TEXT NOT NULL,
-    reference SERIAL,
+    reference smallint DEFAULT nextval('serial'),
     products text[][],
     value integer NOT NULL,
     success boolean default true,
