@@ -210,6 +210,8 @@ class SocketController {
                 success: value >= 0
             });
 
+            console.log(`RESPONSE ${response}`);
+
             return socket.send(JSON.stringify({
                 type: 0,
                 data: {
