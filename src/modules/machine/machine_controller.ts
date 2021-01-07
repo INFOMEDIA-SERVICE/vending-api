@@ -210,7 +210,7 @@ class SocketController {
                 success: value >= 0
             });
 
-            console.log(`RESPONSE ${response}`);
+            console.log(`RESPONSE SERVICE: ${response.service} MESSAGE ${response.message}`);
 
             return socket.send(JSON.stringify({
                 type: 0,
