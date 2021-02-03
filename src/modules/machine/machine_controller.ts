@@ -7,7 +7,6 @@ import { setTimeout } from 'timers';
 import { machineRepository } from './machine_repository';
 import { authController } from '../../utils/auth_controller';
 import { servicesController } from '../services/services_controller';
-import { nanoid } from 'nanoid';
 
 interface IMessage {
     type?: number
