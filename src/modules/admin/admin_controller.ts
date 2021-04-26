@@ -4,7 +4,6 @@ import { IQueryResponse } from '../../interfaces/postgres_responses';
 import { adminsRepository } from './admin_repository';
 import { IUser } from '../user/users_model';
 import { authController } from '../../utils/auth_controller';
-import { clearScreenDown } from 'readline';
 
 class AdminController {
 

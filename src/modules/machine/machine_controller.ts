@@ -25,12 +25,12 @@ class Emitter extends EventEmitter {}
 class SocketController {
 
     private topic: string = process.env.MACHINE_TOPIC || '';
+    private lockersTopic: string = process.env.LOCKERS_TOPIC || '';
 
     public onConnect = async(socket: ws, req: Request): Promise<void> => {
 
         console.log('User connected');
         socket.on('message', (data) => this.onMessage(socket, data, req));
-
     };
 
     private onMessage = async(socket: ws, data: ws.Data, req: Request): Promise<void> => {
@@ -50,6 +50,7 @@ class SocketController {
             case 0: this.saveUser(socket, message); break;
             case 1: this.dispense(socket, message); break;
             case 2: this.verifyStatus(socket, message); break;
+            case 3: this.consultLocker(socket, message); break;
             default:
                 socket.send(JSON.stringify({
                     type: -1,
@@ -358,6 +359,47 @@ class SocketController {
         };
 
         socketUsers.addUser(user);
+    }
+
+    private consultLocker = async(socket: ws, message: IMessage): Promise<void> => {
+
+        const lockerID: string = message.data.machineId;
+        const token: string = message.data.token;
+
+        const options: mqtt.IClientOptions = {
+            clientId: `${process.env.MQTT_CLIENTID}:${lockerID}`,
+            username: process.env.MQTT_USERNAME,
+            password: token,
+            port: parseInt(process.env.MQTT_PORT || '10110') || 10110
+        };
+
+        let client: mqtt.MqttClient = mqtt.connect('mqtt://iot.infomediaservice.com', options);
+
+        client.publish(`${this.lockersTopic}`, JSON.stringify({
+            'action': 'get.status',
+            'locker-name': `${lockerID}`,
+        }));
+
+        client.on('message', (_, message) => {
+
+            const response = JSON.parse(message.toString());
+
+            console.log(response);
+
+            switch (response.action) {
+                case 'locker.status':
+                    socket.send(JSON.stringify({
+                        type: 3,
+                        data: {
+                            locker_name: response.locker_name,
+                            boxes: response.boxes,
+                        }
+                    }));
+                    client.end();
+                break;
+            }
+
+        });
     }
 }
 
