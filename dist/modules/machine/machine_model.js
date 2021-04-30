@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.socketUsers = void 0;
 class SocketUsers {
     constructor() {
         this.addUser = (user) => {

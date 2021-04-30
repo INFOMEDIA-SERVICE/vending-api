@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.userController = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const user_repository_1 = require("./user_repository");
 const auth_controller_1 = require("../../utils/auth_controller");
@@ -42,7 +43,7 @@ class UserController {
             });
             if (response.ok) {
                 delete response.data.password;
-                const token = auth_controller_1.authController.generateToken(response.data);
+                const token = yield auth_controller_1.authController.generateToken(response.data);
                 res.send({
                     ok: true,
                     user: response.data,
@@ -69,7 +70,7 @@ class UserController {
                     return;
                 }
                 delete response.data.password;
-                const token = auth_controller_1.authController.generateToken(response.data);
+                const token = yield auth_controller_1.authController.generateToken(response.data);
                 res.send({
                     ok: true,
                     user: response.data,
@@ -88,7 +89,7 @@ class UserController {
             const response = yield user_repository_1.usersRepository.googleLogin(token);
             if (response.ok) {
                 delete response.data.password;
-                const jwtToken = auth_controller_1.authController.generateToken(response.data);
+                const jwtToken = yield auth_controller_1.authController.generateToken(response.data);
                 res.send({
                     ok: true,
                     user: response.data,
@@ -107,7 +108,7 @@ class UserController {
             const response = yield user_repository_1.usersRepository.googleSignup(token);
             if (response.ok) {
                 delete response.data.password;
-                const jwtToken = auth_controller_1.authController.generateToken(response.data);
+                const jwtToken = yield auth_controller_1.authController.generateToken(response.data);
                 res.send({
                     ok: true,
                     user: response.data,

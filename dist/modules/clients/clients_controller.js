@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.clientController = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const clients_repository_1 = require("./clients_repository");
 class ClientsController {

@@ -361,6 +361,89 @@ class SocketController {
         socketUsers.addUser(user);
     }
 
+    private consultAllLockers = async(socket: ws, message: IMessage): Promise<void> => {
+
+        const token: string = message.data.token;
+
+        const options: mqtt.IClientOptions = {
+            clientId: `${process.env.MQTT_CLIENTID}:{}`,
+            username: process.env.MQTT_USERNAME,
+            password: token,
+            port: parseInt(process.env.MQTT_PORT || '10110') || 10110
+        };
+
+        let client: mqtt.MqttClient = mqtt.connect('mqtt://iot.infomediaservice.com', options);
+
+        client.publish(`${this.lockersTopic}`, JSON.stringify({
+            'action': 'get.lockers',
+        }));
+
+        client.on('message', (_, message) => {
+
+            const response = JSON.parse(message.toString());
+
+            console.log(response);
+
+            switch (response.action) {
+                case 'locker.list':
+                    socket.send(JSON.stringify({
+                        type: 4,
+                        data: {
+                            lockers: response.lockers,
+                        }
+                    }));
+                    client.end();
+                break;
+            }
+
+        });
+    }
+
+    private openBox = async(socket: ws, message: IMessage): Promise<void> => {
+
+        const token: string = message.data.token;
+        const locker_name: string = message.data.locker_name;
+        const box_name: string = message.data.box_name;
+        const clientID: string = message.data.clientID;
+
+        const options: mqtt.IClientOptions = {
+            clientId: `${process.env.MQTT_CLIENTID}:{}`,
+            username: process.env.MQTT_USERNAME,
+            password: token,
+            port: parseInt(process.env.MQTT_PORT || '10110') || 10110
+        };
+
+        let client: mqtt.MqttClient = mqtt.connect('mqtt://iot.infomediaservice.com', options);
+
+        client.publish(`${this.lockersTopic}`, JSON.stringify({
+            'action': 'box.open',
+            'locker_name': locker_name,
+            'box-name': box_name,
+            'token': token,
+            'sender-id': clientID,
+        }));
+
+        client.on('message', (_, message) => {
+
+            const response = JSON.parse(message.toString());
+
+            console.log(response);
+
+            switch (response.action) {
+                case 'box.open':
+                    socket.send(JSON.stringify({
+                        type: 5,
+                        data: {
+
+                        }
+                    }));
+                    client.end();
+                break;
+            }
+
+        });
+    }
+
     private consultLocker = async(socket: ws, message: IMessage): Promise<void> => {
 
         const lockerID: string = message.data.machineId;

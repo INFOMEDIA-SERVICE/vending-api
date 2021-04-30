@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.adminController = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const admin_repository_1 = require("./admin_repository");
 const auth_controller_1 = require("../../utils/auth_controller");
@@ -42,7 +43,7 @@ class AdminController {
             });
             if (response.ok) {
                 delete response.data.password;
-                const token = auth_controller_1.authController.generateToken(response.data);
+                const token = yield auth_controller_1.authController.generateToken(response.data);
                 res.send({
                     ok: true,
                     user: response.data,
@@ -69,7 +70,7 @@ class AdminController {
                     return;
                 }
                 delete response.data.password;
-                const token = auth_controller_1.authController.generateToken(response.data);
+                const token = yield auth_controller_1.authController.generateToken(response.data);
                 res.send({
                     ok: true,
                     user: response.data,

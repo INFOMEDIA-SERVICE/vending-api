@@ -38,7 +38,7 @@ class UserController {
         
         if(response.ok) {
             delete response.data.password;
-            const token: string = authController.generateToken(response.data);
+            const token: string = await authController.generateToken(response.data);
             res.send({
                 ok: true,
                 user: response.data,
@@ -72,7 +72,7 @@ class UserController {
 
             delete response.data.password;
 
-            const token: string = authController.generateToken(response.data);
+            const token: string = await authController.generateToken(response.data);
             
             res.send({
                 ok: true,
@@ -97,7 +97,7 @@ class UserController {
 
             delete response.data.password;
 
-            const jwtToken: string = authController.generateToken(response.data);
+            const jwtToken: string = await authController.generateToken(response.data);
             
             res.send({
                 ok: true,
@@ -123,7 +123,7 @@ class UserController {
 
             delete response.data.password;
 
-            const jwtToken: string = authController.generateToken(response.data);
+            const jwtToken: string = await authController.generateToken(response.data);
             
             res.send({
                 ok: true,

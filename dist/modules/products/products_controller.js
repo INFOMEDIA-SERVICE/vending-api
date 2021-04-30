@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.productsController = void 0;
 const products_repository_1 = require("./products_repository");
 class ProductsController {
     constructor() {
