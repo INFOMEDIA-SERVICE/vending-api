@@ -51,6 +51,8 @@ class SocketController {
             case 1: this.dispense(socket, message); break;
             case 2: this.verifyStatus(socket, message); break;
             case 3: this.consultLocker(socket, message); break;
+            case 4: this.consultAllLockers(socket, message); break;
+            case 5: this.openBox(socket, message); break;
             default:
                 socket.send(JSON.stringify({
                     type: -1,
