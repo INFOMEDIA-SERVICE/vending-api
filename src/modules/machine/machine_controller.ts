@@ -25,7 +25,8 @@ class Emitter extends EventEmitter {}
 class SocketController {
 
     private topic: string = process.env.MACHINE_TOPIC || '';
-    private lockersTopic: string = process.env.LOCKERS_TOPIC || '';
+    private lockersRequestTopic: string = process.env.LOCKERS_REQUEST_TOPIC || '';
+    private lockersResponseTopic: string = process.env.LOCKERS_RESPONSE_TOPIC || '';
 
     public onConnect = async(socket: ws, req: Request): Promise<void> => {
 
@@ -37,14 +38,7 @@ class SocketController {
 
         const message: IMessage = JSON.parse(data.toString());
 
-        const auth: any = authController.validateSocketAccess(message.data.token);
-
-        if(!auth.ok) return socket.send(JSON.stringify({
-            type: -1,
-            data: {
-                message: auth.message
-            }
-        }));
+        console.log(message);
 
         switch (message.type) {
             case 0: this.saveUser(socket, message); break;
@@ -169,7 +163,6 @@ class SocketController {
                     if(counter > 0) {
 
                         client = mqtt.connect('mqtt://iot.infomediaservice.com', options);
-
                         client.subscribe(`${this.topic}`);
                     }
                     
@@ -366,19 +359,26 @@ class SocketController {
     private consultAllLockers = async(socket: ws, message: IMessage): Promise<void> => {
 
         const token: string = message.data.token;
+        const userID: string = message.data.userID || '';
 
         const options: mqtt.IClientOptions = {
-            clientId: `${process.env.MQTT_CLIENTID}:{}`,
-            username: process.env.MQTT_USERNAME,
-            password: token,
-            port: parseInt(process.env.MQTT_PORT || '10110') || 10110
+            clientId: `${userID}`,
+            username: process.env.LOCKERS_USERNAME,
+            password: process.env.LOCKERS_PASSWORD,
+            port: parseInt(process.env.MQTT_PORT || '10110') || 10110,
         };
 
         let client: mqtt.MqttClient = mqtt.connect('mqtt://iot.infomediaservice.com', options);
 
-        client.publish(`${this.lockersTopic}`, JSON.stringify({
+        client.publish(`${this.lockersRequestTopic}`, JSON.stringify({
             'action': 'get.lockers',
         }));
+
+        client.on('connect', () => {
+            client.subscribe(`${this.lockersResponseTopic}`);
+        });
+
+        console.log(client.connected);
 
         client.on('message', (_, message) => {
 
@@ -397,7 +397,6 @@ class SocketController {
                     client.end();
                 break;
             }
-
         });
     }
 
@@ -417,7 +416,7 @@ class SocketController {
 
         let client: mqtt.MqttClient = mqtt.connect('mqtt://iot.infomediaservice.com', options);
 
-        client.publish(`${this.lockersTopic}`, JSON.stringify({
+        client.publish(`${this.lockersRequestTopic}`, JSON.stringify({
             'action': 'box.open',
             'locker_name': locker_name,
             'box-name': box_name,
@@ -460,7 +459,7 @@ class SocketController {
 
         let client: mqtt.MqttClient = mqtt.connect('mqtt://iot.infomediaservice.com', options);
 
-        client.publish(`${this.lockersTopic}`, JSON.stringify({
+        client.publish(`${this.lockersRequestTopic}`, JSON.stringify({
             'action': 'get.status',
             'locker-name': `${lockerID}`,
         }));
