@@ -32,7 +32,6 @@ class SocketController {
         });
         this.onMessage = (socket, data, req) => __awaiter(this, void 0, void 0, function* () {
             const message = JSON.parse(data.toString());
-            console.log(message);
             switch (message.type) {
                 case 0:
                     this.saveUser(socket, message);
@@ -315,29 +314,46 @@ class SocketController {
             const token = message.data.token;
             const locker_name = message.data.locker_name;
             const box_name = message.data.box_name;
-            const clientID = message.data.clientID;
+            const userID = message.data.userID || '';
             const options = {
-                clientId: `${process.env.MQTT_CLIENTID}:{}`,
-                username: process.env.MQTT_USERNAME,
-                password: token,
-                port: parseInt(process.env.MQTT_PORT || '10110') || 10110
+                clientId: `${userID}`,
+                username: process.env.LOCKERS_USERNAME,
+                password: process.env.LOCKERS_PASSWORD,
+                port: parseInt(process.env.MQTT_PORT || '10110') || 10110,
             };
             let client = mqtt_1.default.connect('mqtt://iot.infomediaservice.com', options);
-            client.publish(`${this.lockersRequestTopic}`, JSON.stringify({
+            const action = {
                 'action': 'box.open',
-                'locker_name': locker_name,
+                'locker-name': locker_name,
                 'box-name': box_name,
                 'token': token,
-                'sender-id': clientID,
-            }));
+                'sender-id': userID,
+            };
+            client.publish(`${this.lockersRequestTopic}`, JSON.stringify(action));
+            client.on('connect', () => {
+                client.subscribe(`${this.lockersResponseTopic}`);
+            });
             client.on('message', (_, message) => {
                 const response = JSON.parse(message.toString());
                 console.log(response);
                 switch (response.action) {
-                    case 'box.open':
+                    case 'locker-box-change':
                         socket.send(JSON.stringify({
                             type: 5,
-                            data: {}
+                            data: {
+                                locker_name: response['locker-name'],
+                                box_name: response['box-name'],
+                                isOpen: response.state !== 0,
+                            }
+                        }));
+                        client.end();
+                        break;
+                    case 'box.open.error':
+                        socket.send(JSON.stringify({
+                            type: -1,
+                            data: {
+                                error: response.error,
+                            }
                         }));
                         client.end();
                         break;
@@ -345,28 +361,36 @@ class SocketController {
             });
         });
         this.consultLocker = (socket, message) => __awaiter(this, void 0, void 0, function* () {
-            const lockerID = message.data.machineId;
+            const userID = message.data.userID;
+            const locker_name = message.data.locker_name;
             const token = message.data.token;
             const options = {
-                clientId: `${process.env.MQTT_CLIENTID}:${lockerID}`,
-                username: process.env.MQTT_USERNAME,
-                password: token,
-                port: parseInt(process.env.MQTT_PORT || '10110') || 10110
+                clientId: `${userID}`,
+                username: process.env.LOCKERS_USERNAME,
+                password: process.env.LOCKERS_PASSWORD,
+                port: parseInt(process.env.MQTT_PORT || '10110') || 10110,
             };
             let client = mqtt_1.default.connect('mqtt://iot.infomediaservice.com', options);
             client.publish(`${this.lockersRequestTopic}`, JSON.stringify({
                 'action': 'get.status',
-                'locker-name': `${lockerID}`,
+                'locker-name': `${locker_name}`,
             }));
+            client.on('connect', () => {
+                client.subscribe(`${this.lockersResponseTopic}`);
+            });
             client.on('message', (_, message) => {
                 const response = JSON.parse(message.toString());
-                console.log(response);
+                response.boxes = response.boxes.map((box) => {
+                    box.isOpen = (box.state !== 0);
+                    delete box.state;
+                    return box;
+                });
                 switch (response.action) {
                     case 'locker.status':
                         socket.send(JSON.stringify({
                             type: 3,
                             data: {
-                                locker_name: response.locker_name,
+                                locker_name: response['locker-name'],
                                 boxes: response.boxes,
                             }
                         }));
@@ -382,6 +406,5 @@ exports.socketController = new SocketController;
     type:
         -1: Error
         0: new Connection || Save || OK
-        1: Error
 */
 //# sourceMappingURL=machine_controller.js.map
