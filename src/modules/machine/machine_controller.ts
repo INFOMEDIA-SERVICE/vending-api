@@ -27,6 +27,7 @@ class SocketController {
     private topic: string = process.env.MACHINE_TOPIC || '';
     private lockersRequestTopic: string = process.env.LOCKERS_REQUEST_TOPIC || '';
     private lockersResponseTopic: string = process.env.LOCKERS_RESPONSE_TOPIC || '';
+    private host: string = process.env.MQTT_HOST || '';
 
     public onConnect = async(socket: ws, req: Request): Promise<void> => {
 
@@ -67,7 +68,7 @@ class SocketController {
             port: parseInt(process.env.MQTT_PORT || '') || 10110
         };
 
-        let client: mqtt.MqttClient = mqtt.connect('mqtt://iot.infomediaservice.com', options);
+        let client: mqtt.MqttClient = mqtt.connect(this.host, options);
 
         client.subscribe(`${this.topic}`);
 
@@ -135,7 +136,7 @@ class SocketController {
 
         const listener: Emitter = new Emitter();
 
-        let client: mqtt.MqttClient = mqtt.connect('mqtt://iot.infomediaservice.com', options);
+        let client: mqtt.MqttClient = mqtt.connect(this.host, options);
 
         client.subscribe(`${this.topic}`);
 
@@ -160,7 +161,7 @@ class SocketController {
 
                     if(counter > 0) {
 
-                        client = mqtt.connect('mqtt://iot.infomediaservice.com', options);
+                        client = mqtt.connect(this.host, options);
                         client.subscribe(`${this.topic}`);
                     }
                     
@@ -366,7 +367,7 @@ class SocketController {
             port: parseInt(process.env.MQTT_PORT || '10110') || 10110,
         };
 
-        let client: mqtt.MqttClient = mqtt.connect('mqtt://iot.infomediaservice.com', options);
+        let client: mqtt.MqttClient = mqtt.connect(this.host, options);
 
         client.publish(`${this.lockersRequestTopic}`, JSON.stringify({
             'action': 'get.lockers',
@@ -412,7 +413,7 @@ class SocketController {
             port: parseInt(process.env.MQTT_PORT || '10110') || 10110,
         };
 
-        let client: mqtt.MqttClient = mqtt.connect('mqtt://iot.infomediaservice.com', options);
+        let client: mqtt.MqttClient = mqtt.connect(this.host, options);
 
         const action = {
             'action': 'box.open',
@@ -431,7 +432,7 @@ class SocketController {
         client.on('message', (_, message) => {
 
             const response = JSON.parse(message.toString());
-
+            
             console.log(response);
 
             switch (response.action) {
@@ -450,13 +451,12 @@ class SocketController {
                     socket.send(JSON.stringify({
                         type: -1,
                         data: {
-                            error: response.error,
+                            message: response.error,
                         }
                     }));
                     client.end();
                 break;
             }
-
         });
     }
 
@@ -473,7 +473,7 @@ class SocketController {
             port: parseInt(process.env.MQTT_PORT || '10110') || 10110,
         };
 
-        let client: mqtt.MqttClient = mqtt.connect('mqtt://iot.infomediaservice.com', options);
+        let client: mqtt.MqttClient = mqtt.connect(this.host, options);
 
         client.publish(`${this.lockersRequestTopic}`, JSON.stringify({
             'action': 'get.status',

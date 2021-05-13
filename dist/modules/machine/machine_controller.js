@@ -26,6 +26,7 @@ class SocketController {
         this.topic = process.env.MACHINE_TOPIC || '';
         this.lockersRequestTopic = process.env.LOCKERS_REQUEST_TOPIC || '';
         this.lockersResponseTopic = process.env.LOCKERS_RESPONSE_TOPIC || '';
+        this.host = process.env.MQTT_HOST || '';
         this.onConnect = (socket, req) => __awaiter(this, void 0, void 0, function* () {
             console.log('User connected');
             socket.on('message', (data) => this.onMessage(socket, data, req));
@@ -69,7 +70,7 @@ class SocketController {
                 password: process.env.MQTT_PASSWORD,
                 port: parseInt(process.env.MQTT_PORT || '') || 10110
             };
-            let client = mqtt_1.default.connect('mqtt://iot.infomediaservice.com', options);
+            let client = mqtt_1.default.connect(this.host, options);
             client.subscribe(`${this.topic}`);
             client.on('connect', () => {
                 client.publish(`${this.topic}`, 'vmstatus');
@@ -115,7 +116,7 @@ class SocketController {
                 }));
             }
             const listener = new Emitter();
-            let client = mqtt_1.default.connect('mqtt://iot.infomediaservice.com', options);
+            let client = mqtt_1.default.connect(this.host, options);
             client.subscribe(`${this.topic}`);
             console.log({
                 products: message.data.products,
@@ -129,7 +130,7 @@ class SocketController {
                     if (counter < products.length) {
                         console.log(`Product #${counter + 1}`);
                         if (counter > 0) {
-                            client = mqtt_1.default.connect('mqtt://iot.infomediaservice.com', options);
+                            client = mqtt_1.default.connect(this.host, options);
                             client.subscribe(`${this.topic}`);
                         }
                         this.dispenseSecuense(client, socket, products[counter], listener, counter === products.length - 1);
@@ -286,7 +287,7 @@ class SocketController {
                 password: process.env.LOCKERS_PASSWORD,
                 port: parseInt(process.env.MQTT_PORT || '10110') || 10110,
             };
-            let client = mqtt_1.default.connect('mqtt://iot.infomediaservice.com', options);
+            let client = mqtt_1.default.connect(this.host, options);
             client.publish(`${this.lockersRequestTopic}`, JSON.stringify({
                 'action': 'get.lockers',
             }));
@@ -321,7 +322,7 @@ class SocketController {
                 password: process.env.LOCKERS_PASSWORD,
                 port: parseInt(process.env.MQTT_PORT || '10110') || 10110,
             };
-            let client = mqtt_1.default.connect('mqtt://iot.infomediaservice.com', options);
+            let client = mqtt_1.default.connect(this.host, options);
             const action = {
                 'action': 'box.open',
                 'locker-name': locker_name,
@@ -352,7 +353,7 @@ class SocketController {
                         socket.send(JSON.stringify({
                             type: -1,
                             data: {
-                                error: response.error,
+                                message: response.error,
                             }
                         }));
                         client.end();
@@ -370,7 +371,7 @@ class SocketController {
                 password: process.env.LOCKERS_PASSWORD,
                 port: parseInt(process.env.MQTT_PORT || '10110') || 10110,
             };
-            let client = mqtt_1.default.connect('mqtt://iot.infomediaservice.com', options);
+            let client = mqtt_1.default.connect(this.host, options);
             client.publish(`${this.lockersRequestTopic}`, JSON.stringify({
                 'action': 'get.status',
                 'locker-name': `${locker_name}`,
