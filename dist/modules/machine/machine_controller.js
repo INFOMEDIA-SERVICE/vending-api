@@ -319,7 +319,7 @@ class SocketController {
             const options = {
                 clientId: `${userID}`,
                 username: process.env.LOCKERS_USERNAME,
-                password: process.env.LOCKERS_PASSWORD,
+                password: token,
                 port: parseInt(process.env.MQTT_PORT || '10110') || 10110,
             };
             let client = mqtt_1.default.connect(this.host, options);
@@ -382,7 +382,7 @@ class SocketController {
             client.on('message', (_, message) => {
                 const response = JSON.parse(message.toString());
                 response.boxes = response.boxes.map((box) => {
-                    box.isOpen = (box.state !== 0);
+                    box.is_open = (box.state !== 0);
                     delete box.state;
                     return box;
                 });
