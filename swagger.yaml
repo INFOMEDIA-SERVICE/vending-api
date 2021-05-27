@@ -1,0 +1,1837 @@
+swagger: '2.0'
+info:
+  description: API para realizar ordener a las máquinas expendedoras
+  version: 1.0.0
+  title: Vending Machine - API
+  # put the contact info for your development or API team
+  contact:
+    email: correo@email.com
+
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+
+# tags are used for organizing operations
+tags:
+- name: users
+  description: Rutas de usuarios
+- name: products
+  description: Rutas de productos
+- name: vendings
+  description: Rutas de vendings
+- name: lockers
+  description: Rutas de lockers
+- name: Service
+  description: Rutas de servicios
+- name: admins
+  description: Rutas de admins
+
+schemes:
+ - https
+ - http
+ 
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
+
+paths:
+
+# USER ROUTES
+
+  /users/:
+    post:
+      tags:
+      - users
+      summary: Registrar un usuario
+      operationId: postUser
+      description: |
+        Retorna al usuario registrado y el token
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: body
+          name: body
+          schema:
+            properties:
+              first_name:
+                type: string
+                example: "nombre"
+              last_name:
+                type: string
+                example: "apellido"
+              email:
+                type: string
+                example: correo@email.com
+              password:
+                type: string
+                example: "password"
+      responses:
+        200:
+          description: Usuario registrado
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              user:
+                $ref: '#/definitions/User'
+              token:
+                type: string
+                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+    get:
+      tags:
+      - admins
+      summary: Obtener todos los usuarios
+      operationId: getAllUsers
+      description: |
+        Retorna todos los usuarios
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: header
+          name: Authorization
+          type: string
+          description: Admin privileges
+          required: true
+      responses:
+        200:
+          description: Usuarios registrados
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              users:
+                type: array
+                items:
+                  $ref: '#/definitions/User'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+  /users/login:
+    post:
+      tags:
+      - users
+      summary: Login de usuarios
+      operationId: loginUser
+      description: |
+        Retorna usuario y token
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: body
+          name: body
+          schema:
+            properties:
+              email:
+                type: string
+                example: correo@email.com
+              password:
+                type: string
+                example: "password"
+      responses:
+        200:
+          description: Usuario
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              user:
+                $ref: '#/definitions/User'
+              token:
+                type: string
+                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+  /users/login/google:
+    post:
+      tags:
+      - users
+      summary: Login de usuarios usando google
+      operationId: loginUserWithGoogle
+      description: |
+        Recibe firebase token, hace el login y retorna usuario y token
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: body
+          name: body
+          schema:
+            properties:
+              token:
+                type: string
+                format: uuid
+              
+      responses:
+        200:
+          description: Usuario
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              user:
+                $ref: '#/definitions/User'
+              token:
+                type: string
+                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+  /users/signup/google:
+    post:
+      tags:
+      - users
+      summary: Registro de usuarios usando google
+      operationId: signupUserWithGoogle
+      description: |
+        Recibe firebase token, hace el registro y retorna usuario y token
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: body
+          name: body
+          schema:
+            properties:
+              token:
+                type: string
+                format: uuid
+              
+      responses:
+        200:
+          description: Usuario
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              user:
+                $ref: '#/definitions/User'
+              token:
+                type: string
+                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+  /users/{id}:
+    get:
+      tags:
+      - admins
+      summary: Obtener usuario por id
+      operationId: getUserById
+      description: |
+        Retorna al usuario del id
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: User id.
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+      responses:
+        200:
+          description: Usuario
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              user:
+                $ref: '#/definitions/User'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    delete:
+      tags:
+      - users
+      summary: Eliminar usuario por id
+      operationId: deleteUser
+      description: |
+        Retorna al usuario eliminado
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: User id.
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+      responses:
+        200:
+          description: Usuario eliminado
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              user:
+                $ref: '#/definitions/User'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    put:
+      tags:
+      - users
+      summary: Editar usuario
+      operationId: editUser
+      description: |
+        Retorna al usuario editado
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/User'
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: User id.
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+      responses:
+        200:
+          description: Usuario editado
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              user:
+                $ref: '#/definitions/User'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+            
+    patch:
+      tags:
+      - admins
+      summary: Editar status del usuario
+      operationId: Update user stats
+      description: |
+        Retorna usuario editado
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: User id.
+        - in: header
+          name: Authorization
+          type: string
+          description: Admin privileges
+          required: true
+          
+        - in: body
+          name: body
+          schema:
+            properties:
+              status:
+                type: boolean
+                default: true
+                example: true
+      responses:
+        200:
+          description: Servicios del usuario que consulta
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              user:
+                $ref: '#/definitions/User'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+  /users/me:
+    get:
+      tags:
+      - users
+      summary: Obtener usuario que está haciendo la consulta
+      operationId: getMyUser
+      description: |
+        Retorna al usuario que hace la consulta
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+      responses:
+        200:
+          description: Usuario de la consulta
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              user:
+                $ref: '#/definitions/User'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /products/:
+    get:
+      tags:
+      - products
+      summary: Obtener todos los productos 
+      operationId: getProducts
+      description: |
+        Retorna todos los productos disponibles
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+      responses:
+        200:
+          description: Lista de productos disponibles en la base de datos
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              products:
+                type: array
+                items:
+                  $ref: '#/definitions/Product'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    post:
+      tags:
+      - admins
+      summary: Crear producto
+      operationId: createProduct
+      description: |
+        Retorna el producto creado
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/Product'
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+      responses:
+        200:
+          description: Producto creado
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              product:
+                $ref: '#/definitions/Product'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+  /products/{id}:
+    get:
+      tags:
+      - products
+      summary: Obtener producto por id
+      operationId: getProductById
+      description: |
+        Retorna el producto del id
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: Id del producto
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+      responses:
+        200:
+          description: Producto buscado
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              product:
+                $ref: '#/definitions/Product'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    delete:
+      tags:
+      - admins
+      summary: Eliminar producto
+      operationId: deleteProduct
+      description: |
+        Retorna el producto eliminado
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: Product id.
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+      responses:
+        200:
+          description: Producto eliminado
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              product:
+                $ref: '#/definitions/Product'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    put:
+      tags:
+      - admins
+      summary: Editar producto
+      operationId: editProduct
+      description: |
+        Retorna el producto editado
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/Product'
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: User id.
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+      responses:
+        200:
+          description: Producto editado
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              product:
+                $ref: '#/definitions/Product'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /vendings:
+    post:
+      tags:
+      - admins
+      summary: Crear nueva vending
+      operationId: createVending
+      description: |
+        Retorna la vending creada
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: body
+          name: body
+          schema:
+            properties:
+              name:
+                type: string
+                example: "Vending #1"
+              image:
+                type: string
+                example: 'https://example.com/mypicture.jpg'
+              machine_id:
+                type: string
+                example: "STM32-1234567891"
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+      responses:
+        200:
+          description: Vending creada
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              vending:
+                $ref: '#/definitions/Vending'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    get:
+      tags:
+      - vendings
+      summary: Obtener todas las vendings disponibles
+      operationId: getVendings
+      description: |
+        Retorna las vendings disponibles
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+      responses:
+        200:
+          description: Vendings disponibles
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              vendings:
+                type: array
+                items:
+                  $ref: '#/definitions/Vending'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+  /vendings/{id}:
+    get:
+      tags:
+      - vendings
+      summary: Obtener vending machine por id
+      operationId: getVendingById
+      description: |
+        Retorna la vending requerida
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: User id.
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+      responses:
+        200:
+          description: Vending de la consulta
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              vending:
+                $ref: '#/definitions/Vending'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    put:
+      tags:
+      - admins
+      summary: Editar vending
+      operationId: editVending
+      description: |
+        Retorna la vending editada
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/Vending'
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: User id.
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+      responses:
+        200:
+          description: Vending editada
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              vending:
+                $ref: '#/definitions/Vending'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    delete:
+      tags:
+      - admins
+      summary: Eliminar Vending
+      operationId: deleteVending
+      description: |
+        Retorna el vending eliminada
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: Vending id.
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+      responses:
+        200:
+          description: Vending eliminada
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              vending:
+                $ref: '#/definitions/Vending'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+  /vendings/{id}/products:
+    get:
+      tags:
+      - vendings
+      summary: Obtener productos de la máquina
+      operationId: getProductsByMachine
+      description: |
+        Se recibe el id de la máquina y se retorna los productos disponibles de la misma
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: Id de la máquina
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+      responses:
+        200:
+          description: Lista de productos disponibles en la máquina
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              products:
+                type: array
+                items:
+                  $ref: '#/definitions/Product'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+  /vendings/:
+    get:
+      tags:
+      - vendings
+      summary: Ejecutar ordenes a la máquina
+      operationId: ordersToMachine
+      description: |
+        Conexión web socket
+        Ejecutar ordenes a la máquina
+        Las ordenes disponibles actualmente son dispensar productos y obtener el estado de la máquina
+        
+        La orden de pedir el estado de la máquina se realiza con el "type" 2, el cuál devolverá un mensaje con el estado de la máquina (Si la respuesta nunca llega, significa que la máquina está apagada)
+        La orden de dispensar productos se realiza con el "type" 1 y se le envian los productos como en el ejemplo del body
+        
+        type: Es la orden a ejecutar
+        data: Es el objeto que lleva todo el mensaje de la orden
+        
+        Para dispensar productos
+        Dentro de data debe ir una lista de productos con el key "products"
+        La lista de los productos será una lista de objetos que deberá llevar la siguiente estructura:
+        
+        id: ID del producto
+        name: Nombre del producto
+        item: Es la ubicación del producto en la vending
+        price: Precio del producto
+        
+        Además de la lista de productos, el objeto "data" deberá contener lo siguiente
+        
+        machineId: ID de la máquina, mismo id que devuelve el código QR
+        userId: ID del usuario que está haciendo la solicitud
+        token: Token de acceso
+        
+        Si todo está marchando bien, el socket le devolverá un "type": 0
+        De lo contrario, la respuesta será un "type": -1
+        
+        
+        
+        PATH: ws://yourdomain.com/connection/
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+        - in: body
+          name: body
+          schema:
+            properties:
+              type: 
+                type: number
+                example: 1
+              data:
+                properties:
+                  products:
+                    type: array
+                    items:
+                      $ref: '#/definitions/SocketProduct'
+                  machineId:
+                    type: string
+                    example: "STM32-1234567891"
+                  userId:
+                    type: string
+                    format: uuid
+                    
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+      responses:
+        200:
+          description: Vendings disponibles
+          schema:
+            properties:
+              type: 
+                type: number
+                example: 1
+              data:
+                properties:
+                  products:
+                    type: array
+                    items:
+                      $ref: '#/definitions/SocketProduct'
+                  machineId:
+                    type: string
+                    example: "STM32-1234567891"
+                  userId:
+                    type: string
+                    format: uuid
+        400:
+          description: Error message
+          schema:
+            properties:
+              type:
+                type: number
+                example: -1
+              data:
+                properties:
+                  product:
+                    $ref: '#/definitions/SocketProduct'
+                  message:
+                    type: string
+                    example: "product De toditos not dispensed"
+        401:
+          description: Error message
+          schema:
+            properties:
+              type:
+                type: number
+                example: -1
+              data:
+                properties:
+                  message:
+                    type: string
+                    example: "jwt must be provided"
+  
+  /services/{id}:
+    get:
+      tags:
+      - Service
+      summary: Obtener servicio por id
+      operationId: getServiceById
+      description: |
+        Retorna el servicio requerido
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: ID del servicio
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+      responses:
+        200:
+          description: Servicio de la consulta
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              service:
+                $ref: '#/definitions/Service'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    put:
+      tags:
+      - admins
+      summary: Editar servicio
+      operationId: editService
+      description: |
+        Retorna el servicio editado
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: ID del servicio
+        - in: header
+          name: Authorization
+          type: string
+          description: Admin privileges
+          required: true
+      responses:
+        200:
+          description: Servicio editado
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              Service:
+                type: array
+                items:
+                  $ref: '#/definitions/Service'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+            
+    delete:
+      tags:
+      - admins
+      summary: Eliminar servicio
+      operationId: deleteService
+      description: |
+        Retorna el servicio eliminado
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: ID del servicio
+        - in: header
+          name: Authorization
+          type: string
+          description: Admin privileges
+          required: true
+      responses:
+        200:
+          description: Servicio eliminado
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              Service:
+                type: array
+                items:
+                  $ref: '#/definitions/Service'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+  /services/me:
+    get:
+      tags:
+      - Service
+      summary: Obtener servicios del usuario que consulta
+      operationId: getMyService
+      description: |
+        Retorna los servicios del usuario que hace la consulta
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+      responses:
+        200:
+          description: Servicios del usuario que consulta
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              Service:
+                type: array
+                items:
+                  $ref: '#/definitions/Service'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+  /services:
+    get:
+      tags:
+      - admins
+      summary: Obtener todos los servicios
+      operationId: getAllService
+      description: |
+        Retorna todos los servicios
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: header
+          name: Authorization
+          type: string
+          description: Admin privileges
+          required: true
+      responses:
+        200:
+          description: Servicios del usuario que consulta
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              Service:
+                type: array
+                items:
+                  $ref: '#/definitions/Service'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+  /services/users/{id}:
+    get:
+      tags:
+      - admins
+      summary: Obtener todos los servicios por usuario
+      operationId: getAllUserService
+      description: |
+        Retorna todos los servicios del usuario
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: ID del usuario
+        - in: header
+          name: Authorization
+          type: string
+          description: Admin privileges
+          required: true
+      responses:
+        200:
+          description: Servicios del usuario
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              Service:
+                type: array
+                items:
+                  $ref: '#/definitions/Service'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /services/vendings/{id}:
+    get:
+      tags:
+      - admins
+      summary: Obtener todos los servicios por vending
+      operationId: getAllVendingsService
+      description: |
+        Retorna todos los servicios de la vending
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: ID de la vending
+        - in: header
+          name: Authorization
+          type: string
+          description: Admin privileges
+          required: true
+      responses:
+        200:
+          description: Servicios de la vending
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              Service:
+                type: array
+                items:
+                  $ref: '#/definitions/Service'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+            
+  /admins/:
+    post:
+      tags:
+      - admins
+      summary: Registrar un Admin
+      operationId: createAdmin
+      description: |
+        Retorna al usuario registrado y el token
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: body
+          name: body
+          schema:
+            properties:
+              first_name:
+                type: string
+                example: "nombre"
+              last_name:
+                type: string
+                example: "apellido"
+              email:
+                type: string
+                example: correo@email.com
+              password:
+                type: string
+                example: "password"
+      responses:
+        200:
+          description: Usuario registrado
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              user:
+                $ref: '#/definitions/User'
+              token:
+                type: string
+                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+    get:
+      tags:
+      - admins
+      summary: Obtener todos los admins
+      operationId: getAllAdmins
+      description: |
+        Retorna todos los usuarios
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: header
+          name: Authorization
+          type: string
+          description: Admin privileges
+          required: true
+      responses:
+        200:
+          description: Usuarios registrados
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              users:
+                type: array
+                items:
+                  $ref: '#/definitions/User'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+  /admins/login:
+    post:
+      tags:
+      - admins
+      summary: Login de admins
+      operationId: loginAdmins
+      description: |
+        Retorna usuario y token
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: body
+          name: body
+          schema:
+            properties:
+              email:
+                type: string
+                example: correo@email.com
+              password:
+                type: string
+                example: "password"
+      responses:
+        200:
+          description: Usuario
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              user:
+                $ref: '#/definitions/User'
+              token:
+                type: string
+                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /admins/{id}:
+    get:
+      tags:
+      - admins
+      summary: Obtener admin por id
+      operationId: getAdminById
+      description: |
+        Retorna al usuario del id
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: User id.
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+      responses:
+        200:
+          description: Usuario
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              user:
+                $ref: '#/definitions/User'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    delete:
+      tags:
+      - admins
+      summary: Eliminar admin por id
+      operationId: deleteAdmin
+      description: |
+        Retorna al usuario eliminado
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: User id.
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+      responses:
+        200:
+          description: Usuario eliminado
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              user:
+                $ref: '#/definitions/User'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    put:
+      tags:
+      - admins
+      summary: Editar admin
+      operationId: editAdmin
+      description: |
+        Retorna al usuario editado
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/User'
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: User id.
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+      responses:
+        200:
+          description: Usuario editado
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              user:
+                $ref: '#/definitions/User'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+            
+    patch:
+      tags:
+      - admins
+      summary: Editar status del admin
+      operationId: UpdateAdminStatus
+      description: |
+        Retorna usuario editado
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: User id.
+        - in: header
+          name: Authorization
+          type: string
+          description: Admin privileges
+          required: true
+          
+        - in: body
+          name: body
+          schema:
+            properties:
+              status:
+                type: boolean
+                default: true
+                example: true
+      responses:
+        200:
+          description: Servicios del usuario que consulta
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              user:
+                $ref: '#/definitions/User'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+  /admins/me:
+    get:
+      tags:
+      - admins
+      summary: Obtener admin que está haciendo la consulta
+      operationId: getMyAdminUser
+      description: |
+        Retorna al usuario que hace la consulta
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: header
+          name: Authorization
+          type: string
+          required: true
+      responses:
+        200:
+          description: Usuario de la consulta
+          schema:
+            properties:
+              ok: 
+                type: boolean
+              user:
+                $ref: '#/definitions/User'
+        400:
+          description: Error message
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+
+
+definitions:
+  Product:
+    type: object
+    required:
+      - name
+      - price
+      - image
+      - item
+      - description
+      - quantity
+      - machine_id
+    properties:
+      id:
+        type: string
+        format: uuid
+        example: 'd290f1ee-6c54-4b01-90e6-d701748f0851'
+      name:
+        type: string
+        example: 'De toditos de limón'
+      price:
+        type: number
+        format: integer
+        example: 15000
+      image:
+        type: string
+        example: 'https://example.com/mypicture.jpg'
+      item:
+        type: string
+        example: "15"
+      description:
+        type: string
+        example: "product description product description product description"
+      quantity:
+        type: number
+        format: integer
+        example: 10
+      machine_id:
+        type: string
+        example: "STM32-1234567891"
+      status:
+        type: boolean
+        example: true
+        default: true
+      created_at:
+        type: string
+        format: datetime
+        example: '2019-12-11T19:22:49.503Z'
+      updated_at:
+        type: string
+        format: datetime
+        example: '2019-12-11T19:22:49.503Z'
+  SocketProduct:
+    type: object
+    required:
+      - id
+      - name
+      - item
+    properties:
+      id:
+        type: string
+        format: uuid
+      name:
+        type: string
+        example: "De toditos natural"
+      item:
+        type: string
+        example: "27"
+  User:
+    required:
+      - first_name
+      - last_name
+      - email
+    properties:
+      id:
+        type: string
+        format: uuid
+        example: 'd290f1ee-6c54-4b01-90e6-d701748f0851'
+      first_name:
+        type: string
+        example: nombre
+      last_name:
+        type: string
+        example: apellido
+      email:
+        type: string
+        format: url
+        example: correo@email.com
+      requests:
+        type: number
+        format: integer
+        example: 5
+      status:
+        type: boolean
+        example: true
+        default: true
+      uid:
+        type: string
+        example: 'd290f1ee-6c54-4b01-90e6-d701748f0851'
+      password:
+        type: string
+        example: password
+      created_at:
+        type: string
+        format: datetime
+        example: '2019-12-11T19:22:49.503Z'
+      updated_at:
+        type: string
+        format: datetime
+        example: '2019-12-11T19:22:49.503Z'
+  Vending:
+    type: object
+    required:
+      - name
+      - machine_id
+      - image
+    properties:
+      id:
+        type: string
+        format: uuid
+        example: 'd290f1ee-6c54-4b01-90e6-d701748f0851'
+      name:
+        type: string
+        example: "Vending #1"
+      image:
+        type: string
+        example: 'https://example.com/mypicture.jpg'
+      machine_id:
+        type: string
+        example: 'STM32-1234567891'
+      created_at:
+        type: string
+        format: datetime
+        example: '2019-12-11T19:22:49.503Z'
+      updated_at:
+        type: string
+        format: datetime
+        example: '2019-12-11T19:22:49.503Z'
+  Service:
+    type: object
+    required:
+      - user_id
+      - machine_id
+      - products
+    properties:
+      id:
+        type: string
+        format: uuid
+        example: 'd290f1ee-6c54-4b01-90e6-d701748f0851'
+      products:
+        type: array
+        items:
+          properties:
+            id:
+              type: string
+              format: uuid
+            dispensed:
+              type: boolean
+              example: false
+              default: true
+            price:
+              type: number
+              example: 2200
+              default: 0
+      user_id:
+        type: string
+        format: uuid
+        example: 'd290f1ee-6c54-4b01-90e6-d701748f0851'
+      machine_id:
+        type: string
+        example: 'STM32-1234567891'
+      reference:
+        type: string
+        example: 'u89cd701748f0851'
+      value:
+        type: number
+        example: 10000
+      success:
+        type: boolean
+        example: true
+        default: true
+      created_at:
+        type: string
+        format: datetime
+        example: '2019-12-11T19:22:49.503Z'
+      updated_at:
+        type: string
+        format: datetime
+        example: '2019-12-11T19:22:49.503Z'
+  ErrorResponse:
+    required:
+      - ok
+      - message
+    properties:
+      ok:
+        type: boolean
+        default: false
+      message:
+        type: string
+        example: 'Error message'
+
+host: virtserver.swaggerhub.com
+basePath: /Smartinfo/vending-api/1.0.0

@@ -344,7 +344,7 @@ class SocketController {
                             data: {
                                 locker_name: response['locker-name'],
                                 box_name: response['box-name'],
-                                isOpen: response.state !== 0,
+                                is_open: response.state !== 0,
                             }
                         }));
                         client.end();

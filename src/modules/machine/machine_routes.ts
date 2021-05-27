@@ -12,7 +12,7 @@ server.on('upgrade', (req: Request, socket, head) => {
 
     const pathname: string = url.parse(req.url).pathname + '';
     
-    if(pathname === '/vending/') {
+    if(pathname === '/connection/') {
 
         wsServer.handleUpgrade(req, socket, head, socket => {
             wsServer.emit('connection', socket, req);

@@ -11,7 +11,7 @@ const wsServer = new ws_1.default.Server({ noServer: true });
 wsServer.on('connection', machine_controller_1.socketController.onConnect);
 app_1.server.on('upgrade', (req, socket, head) => {
     const pathname = url_1.default.parse(req.url).pathname + '';
-    if (pathname === '/vending/') {
+    if (pathname === '/connection/') {
         wsServer.handleUpgrade(req, socket, head, socket => {
             wsServer.emit('connection', socket, req);
         });
