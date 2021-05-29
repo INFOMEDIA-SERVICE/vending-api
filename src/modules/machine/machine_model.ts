@@ -2,7 +2,7 @@ import ws from 'ws';
 
 export interface ISocketUser {
     client: ws
-    userId: string
+    user_id: string
     userName: string
 }
 
@@ -18,10 +18,10 @@ class SocketUsers {
         this.users.push(user);
     };
 
-    public getUserById = (userId:String) => {
+    public getUserById = (user_id:String) => {
 
         const user:ISocketUser = this.users.filter(user => {
-            return user.userId === userId;
+            return user.user_id === user_id;
         })[0];
 
         return user;
@@ -31,8 +31,8 @@ class SocketUsers {
         return this.users;
     };
 
-    public deleteUser = (userId:String):void => {
-        this.users = this.users.filter(user => user.userId !== userId);
+    public deleteUser = (user_id:String):void => {
+        this.users = this.users.filter(user => user.user_id !== user_id);
     };
 
 }

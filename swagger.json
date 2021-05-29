@@ -1393,7 +1393,7 @@
                       "type": "string",
                       "example": "STM32-1234567891"
                     },
-                    "userId": {
+                    "user_id": {
                       "type": "string",
                       "format": "uuid"
                     },
@@ -1429,7 +1429,7 @@
                       "type": "string",
                       "example": "STM32-1234567891"
                     },
-                    "userId": {
+                    "user_id": {
                       "type": "string",
                       "format": "uuid"
                     }

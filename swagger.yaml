@@ -926,7 +926,7 @@ paths:
         Además de la lista de productos, el objeto "data" deberá contener lo siguiente
         
         machineId: ID de la máquina, mismo id que devuelve el código QR
-        userId: ID del usuario que está haciendo la solicitud
+        user_id: ID del usuario que está haciendo la solicitud
         token: Token de acceso
         
         Si todo está marchando bien, el socket le devolverá un "type": 0
@@ -960,7 +960,7 @@ paths:
                   machineId:
                     type: string
                     example: "STM32-1234567891"
-                  userId:
+                  user_id:
                     type: string
                     format: uuid
                     
@@ -984,7 +984,7 @@ paths:
                   machineId:
                     type: string
                     example: "STM32-1234567891"
-                  userId:
+                  user_id:
                     type: string
                     format: uuid
         400:
@@ -1001,6 +1001,349 @@ paths:
                   message:
                     type: string
                     example: "product De toditos not dispensed"
+        401:
+          description: Error message
+          schema:
+            properties:
+              type:
+                type: number
+                example: -1
+              data:
+                properties:
+                  message:
+                    type: string
+                    example: "jwt must be provided"
+  
+  /lockers/:
+    get:
+      tags:
+      - lockers
+      summary: Ejecutar ordenes a lockers
+      operationId: ordersToLockers
+      description: |
+        Conexión web socket
+        Ejecutar ordenes a la los lockers
+        Las ordenes disponibles actualmente son consultar todos los lockers, consultar si un locker está abierto o cerrado
+        
+        type: Es la orden a ejecutar
+        data: Es el objeto que lleva todo el mensaje de la orden
+        
+        Si todo está marchando bien, el socket le devolverá el mismo "type" que mandaste
+        De lo contrario, la respuesta será un "type": -1
+        
+        PATH: ws://yourdomain.com/connection/
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      responses:
+        200:
+          description: Vendings disponibles
+          schema:
+            properties:
+              type: 
+                type: number
+                example: 1
+              data:
+                properties:
+                  products:
+                    type: array
+                    items:
+                      $ref: '#/definitions/SocketProduct'
+                  machineId:
+                    type: string
+                    example: "STM32-1234567891"
+                  user_id:
+                    type: string
+                    format: uuid
+        400:
+          description: Error message
+          schema:
+            properties:
+              type:
+                type: number
+                example: -1
+              data:
+                properties:
+                  product:
+                    $ref: '#/definitions/SocketProduct'
+                  message:
+                    type: string
+                    example: "product De toditos not dispensed"
+        401:
+          description: Error message
+          schema:
+            properties:
+              type:
+                type: number
+                example: -1
+              data:
+                properties:
+                  message:
+                    type: string
+                    example: "jwt must be provided"
+  
+  /lockers/type/3:
+    get:
+      tags:
+      - lockers
+      summary: Consultar estado de locker
+      operationId: consultLocker
+      description: |
+        
+        type: Es la orden a ejecutar
+        data: Es el objeto que lleva todo el mensaje de la orden
+        
+        Si todo está marchando bien, el socket le devolverá el mismo "type" que mandaste
+        De lo contrario, la respuesta será un "type": -1
+        
+        Se debe mandar los siguientes parametros en el objeto "data"
+        
+        user_id: Identificador único del usuario
+        locker_name: Nombre del locker a consultar
+        token: JWT de autenticacion
+
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: body
+          name: body
+          schema:
+            properties:
+              type: 
+                type: number
+                example: 3
+              data:
+                properties:
+                  user_id: 
+                    type: string
+                    format: uuid
+                  locker_name:
+                    type: string
+                    example: "locker-10001/"
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+
+      responses:
+        200:
+          description: Vendings disponibles
+          schema:
+            properties:
+              type: 
+                type: number
+                example: 3
+              data:
+                properties:
+                  locker_name:
+                    type: string
+                    example: "the locker name"
+                  boxes:
+                    type: array
+                    items:
+                      properties:
+                        name:
+                          type: string
+                          example: "Box1_name"
+                        is_open:
+                          type: boolean
+                          example: false
+        400:
+          description: Error message
+          schema:
+            properties:
+              type:
+                type: number
+                example: -1
+              data:
+                properties:
+                  message:
+                    type: string
+                    example: "locker not found"
+        401:
+          description: Error message
+          schema:
+            properties:
+              type:
+                type: number
+                example: -1
+              data:
+                properties:
+                  message:
+                    type: string
+                    example: "jwt must be provided"
+  
+  
+  /lockers/type/4:
+    get:
+      tags:
+      - lockers
+      summary: Consultar todos los lockers disponibles
+      operationId: consultAllLockers
+      description: |
+        
+        type: Es la orden a ejecutar
+        data: Es el objeto que lleva todo el mensaje de la orden
+        
+        Si todo está marchando bien, el socket le devolverá el mismo "type" que mandaste
+        De lo contrario, la respuesta será un "type": -1
+        
+        Se debe mandar los siguientes parametros en el objeto "data"
+        
+        user_id: Identificador único del usuario
+        token: JWT de autenticacion
+
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: body
+          name: body
+          schema:
+            properties:
+              type: 
+                type: number
+                example: 4
+              data:
+                properties:
+                  user_id: 
+                    type: string
+                    format: uuid
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+
+      responses:
+        200:
+          description: Vendings disponibles
+          schema:
+            properties:
+              type: 
+                type: number
+                example: 4
+              data:
+                properties:
+                  locker_name:
+                    type: string
+                    example: "the locker name"
+                  boxes:
+                    type: array
+                    items:
+                      properties:
+                        name:
+                          type: string
+                          example: "Box1_name"
+                        is_open:
+                          type: boolean
+                          example: false
+        400:
+          description: Error message
+          schema:
+            properties:
+              type:
+                type: number
+                example: -1
+              data:
+                properties:
+                  message:
+                    type: string
+                    example: "lockers not found"
+        401:
+          description: Error message
+          schema:
+            properties:
+              type:
+                type: number
+                example: -1
+              data:
+                properties:
+                  message:
+                    type: string
+                    example: "jwt must be provided"
+  
+  
+  /lockers/type/5:
+    get:
+      tags:
+      - lockers
+      summary: Abrir locker
+      operationId: openLocker
+      description: |
+        
+        type: Es la orden a ejecutar
+        data: Es el objeto que lleva todo el mensaje de la orden
+        
+        Si todo está marchando bien, el socket le devolverá el mismo "type" que mandaste
+        De lo contrario, la respuesta será un "type": -1
+        
+        Se debe mandar los siguientes parametros en el objeto "data"
+        
+        user_id: Identificador único del usuario
+        locker_name: Nombre del locker a consultar
+        box_name: Nombre de la caja que se quiere abrir
+        token: JWT de autenticacion
+
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: body
+          name: body
+          schema:
+            properties:
+              type: 
+                type: number
+                example: 5
+              data:
+                properties:
+                  user_id: 
+                    type: string
+                    format: uuid
+                  locker_name:
+                    type: string
+                    example: "locker-10001/"
+                  box_name:
+                    type: string
+                    example: "Box1_name"
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+
+      responses:
+        200:
+          description: Vendings disponibles
+          schema:
+            properties:
+              type: 
+                type: number
+                example: 5
+              data:
+                properties:
+                  locker_name:
+                    type: string
+                    example: "the locker name"
+                  box_name:
+                    type: string
+                    example: "Box1_name"
+                  is_open:
+                    type: boolean
+                    example: false
+        400:
+          description: Error message
+          schema:
+            properties:
+              type:
+                type: number
+                example: -1
+              data:
+                properties:
+                  message:
+                    type: string
+                    example: "locker not found"
         401:
           description: Error message
           schema:

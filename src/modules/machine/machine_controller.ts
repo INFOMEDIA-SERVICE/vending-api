@@ -121,9 +121,9 @@ class SocketController {
             port: parseInt(process.env.MQTT_PORT || '') || 10110
         };
 
-        const userId: string = message.data.userId;
+        const user_id: string = message.data.user_id;
 
-        const userResponse = await machineRepository.updateRequests(userId);
+        const userResponse = await machineRepository.updateRequests(user_id);
 
         if(!userResponse.ok) {
             return socket.send(JSON.stringify({
@@ -142,7 +142,7 @@ class SocketController {
 
         console.log({
             products: message.data.products,
-            userId: message.data.userId
+            user_id: message.data.user_id
         });
 
         client.on('connect', () => {
@@ -151,7 +151,7 @@ class SocketController {
 
             let counter = 0;
 
-            this.createService(listener, socket, machineId, userId);
+            this.createService(listener, socket, machineId, user_id);
             
             listener.on('next', () => {
                 
@@ -348,7 +348,7 @@ class SocketController {
 
         const user:ISocketUser = {
             client: socket,
-            userId: message.data.userId,
+            user_id: message.data.user_id,
             userName: message.data.userName
         };
 
@@ -358,10 +358,10 @@ class SocketController {
     private consultAllLockers = async(socket: ws, message: IMessage): Promise<void> => {
 
         const token: string = message.data.token;
-        const userID: string = message.data.userID || '';
+        const user_id: string = message.data.user_id || '';
 
         const options: mqtt.IClientOptions = {
-            clientId: `${userID}`,
+            clientId: `${user_id}`,
             username: process.env.LOCKERS_USERNAME,
             password: process.env.LOCKERS_PASSWORD,
             port: parseInt(process.env.MQTT_PORT || '10110') || 10110,
@@ -404,10 +404,10 @@ class SocketController {
         const token: string = message.data.token;
         const locker_name: string = message.data.locker_name;
         const box_name: string = message.data.box_name;
-        const userID: string = message.data.userID || '';
+        const user_id: string = message.data.user_id || '';
 
         const options: mqtt.IClientOptions = {
-            clientId: `${userID}`,
+            clientId: `${user_id}`,
             username: process.env.LOCKERS_USERNAME,
             password: token,
             port: parseInt(process.env.MQTT_PORT || '10110') || 10110,
@@ -420,7 +420,7 @@ class SocketController {
             'locker-name': locker_name,
             'box-name': box_name,
             'token': token,
-            'sender-id': userID,
+            'sender-id': user_id,
         };
 
         client.publish(`${this.lockersRequestTopic}`, JSON.stringify(action));
@@ -462,12 +462,12 @@ class SocketController {
 
     private consultLocker = async(socket: ws, message: IMessage): Promise<void> => {
 
-        const userID: string = message.data.userID;
+        const user_id: string = message.data.user_id;
         const locker_name: string = message.data.locker_name;
         const token: string = message.data.token;
 
         const options: mqtt.IClientOptions = {
-            clientId: `${userID}`,
+            clientId: `${user_id}`,
             username: process.env.LOCKERS_USERNAME,
             password: process.env.LOCKERS_PASSWORD,
             port: parseInt(process.env.MQTT_PORT || '10110') || 10110,

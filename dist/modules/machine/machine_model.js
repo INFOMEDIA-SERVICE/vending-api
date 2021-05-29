@@ -6,17 +6,17 @@ class SocketUsers {
         this.addUser = (user) => {
             this.users.push(user);
         };
-        this.getUserById = (userId) => {
+        this.getUserById = (user_id) => {
             const user = this.users.filter(user => {
-                return user.userId === userId;
+                return user.user_id === user_id;
             })[0];
             return user;
         };
         this.getUsers = () => {
             return this.users;
         };
-        this.deleteUser = (userId) => {
-            this.users = this.users.filter(user => user.userId !== userId);
+        this.deleteUser = (user_id) => {
+            this.users = this.users.filter(user => user.user_id !== user_id);
         };
         this.users = [];
     }

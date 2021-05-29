@@ -105,8 +105,8 @@ class SocketController {
                 password: process.env.MQTT_PASSWORD,
                 port: parseInt(process.env.MQTT_PORT || '') || 10110
             };
-            const userId = message.data.userId;
-            const userResponse = yield machine_repository_1.machineRepository.updateRequests(userId);
+            const user_id = message.data.user_id;
+            const userResponse = yield machine_repository_1.machineRepository.updateRequests(user_id);
             if (!userResponse.ok) {
                 return socket.send(JSON.stringify({
                     type: -1,
@@ -120,12 +120,12 @@ class SocketController {
             client.subscribe(`${this.topic}`);
             console.log({
                 products: message.data.products,
-                userId: message.data.userId
+                user_id: message.data.user_id
             });
             client.on('connect', () => {
                 const products = message.data.products;
                 let counter = 0;
-                this.createService(listener, socket, machineId, userId);
+                this.createService(listener, socket, machineId, user_id);
                 listener.on('next', () => {
                     if (counter < products.length) {
                         console.log(`Product #${counter + 1}`);
@@ -273,16 +273,16 @@ class SocketController {
         this.saveUser = (socket, message) => __awaiter(this, void 0, void 0, function* () {
             const user = {
                 client: socket,
-                userId: message.data.userId,
+                user_id: message.data.user_id,
                 userName: message.data.userName
             };
             machine_model_1.socketUsers.addUser(user);
         });
         this.consultAllLockers = (socket, message) => __awaiter(this, void 0, void 0, function* () {
             const token = message.data.token;
-            const userID = message.data.userID || '';
+            const user_id = message.data.user_id || '';
             const options = {
-                clientId: `${userID}`,
+                clientId: `${user_id}`,
                 username: process.env.LOCKERS_USERNAME,
                 password: process.env.LOCKERS_PASSWORD,
                 port: parseInt(process.env.MQTT_PORT || '10110') || 10110,
@@ -315,9 +315,9 @@ class SocketController {
             const token = message.data.token;
             const locker_name = message.data.locker_name;
             const box_name = message.data.box_name;
-            const userID = message.data.userID || '';
+            const user_id = message.data.user_id || '';
             const options = {
-                clientId: `${userID}`,
+                clientId: `${user_id}`,
                 username: process.env.LOCKERS_USERNAME,
                 password: token,
                 port: parseInt(process.env.MQTT_PORT || '10110') || 10110,
@@ -328,7 +328,7 @@ class SocketController {
                 'locker-name': locker_name,
                 'box-name': box_name,
                 'token': token,
-                'sender-id': userID,
+                'sender-id': user_id,
             };
             client.publish(`${this.lockersRequestTopic}`, JSON.stringify(action));
             client.on('connect', () => {
@@ -362,11 +362,11 @@ class SocketController {
             });
         });
         this.consultLocker = (socket, message) => __awaiter(this, void 0, void 0, function* () {
-            const userID = message.data.userID;
+            const user_id = message.data.user_id;
             const locker_name = message.data.locker_name;
             const token = message.data.token;
             const options = {
-                clientId: `${userID}`,
+                clientId: `${user_id}`,
                 username: process.env.LOCKERS_USERNAME,
                 password: process.env.LOCKERS_PASSWORD,
                 port: parseInt(process.env.MQTT_PORT || '10110') || 10110,
