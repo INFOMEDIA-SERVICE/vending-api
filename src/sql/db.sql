@@ -27,7 +27,6 @@ CREATE TABLE IF NOT EXISTS vendings(
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
     constraint pk_vendings primary key(id)
-    constraint fk_user_id FOREIGN KEY (products) REFERENCES products (id)
 );
 
 CREATE TABLE IF NOT EXISTS users(
