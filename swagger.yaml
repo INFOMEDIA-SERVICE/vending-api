@@ -1,6 +1,11 @@
 swagger: '2.0'
 info:
-  description: API para realizar ordener a las máquinas expendedoras
+  description:
+    API para realizar ordener a las máquinas expendedoras
+    
+    Para empezar debes crear un usuario admin mediante el metodo POST admin/
+    
+    Este endpoint te devolvera un token el cual es valido para acceder a todos los endpoints.
   version: 1.0.0
   title: Vending Machine - API
   # put the contact info for your development or API team
@@ -2176,5 +2181,5 @@ definitions:
         type: string
         example: 'Error message'
 
-host: virtserver.swaggerhub.com
-basePath: /Smartinfo/vending-api/1.0.0
+host: 20.65.46.44:3004
+basePath: /

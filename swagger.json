@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "description": "API para realizar ordener a las máquinas expendedoras",
+    "description": "API para realizar ordener a las máquinas expendedoras\nPara empezar debes crear un usuario admin mediante el metodo POST admin/\nEste endpoint te devolvera un token el cual es valido para acceder a todos los endpoints.",
     "version": "1.0.0",
     "title": "Vending Machine - API",
     "contact": {
@@ -12,8 +12,6 @@
       "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
-  "host": "your-domain.com",
-  "basePath": "/api/",
   "tags": [
     {
       "name": "users",
@@ -28,6 +26,10 @@
       "description": "Rutas de vendings"
     },
     {
+      "name": "lockers",
+      "description": "Rutas de lockers"
+    },
+    {
       "name": "Service",
       "description": "Rutas de servicios"
     },
@@ -40,78 +42,34 @@
     "https",
     "http"
   ],
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
   "paths": {
     "/users/": {
-      "get": {
-        "tags": [
-          "admins"
-        ],
-        "summary": "Obtener todos los usuarios",
-        "description": "Retorna todos los usuarios\n",
-        "operationId": "getAllUsers",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "Authorization",
-            "in": "header",
-            "description": "Admin privileges",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Usuarios registrados",
-            "schema": {
-              "properties": {
-                "ok": {
-                  "type": "boolean"
-                },
-                "users": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/definitions/User"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Error message",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
-      },
       "post": {
         "tags": [
           "users"
         ],
         "summary": "Registrar un usuario",
-        "description": "Retorna al usuario registrado y el token\n",
         "operationId": "postUser",
+        "description": "Retorna al usuario registrado y el token\n",
         "produces": [
           "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
         ],
         "parameters": [
           {
             "in": "body",
             "name": "body",
-            "required": false,
             "schema": {
               "properties": {
                 "first_name": {
@@ -164,12 +122,62 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
+        }
+      },
+      "get": {
+        "tags": [
+          "admins"
+        ],
+        "summary": "Obtener todos los usuarios",
+        "operationId": "getAllUsers",
+        "description": "Retorna todos los usuarios\n",
+        "produces": [
+          "application/json"
+        ],
         "security": [
           {
             "Bearer": []
           }
-        ]
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "description": "Admin privileges",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuarios registrados",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "users": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/User"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
       }
     },
     "/users/login": {
@@ -178,16 +186,20 @@
           "users"
         ],
         "summary": "Login de usuarios",
-        "description": "Retorna usuario y token\n",
         "operationId": "loginUser",
+        "description": "Retorna usuario y token\n",
         "produces": [
           "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
         ],
         "parameters": [
           {
             "in": "body",
             "name": "body",
-            "required": false,
             "schema": {
               "properties": {
                 "email": {
@@ -232,12 +244,7 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
+        }
       }
     },
     "/users/login/google": {
@@ -246,16 +253,20 @@
           "users"
         ],
         "summary": "Login de usuarios usando google",
-        "description": "Recibe firebase token, hace el login y retorna usuario y token\n",
         "operationId": "loginUserWithGoogle",
+        "description": "Recibe firebase token, hace el login y retorna usuario y token\n",
         "produces": [
           "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
         ],
         "parameters": [
           {
             "in": "body",
             "name": "body",
-            "required": false,
             "schema": {
               "properties": {
                 "token": {
@@ -296,12 +307,7 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
+        }
       }
     },
     "/users/signup/google": {
@@ -310,16 +316,20 @@
           "users"
         ],
         "summary": "Registro de usuarios usando google",
-        "description": "Recibe firebase token, hace el registro y retorna usuario y token\n",
         "operationId": "signupUserWithGoogle",
+        "description": "Recibe firebase token, hace el registro y retorna usuario y token\n",
         "produces": [
           "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
         ],
         "parameters": [
           {
             "in": "body",
             "name": "body",
-            "required": false,
             "schema": {
               "properties": {
                 "token": {
@@ -360,12 +370,7 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
+        }
       }
     },
     "/users/{id}": {
@@ -374,24 +379,29 @@
           "admins"
         ],
         "summary": "Obtener usuario por id",
-        "description": "Retorna al usuario del id\n",
         "operationId": "getUserById",
+        "description": "Retorna al usuario del id\n",
         "produces": [
           "application/json"
         ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
-            "name": "id",
             "in": "path",
-            "description": "User id.",
+            "name": "id",
+            "type": "string",
             "required": true,
-            "type": "string"
+            "description": "User id."
           },
           {
-            "name": "Authorization",
             "in": "header",
-            "required": true,
-            "type": "string"
+            "name": "Authorization",
+            "type": "string",
+            "required": true
           }
         ],
         "responses": {
@@ -420,102 +430,36 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
-      },
-      "put": {
-        "tags": [
-          "users"
-        ],
-        "summary": "Editar usuario",
-        "description": "Retorna al usuario editado\n",
-        "operationId": "editUser",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/User"
-            }
-          },
-          {
-            "name": "id",
-            "in": "path",
-            "description": "User id.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "Authorization",
-            "in": "header",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Usuario editado",
-            "schema": {
-              "properties": {
-                "ok": {
-                  "type": "boolean"
-                },
-                "user": {
-                  "$ref": "#/definitions/User"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Error message",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
+        }
       },
       "delete": {
         "tags": [
           "users"
         ],
         "summary": "Eliminar usuario por id",
-        "description": "Retorna al usuario eliminado\n",
         "operationId": "deleteUser",
+        "description": "Retorna al usuario eliminado\n",
         "produces": [
           "application/json"
         ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
-            "name": "id",
             "in": "path",
-            "description": "User id.",
+            "name": "id",
+            "type": "string",
             "required": true,
-            "type": "string"
+            "description": "User id."
           },
           {
-            "name": "Authorization",
             "in": "header",
-            "required": true,
-            "type": "string"
+            "name": "Authorization",
+            "type": "string",
+            "required": true
           }
         ],
         "responses": {
@@ -544,48 +488,113 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
+        }
+      },
+      "put": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Editar usuario",
+        "operationId": "editUser",
+        "description": "Retorna al usuario editado\n",
+        "produces": [
+          "application/json"
+        ],
         "security": [
           {
             "Bearer": []
           }
-        ]
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "type": "string",
+            "required": true,
+            "description": "User id."
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario editado",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "user": {
+                  "$ref": "#/definitions/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
       },
       "patch": {
         "tags": [
           "admins"
         ],
         "summary": "Editar status del usuario",
-        "description": "Retorna usuario editado\n",
         "operationId": "Update user stats",
+        "description": "Retorna usuario editado\n",
         "produces": [
           "application/json"
         ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
-            "name": "id",
             "in": "path",
-            "description": "User id.",
+            "name": "id",
+            "type": "string",
             "required": true,
-            "type": "string"
+            "description": "User id."
           },
           {
-            "name": "Authorization",
             "in": "header",
+            "name": "Authorization",
+            "type": "string",
             "description": "Admin privileges",
-            "required": true,
-            "type": "string"
+            "required": true
           },
           {
             "in": "body",
             "name": "body",
-            "required": false,
             "schema": {
               "properties": {
                 "status": {
                   "type": "boolean",
-                  "example": true,
-                  "default": true
+                  "default": true,
+                  "example": true
                 }
               }
             }
@@ -617,12 +626,7 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
+        }
       }
     },
     "/users/me": {
@@ -631,17 +635,22 @@
           "users"
         ],
         "summary": "Obtener usuario que está haciendo la consulta",
-        "description": "Retorna al usuario que hace la consulta\n",
         "operationId": "getMyUser",
+        "description": "Retorna al usuario que hace la consulta\n",
         "produces": [
           "application/json"
         ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
-            "name": "Authorization",
             "in": "header",
-            "required": true,
-            "type": "string"
+            "name": "Authorization",
+            "type": "string",
+            "required": true
           }
         ],
         "responses": {
@@ -670,12 +679,7 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
+        }
       }
     },
     "/products/": {
@@ -684,17 +688,22 @@
           "products"
         ],
         "summary": "Obtener todos los productos",
-        "description": "Retorna todos los productos disponibles\n",
         "operationId": "getProducts",
+        "description": "Retorna todos los productos disponibles\n",
         "produces": [
           "application/json"
         ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
-            "name": "Authorization",
             "in": "header",
-            "required": true,
-            "type": "string"
+            "name": "Authorization",
+            "type": "string",
+            "required": true
           }
         ],
         "responses": {
@@ -726,22 +735,22 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
+        }
       },
       "post": {
         "tags": [
           "admins"
         ],
         "summary": "Crear producto",
-        "description": "Retorna el producto creado\n",
         "operationId": "createProduct",
+        "description": "Retorna el producto creado\n",
         "produces": [
           "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
         ],
         "parameters": [
           {
@@ -753,10 +762,10 @@
             }
           },
           {
-            "name": "Authorization",
             "in": "header",
-            "required": true,
-            "type": "string"
+            "name": "Authorization",
+            "type": "string",
+            "required": true
           }
         ],
         "responses": {
@@ -785,12 +794,7 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
+        }
       }
     },
     "/products/{id}": {
@@ -799,24 +803,29 @@
           "products"
         ],
         "summary": "Obtener producto por id",
-        "description": "Retorna el producto del id\n",
         "operationId": "getProductById",
+        "description": "Retorna el producto del id\n",
         "produces": [
           "application/json"
         ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
-            "name": "id",
             "in": "path",
-            "description": "Id del producto",
+            "name": "id",
+            "type": "string",
             "required": true,
-            "type": "string"
+            "description": "Id del producto"
           },
           {
-            "name": "Authorization",
             "in": "header",
-            "required": true,
-            "type": "string"
+            "name": "Authorization",
+            "type": "string",
+            "required": true
           }
         ],
         "responses": {
@@ -845,102 +854,36 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
-      },
-      "put": {
-        "tags": [
-          "admins"
-        ],
-        "summary": "Editar producto",
-        "description": "Retorna el producto editado\n",
-        "operationId": "editProduct",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/Product"
-            }
-          },
-          {
-            "name": "id",
-            "in": "path",
-            "description": "User id.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "Authorization",
-            "in": "header",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Producto editado",
-            "schema": {
-              "properties": {
-                "ok": {
-                  "type": "boolean"
-                },
-                "product": {
-                  "$ref": "#/definitions/Product"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Error message",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
+        }
       },
       "delete": {
         "tags": [
           "admins"
         ],
         "summary": "Eliminar producto",
-        "description": "Retorna el producto eliminado\n",
         "operationId": "deleteProduct",
+        "description": "Retorna el producto eliminado\n",
         "produces": [
           "application/json"
         ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
-            "name": "id",
             "in": "path",
-            "description": "Product id.",
+            "name": "id",
+            "type": "string",
             "required": true,
-            "type": "string"
+            "description": "Product id."
           },
           {
-            "name": "Authorization",
             "in": "header",
-            "required": true,
-            "type": "string"
+            "name": "Authorization",
+            "type": "string",
+            "required": true
           }
         ],
         "responses": {
@@ -969,31 +912,168 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
+        }
+      },
+      "put": {
+        "tags": [
+          "admins"
+        ],
+        "summary": "Editar producto",
+        "operationId": "editProduct",
+        "description": "Retorna el producto editado\n",
+        "produces": [
+          "application/json"
+        ],
         "security": [
           {
             "Bearer": []
           }
-        ]
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Product"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "type": "string",
+            "required": true,
+            "description": "User id."
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Producto editado",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "product": {
+                  "$ref": "#/definitions/Product"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
       }
     },
     "/vendings": {
+      "post": {
+        "tags": [
+          "admins"
+        ],
+        "summary": "Crear nueva vending",
+        "operationId": "createVending",
+        "description": "Retorna la vending creada\n",
+        "produces": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "Vending #1"
+                },
+                "image": {
+                  "type": "string",
+                  "example": "https://example.com/mypicture.jpg"
+                },
+                "machine_id": {
+                  "type": "string",
+                  "example": "STM32-1234567891"
+                }
+              }
+            }
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vending creada",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "vending": {
+                  "$ref": "#/definitions/Vending"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
       "get": {
         "tags": [
           "vendings"
         ],
         "summary": "Obtener todas las vendings disponibles",
-        "description": "Retorna las vendings disponibles\n",
         "operationId": "getVendings",
+        "description": "Retorna las vendings disponibles\n",
         "produces": [
           "application/json"
         ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
-            "name": "Authorization",
             "in": "header",
-            "required": true,
-            "type": "string"
+            "name": "Authorization",
+            "type": "string",
+            "required": true
           }
         ],
         "responses": {
@@ -1025,84 +1105,7 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
-      },
-      "post": {
-        "tags": [
-          "admins"
-        ],
-        "summary": "Crear nueva vending",
-        "description": "Retorna la vending creada\n",
-        "operationId": "createVending",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": false,
-            "schema": {
-              "properties": {
-                "name": {
-                  "type": "string",
-                  "example": "Vending #1"
-                },
-                "image": {
-                  "type": "string",
-                  "example": "https://example.com/mypicture.jpg"
-                },
-                "machine_id": {
-                  "type": "string",
-                  "example": "STM32-1234567891"
-                }
-              }
-            }
-          },
-          {
-            "name": "Authorization",
-            "in": "header",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Vending creada",
-            "schema": {
-              "properties": {
-                "ok": {
-                  "type": "boolean"
-                },
-                "vending": {
-                  "$ref": "#/definitions/Vending"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Error message",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
+        }
       }
     },
     "/vendings/{id}": {
@@ -1111,24 +1114,29 @@
           "vendings"
         ],
         "summary": "Obtener vending machine por id",
-        "description": "Retorna la vending requerida\n",
         "operationId": "getVendingById",
+        "description": "Retorna la vending requerida\n",
         "produces": [
           "application/json"
         ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
-            "name": "id",
             "in": "path",
-            "description": "User id.",
+            "name": "id",
+            "type": "string",
             "required": true,
-            "type": "string"
+            "description": "User id."
           },
           {
-            "name": "Authorization",
             "in": "header",
-            "required": true,
-            "type": "string"
+            "name": "Authorization",
+            "type": "string",
+            "required": true
           }
         ],
         "responses": {
@@ -1157,22 +1165,22 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
+        }
       },
       "put": {
         "tags": [
           "admins"
         ],
         "summary": "Editar vending",
-        "description": "Retorna la vending editada\n",
         "operationId": "editVending",
+        "description": "Retorna la vending editada\n",
         "produces": [
           "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
         ],
         "parameters": [
           {
@@ -1184,17 +1192,17 @@
             }
           },
           {
-            "name": "id",
             "in": "path",
-            "description": "User id.",
+            "name": "id",
+            "type": "string",
             "required": true,
-            "type": "string"
+            "description": "User id."
           },
           {
-            "name": "Authorization",
             "in": "header",
-            "required": true,
-            "type": "string"
+            "name": "Authorization",
+            "type": "string",
+            "required": true
           }
         ],
         "responses": {
@@ -1223,36 +1231,36 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
+        }
       },
       "delete": {
         "tags": [
           "admins"
         ],
         "summary": "Eliminar Vending",
-        "description": "Retorna el vending eliminada\n",
         "operationId": "deleteVending",
+        "description": "Retorna el vending eliminada\n",
         "produces": [
           "application/json"
         ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
-            "name": "id",
             "in": "path",
-            "description": "Vending id.",
+            "name": "id",
+            "type": "string",
             "required": true,
-            "type": "string"
+            "description": "Vending id."
           },
           {
-            "name": "Authorization",
             "in": "header",
-            "required": true,
-            "type": "string"
+            "name": "Authorization",
+            "type": "string",
+            "required": true
           }
         ],
         "responses": {
@@ -1281,12 +1289,7 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
+        }
       }
     },
     "/vendings/{id}/products": {
@@ -1295,24 +1298,29 @@
           "vendings"
         ],
         "summary": "Obtener productos de la máquina",
-        "description": "Se recibe el id de la máquina y se retorna los productos disponibles de la misma\n",
         "operationId": "getProductsByMachine",
+        "description": "Se recibe el id de la máquina y se retorna los productos disponibles de la misma\n",
         "produces": [
           "application/json"
         ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
-            "name": "id",
             "in": "path",
-            "description": "Id de la máquina",
+            "name": "id",
+            "type": "string",
             "required": true,
-            "type": "string"
+            "description": "Id de la máquina"
           },
           {
-            "name": "Authorization",
             "in": "header",
-            "required": true,
-            "type": "string"
+            "name": "Authorization",
+            "type": "string",
+            "required": true
           }
         ],
         "responses": {
@@ -1344,12 +1352,7 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
+        }
       }
     },
     "/vendings/": {
@@ -1358,22 +1361,26 @@
           "vendings"
         ],
         "summary": "Ejecutar ordenes a la máquina",
-        "description": "Conexión web socket\nEjecutar ordenes a la máquina\nLas ordenes disponibles actualmente son dispensar productos y obtener el estado de la máquina\n\nLa orden de pedir el estado de la máquina se realiza con el \"type\" 2, el cuál devolverá un mensaje con el estado de la máquina (Si la respuesta nunca llega, significa que la máquina está apagada)\nLa orden de dispensar productos se realiza con el \"type\" 1 y se le envian los productos como en el ejemplo del body\n\ntype: Es la orden a ejecutar\ndata: Es el objeto que lleva todo el mensaje de la orden\n\nPara dispensar productos\nDentro de data debe ir una lista de productos con el key \"products\"\nLa lista de los productos será una lista de objetos que deberá llevar la siguiente estructura:\n\nid: ID del producto\nname: Nombre del producto\nitem: Es la ubicación del producto en la vending\nprice: Precio del producto\n\nAdemás de la lista de productos, el objeto \"data\" deberá contener lo siguiente\n\nmachineId: ID de la máquina, mismo id que devuelve el código QR\nuserId: ID del usuario que está haciendo la solicitud\ntoken: Token de acceso\n\nSi todo está marchando bien, el socket le devolverá un \"type\": 0\nDe lo contrario, la respuesta será un \"type\": -1\n\n\n\nPATH: ws://yourdomain.com/vending/\n",
         "operationId": "ordersToMachine",
+        "description": "Conexión web socket\nEjecutar ordenes a la máquina\nLas ordenes disponibles actualmente son dispensar productos y obtener el estado de la máquina\n\nLa orden de pedir el estado de la máquina se realiza con el \"type\" 2, el cuál devolverá un mensaje con el estado de la máquina (Si la respuesta nunca llega, significa que la máquina está apagada)\nLa orden de dispensar productos se realiza con el \"type\" 1 y se le envian los productos como en el ejemplo del body\n\ntype: Es la orden a ejecutar\ndata: Es el objeto que lleva todo el mensaje de la orden\n\nPara dispensar productos\nDentro de data debe ir una lista de productos con el key \"products\"\nLa lista de los productos será una lista de objetos que deberá llevar la siguiente estructura:\n\nid: ID del producto\nname: Nombre del producto\nitem: Es la ubicación del producto en la vending\nprice: Precio del producto\n\nAdemás de la lista de productos, el objeto \"data\" deberá contener lo siguiente\n\nmachineId: ID de la máquina, mismo id que devuelve el código QR\nuser_id: ID del usuario que está haciendo la solicitud\ntoken: Token de acceso\n\nSi todo está marchando bien, el socket le devolverá un \"type\": 0\nDe lo contrario, la respuesta será un \"type\": -1\n\n\n\nPATH: ws://yourdomain.com/connection/\n",
         "produces": [
           "application/json"
         ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
-            "name": "Authorization",
             "in": "header",
-            "required": true,
-            "type": "string"
+            "name": "Authorization",
+            "type": "string",
+            "required": true
           },
           {
             "in": "body",
             "name": "body",
-            "required": false,
             "schema": {
               "properties": {
                 "type": {
@@ -1381,7 +1388,6 @@
                   "example": 1
                 },
                 "data": {
-                  "type": "object",
                   "properties": {
                     "products": {
                       "type": "array",
@@ -1417,7 +1423,6 @@
                   "example": 1
                 },
                 "data": {
-                  "type": "object",
                   "properties": {
                     "products": {
                       "type": "array",
@@ -1447,7 +1452,6 @@
                   "example": -1
                 },
                 "data": {
-                  "type": "object",
                   "properties": {
                     "product": {
                       "$ref": "#/definitions/SocketProduct"
@@ -1470,7 +1474,6 @@
                   "example": -1
                 },
                 "data": {
-                  "type": "object",
                   "properties": {
                     "message": {
                       "type": "string",
@@ -1481,12 +1484,456 @@
               }
             }
           }
-        },
+        }
+      }
+    },
+    "/lockers/": {
+      "get": {
+        "tags": [
+          "lockers"
+        ],
+        "summary": "Ejecutar ordenes a lockers",
+        "operationId": "ordersToLockers",
+        "description": "Conexión web socket\nEjecutar ordenes a la los lockers\nLas ordenes disponibles actualmente son consultar todos los lockers, consultar si un locker está abierto o cerrado\n\ntype: Es la orden a ejecutar\ndata: Es el objeto que lleva todo el mensaje de la orden\n\nSi todo está marchando bien, el socket le devolverá el mismo \"type\" que mandaste\nDe lo contrario, la respuesta será un \"type\": -1\n\nPATH: ws://yourdomain.com/connection/\n",
+        "produces": [
+          "application/json"
+        ],
         "security": [
           {
             "Bearer": []
           }
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "Vendings disponibles",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": 1
+                },
+                "data": {
+                  "properties": {
+                    "products": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/definitions/SocketProduct"
+                      }
+                    },
+                    "machineId": {
+                      "type": "string",
+                      "example": "STM32-1234567891"
+                    },
+                    "user_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": -1
+                },
+                "data": {
+                  "properties": {
+                    "product": {
+                      "$ref": "#/definitions/SocketProduct"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "product De toditos not dispensed"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error message",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": -1
+                },
+                "data": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "jwt must be provided"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lockers/type/3": {
+      "get": {
+        "tags": [
+          "lockers"
+        ],
+        "summary": "Consultar estado de locker",
+        "operationId": "consultLocker",
+        "description": "\ntype: Es la orden a ejecutar\ndata: Es el objeto que lleva todo el mensaje de la orden\n\nSi todo está marchando bien, el socket le devolverá el mismo \"type\" que mandaste\nDe lo contrario, la respuesta será un \"type\": -1\n\nSe debe mandar los siguientes parametros en el objeto \"data\"\n\nuser_id: Identificador único del usuario\nlocker_name: Nombre del locker a consultar\ntoken: JWT de autenticacion\n",
+        "produces": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": 3
+                },
+                "data": {
+                  "properties": {
+                    "user_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "locker_name": {
+                      "type": "string",
+                      "example": "locker-10001/"
+                    },
+                    "token": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vendings disponibles",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": 3
+                },
+                "data": {
+                  "properties": {
+                    "locker_name": {
+                      "type": "string",
+                      "example": "the locker name"
+                    },
+                    "boxes": {
+                      "type": "array",
+                      "items": {
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "example": "Box1_name"
+                          },
+                          "is_open": {
+                            "type": "boolean",
+                            "example": false
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": -1
+                },
+                "data": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "locker not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error message",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": -1
+                },
+                "data": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "jwt must be provided"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lockers/type/4": {
+      "get": {
+        "tags": [
+          "lockers"
+        ],
+        "summary": "Consultar todos los lockers disponibles",
+        "operationId": "consultAllLockers",
+        "description": "\ntype: Es la orden a ejecutar\ndata: Es el objeto que lleva todo el mensaje de la orden\n\nSi todo está marchando bien, el socket le devolverá el mismo \"type\" que mandaste\nDe lo contrario, la respuesta será un \"type\": -1\n\nSe debe mandar los siguientes parametros en el objeto \"data\"\n\nuser_id: Identificador único del usuario\ntoken: JWT de autenticacion\n",
+        "produces": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": 4
+                },
+                "data": {
+                  "properties": {
+                    "user_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "token": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vendings disponibles",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": 4
+                },
+                "data": {
+                  "properties": {
+                    "locker_name": {
+                      "type": "string",
+                      "example": "the locker name"
+                    },
+                    "boxes": {
+                      "type": "array",
+                      "items": {
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "example": "Box1_name"
+                          },
+                          "is_open": {
+                            "type": "boolean",
+                            "example": false
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": -1
+                },
+                "data": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "lockers not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error message",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": -1
+                },
+                "data": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "jwt must be provided"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lockers/type/5": {
+      "get": {
+        "tags": [
+          "lockers"
+        ],
+        "summary": "Abrir locker",
+        "operationId": "openLocker",
+        "description": "\ntype: Es la orden a ejecutar\ndata: Es el objeto que lleva todo el mensaje de la orden\n\nSi todo está marchando bien, el socket le devolverá el mismo \"type\" que mandaste\nDe lo contrario, la respuesta será un \"type\": -1\n\nSe debe mandar los siguientes parametros en el objeto \"data\"\n\nuser_id: Identificador único del usuario\nlocker_name: Nombre del locker a consultar\nbox_name: Nombre de la caja que se quiere abrir\ntoken: JWT de autenticacion\n",
+        "produces": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": 5
+                },
+                "data": {
+                  "properties": {
+                    "user_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "locker_name": {
+                      "type": "string",
+                      "example": "locker-10001/"
+                    },
+                    "box_name": {
+                      "type": "string",
+                      "example": "Box1_name"
+                    },
+                    "token": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vendings disponibles",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": 5
+                },
+                "data": {
+                  "properties": {
+                    "locker_name": {
+                      "type": "string",
+                      "example": "the locker name"
+                    },
+                    "box_name": {
+                      "type": "string",
+                      "example": "Box1_name"
+                    },
+                    "is_open": {
+                      "type": "boolean",
+                      "example": false
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": -1
+                },
+                "data": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "locker not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error message",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": -1
+                },
+                "data": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "jwt must be provided"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/services/{id}": {
@@ -1495,24 +1942,29 @@
           "Service"
         ],
         "summary": "Obtener servicio por id",
-        "description": "Retorna el servicio requerido\n",
         "operationId": "getServiceById",
+        "description": "Retorna el servicio requerido\n",
         "produces": [
           "application/json"
         ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
-            "name": "id",
             "in": "path",
-            "description": "ID del servicio",
+            "name": "id",
+            "type": "string",
             "required": true,
-            "type": "string"
+            "description": "ID del servicio"
           },
           {
-            "name": "Authorization",
             "in": "header",
-            "required": true,
-            "type": "string"
+            "name": "Authorization",
+            "type": "string",
+            "required": true
           }
         ],
         "responses": {
@@ -1541,37 +1993,37 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
+        }
       },
       "put": {
         "tags": [
           "admins"
         ],
         "summary": "Editar servicio",
-        "description": "Retorna el servicio editado\n",
         "operationId": "editService",
+        "description": "Retorna el servicio editado\n",
         "produces": [
           "application/json"
         ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
-            "name": "id",
             "in": "path",
-            "description": "ID del servicio",
+            "name": "id",
+            "type": "string",
             "required": true,
-            "type": "string"
+            "description": "ID del servicio"
           },
           {
-            "name": "Authorization",
             "in": "header",
+            "name": "Authorization",
+            "type": "string",
             "description": "Admin privileges",
-            "required": true,
-            "type": "string"
+            "required": true
           }
         ],
         "responses": {
@@ -1603,37 +2055,37 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
+        }
       },
       "delete": {
         "tags": [
           "admins"
         ],
         "summary": "Eliminar servicio",
-        "description": "Retorna el servicio eliminado\n",
         "operationId": "deleteService",
+        "description": "Retorna el servicio eliminado\n",
         "produces": [
           "application/json"
         ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
-            "name": "id",
             "in": "path",
-            "description": "ID del servicio",
+            "name": "id",
+            "type": "string",
             "required": true,
-            "type": "string"
+            "description": "ID del servicio"
           },
           {
-            "name": "Authorization",
             "in": "header",
+            "name": "Authorization",
+            "type": "string",
             "description": "Admin privileges",
-            "required": true,
-            "type": "string"
+            "required": true
           }
         ],
         "responses": {
@@ -1665,12 +2117,7 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
+        }
       }
     },
     "/services/me": {
@@ -1679,17 +2126,22 @@
           "Service"
         ],
         "summary": "Obtener servicios del usuario que consulta",
-        "description": "Retorna los servicios del usuario que hace la consulta\n",
         "operationId": "getMyService",
+        "description": "Retorna los servicios del usuario que hace la consulta\n",
         "produces": [
           "application/json"
         ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
-            "name": "Authorization",
             "in": "header",
-            "required": true,
-            "type": "string"
+            "name": "Authorization",
+            "type": "string",
+            "required": true
           }
         ],
         "responses": {
@@ -1721,12 +2173,7 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
+        }
       }
     },
     "/services": {
@@ -1735,18 +2182,23 @@
           "admins"
         ],
         "summary": "Obtener todos los servicios",
-        "description": "Retorna todos los servicios\n",
         "operationId": "getAllService",
+        "description": "Retorna todos los servicios\n",
         "produces": [
           "application/json"
         ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
-            "name": "Authorization",
             "in": "header",
+            "name": "Authorization",
+            "type": "string",
             "description": "Admin privileges",
-            "required": true,
-            "type": "string"
+            "required": true
           }
         ],
         "responses": {
@@ -1778,12 +2230,7 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
+        }
       }
     },
     "/services/users/{id}": {
@@ -1792,25 +2239,30 @@
           "admins"
         ],
         "summary": "Obtener todos los servicios por usuario",
-        "description": "Retorna todos los servicios del usuario\n",
         "operationId": "getAllUserService",
+        "description": "Retorna todos los servicios del usuario\n",
         "produces": [
           "application/json"
         ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
-            "name": "id",
             "in": "path",
-            "description": "ID del usuario",
+            "name": "id",
+            "type": "string",
             "required": true,
-            "type": "string"
+            "description": "ID del usuario"
           },
           {
-            "name": "Authorization",
             "in": "header",
+            "name": "Authorization",
+            "type": "string",
             "description": "Admin privileges",
-            "required": true,
-            "type": "string"
+            "required": true
           }
         ],
         "responses": {
@@ -1842,12 +2294,7 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
+        }
       }
     },
     "/services/vendings/{id}": {
@@ -1856,25 +2303,30 @@
           "admins"
         ],
         "summary": "Obtener todos los servicios por vending",
-        "description": "Retorna todos los servicios de la vending\n",
         "operationId": "getAllVendingsService",
+        "description": "Retorna todos los servicios de la vending\n",
         "produces": [
           "application/json"
         ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
-            "name": "id",
             "in": "path",
-            "description": "ID de la vending",
+            "name": "id",
+            "type": "string",
             "required": true,
-            "type": "string"
+            "description": "ID de la vending"
           },
           {
-            "name": "Authorization",
             "in": "header",
+            "name": "Authorization",
+            "type": "string",
             "description": "Admin privileges",
-            "required": true,
-            "type": "string"
+            "required": true
           }
         ],
         "responses": {
@@ -1906,85 +2358,29 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
+        }
       }
     },
     "/admins/": {
-      "get": {
-        "tags": [
-          "admins"
-        ],
-        "summary": "Obtener todos los admins",
-        "description": "Retorna todos los usuarios\n",
-        "operationId": "getAllAdmins",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "Authorization",
-            "in": "header",
-            "description": "Admin privileges",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Usuarios registrados",
-            "schema": {
-              "properties": {
-                "ok": {
-                  "type": "boolean"
-                },
-                "users": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/definitions/User"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Error message",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
-      },
       "post": {
         "tags": [
           "admins"
         ],
         "summary": "Registrar un Admin",
-        "description": "Retorna al usuario registrado y el token\n",
         "operationId": "createAdmin",
+        "description": "Retorna al usuario registrado y el token\n",
         "produces": [
           "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
         ],
         "parameters": [
           {
             "in": "body",
             "name": "body",
-            "required": false,
             "schema": {
               "properties": {
                 "first_name": {
@@ -2037,12 +2433,62 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
+        }
+      },
+      "get": {
+        "tags": [
+          "admins"
+        ],
+        "summary": "Obtener todos los admins",
+        "operationId": "getAllAdmins",
+        "description": "Retorna todos los usuarios\n",
+        "produces": [
+          "application/json"
+        ],
         "security": [
           {
             "Bearer": []
           }
-        ]
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "description": "Admin privileges",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuarios registrados",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "users": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/User"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
       }
     },
     "/admins/login": {
@@ -2051,16 +2497,20 @@
           "admins"
         ],
         "summary": "Login de admins",
-        "description": "Retorna usuario y token\n",
         "operationId": "loginAdmins",
+        "description": "Retorna usuario y token\n",
         "produces": [
           "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
         ],
         "parameters": [
           {
             "in": "body",
             "name": "body",
-            "required": false,
             "schema": {
               "properties": {
                 "email": {
@@ -2105,12 +2555,7 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
+        }
       }
     },
     "/admins/{id}": {
@@ -2119,24 +2564,29 @@
           "admins"
         ],
         "summary": "Obtener admin por id",
-        "description": "Retorna al usuario del id\n",
         "operationId": "getAdminById",
+        "description": "Retorna al usuario del id\n",
         "produces": [
           "application/json"
         ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
-            "name": "id",
             "in": "path",
-            "description": "User id.",
+            "name": "id",
+            "type": "string",
             "required": true,
-            "type": "string"
+            "description": "User id."
           },
           {
-            "name": "Authorization",
             "in": "header",
-            "required": true,
-            "type": "string"
+            "name": "Authorization",
+            "type": "string",
+            "required": true
           }
         ],
         "responses": {
@@ -2165,102 +2615,36 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
-      },
-      "put": {
-        "tags": [
-          "admins"
-        ],
-        "summary": "Editar admin",
-        "description": "Retorna al usuario editado\n",
-        "operationId": "editAdmin",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/User"
-            }
-          },
-          {
-            "name": "id",
-            "in": "path",
-            "description": "User id.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "Authorization",
-            "in": "header",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Usuario editado",
-            "schema": {
-              "properties": {
-                "ok": {
-                  "type": "boolean"
-                },
-                "user": {
-                  "$ref": "#/definitions/User"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Error message",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
+        }
       },
       "delete": {
         "tags": [
           "admins"
         ],
         "summary": "Eliminar admin por id",
-        "description": "Retorna al usuario eliminado\n",
         "operationId": "deleteAdmin",
+        "description": "Retorna al usuario eliminado\n",
         "produces": [
           "application/json"
         ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
-            "name": "id",
             "in": "path",
-            "description": "User id.",
+            "name": "id",
+            "type": "string",
             "required": true,
-            "type": "string"
+            "description": "User id."
           },
           {
-            "name": "Authorization",
             "in": "header",
-            "required": true,
-            "type": "string"
+            "name": "Authorization",
+            "type": "string",
+            "required": true
           }
         ],
         "responses": {
@@ -2289,48 +2673,113 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
+        }
+      },
+      "put": {
+        "tags": [
+          "admins"
+        ],
+        "summary": "Editar admin",
+        "operationId": "editAdmin",
+        "description": "Retorna al usuario editado\n",
+        "produces": [
+          "application/json"
+        ],
         "security": [
           {
             "Bearer": []
           }
-        ]
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "type": "string",
+            "required": true,
+            "description": "User id."
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario editado",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "user": {
+                  "$ref": "#/definitions/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
       },
       "patch": {
         "tags": [
           "admins"
         ],
         "summary": "Editar status del admin",
-        "description": "Retorna usuario editado\n",
         "operationId": "UpdateAdminStatus",
+        "description": "Retorna usuario editado\n",
         "produces": [
           "application/json"
         ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
-            "name": "id",
             "in": "path",
-            "description": "User id.",
+            "name": "id",
+            "type": "string",
             "required": true,
-            "type": "string"
+            "description": "User id."
           },
           {
-            "name": "Authorization",
             "in": "header",
+            "name": "Authorization",
+            "type": "string",
             "description": "Admin privileges",
-            "required": true,
-            "type": "string"
+            "required": true
           },
           {
             "in": "body",
             "name": "body",
-            "required": false,
             "schema": {
               "properties": {
                 "status": {
                   "type": "boolean",
-                  "example": true,
-                  "default": true
+                  "default": true,
+                  "example": true
                 }
               }
             }
@@ -2362,12 +2811,7 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
+        }
       }
     },
     "/admins/me": {
@@ -2376,17 +2820,22 @@
           "admins"
         ],
         "summary": "Obtener admin que está haciendo la consulta",
-        "description": "Retorna al usuario que hace la consulta\n",
         "operationId": "getMyAdminUser",
+        "description": "Retorna al usuario que hace la consulta\n",
         "produces": [
           "application/json"
         ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "parameters": [
           {
-            "name": "Authorization",
             "in": "header",
-            "required": true,
-            "type": "string"
+            "name": "Authorization",
+            "type": "string",
+            "required": true
           }
         ],
         "responses": {
@@ -2415,33 +2864,21 @@
               "$ref": "#/definitions/ErrorResponse"
             }
           }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
+        }
       }
-    }
-  },
-  "securityDefinitions": {
-    "Bearer": {
-      "type": "apiKey",
-      "name": "Authorization",
-      "in": "header"
     }
   },
   "definitions": {
     "Product": {
       "type": "object",
       "required": [
-        "description",
-        "image",
-        "item",
-        "machine_id",
         "name",
         "price",
-        "quantity"
+        "image",
+        "item",
+        "description",
+        "quantity",
+        "machine_id"
       ],
       "properties": {
         "id": {
@@ -2500,8 +2937,8 @@
       "type": "object",
       "required": [
         "id",
-        "item",
-        "name"
+        "name",
+        "item"
       ],
       "properties": {
         "id": {
@@ -2520,9 +2957,9 @@
     },
     "User": {
       "required": [
-        "email",
         "first_name",
-        "last_name"
+        "last_name",
+        "email"
       ],
       "properties": {
         "id": {
@@ -2576,9 +3013,9 @@
     "Vending": {
       "type": "object",
       "required": [
-        "image",
+        "name",
         "machine_id",
-        "name"
+        "image"
       ],
       "properties": {
         "id": {
@@ -2613,9 +3050,9 @@
     "Service": {
       "type": "object",
       "required": [
+        "user_id",
         "machine_id",
-        "products",
-        "user_id"
+        "products"
       ],
       "properties": {
         "id": {
@@ -2626,7 +3063,6 @@
         "products": {
           "type": "array",
           "items": {
-            "type": "object",
             "properties": {
               "id": {
                 "type": "string",
@@ -2639,7 +3075,8 @@
               },
               "price": {
                 "type": "number",
-                "example": 2200
+                "example": 2200,
+                "default": 0
               }
             }
           }
@@ -2680,8 +3117,8 @@
     },
     "ErrorResponse": {
       "required": [
-        "message",
-        "ok"
+        "ok",
+        "message"
       ],
       "properties": {
         "ok": {
@@ -2694,5 +3131,7 @@
         }
       }
     }
-  }
+  },
+  "host": "20.65.46.44:3004",
+  "basePath": "/"
 }
