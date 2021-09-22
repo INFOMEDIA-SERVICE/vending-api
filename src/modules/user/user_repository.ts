@@ -40,7 +40,8 @@ class UsersRepository {
                 data: value.rows[0]
             }
         })
-        .catch((err) => {
+	.catch((err) => {
+	   console.log(err)
             return {
                 ok: false,
                 data: err.message

@@ -15,22 +15,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.authController = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const jwt_decode_1 = __importDefault(require("jwt-decode"));
-const axios_1 = __importDefault(require("axios"));
 class AuthController {
     constructor() {
         this.generateToken = (user) => __awaiter(this, void 0, void 0, function* () {
-            // return jwt.sign({
-            //     email: user.email,
-            //     role: user.role,
-            //     id: user.id
-            // }, 
-            // process.env.TOKEN_KEY + '',
-            // {
-            //     expiresIn: process.env.TOKEN_DURATION
-            // }
-            // );
-            const response = yield axios_1.default.get(`https://iot.infomediaservice.com/cws/jwt?u=${process.env.MQTT_USERNAME}&p=${process.env.MQTT_PASSWORD}&c=${process.env.MQTT_CLIENTID}`);
-            return response.data.jwt;
+            return jsonwebtoken_1.default.sign({
+                email: user.email,
+                role: user.role,
+                id: user.id
+            }, process.env.TOKEN_KEY + '', {
+                expiresIn: process.env.TOKEN_DURATION
+            });
+            //const response = await axios.get(
+            //`https://iot.infomediaservice.com/cws/jwt?u=${process.env.MQTT_USERNAME}&p=${process.env.MQTT_PASSWORD}&c=${process.env.MQTT_CLIENTID}`,
+            //);
+            // return response.data.jwt;
         });
         this.validateUserToken = (req, res, next) => {
             const token = req.headers.authorization + '';

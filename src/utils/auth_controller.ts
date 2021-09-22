@@ -7,22 +7,22 @@ import axios from 'axios';
 class AuthController {
 
     public generateToken = async(user: IUser) => {
-        // return jwt.sign({
-        //     email: user.email,
-        //     role: user.role,
-        //     id: user.id
-        // }, 
-        // process.env.TOKEN_KEY + '',
-        // {
-        //     expiresIn: process.env.TOKEN_DURATION
-        // }
-        // );
-
-        const response = await axios.get(
-            `https://iot.infomediaservice.com/cws/jwt?u=${process.env.MQTT_USERNAME}&p=${process.env.MQTT_PASSWORD}&c=${process.env.MQTT_CLIENTID}`,
+        return jwt.sign({
+            email: user.email,
+            role: user.role,
+            id: user.id
+        }, 
+        process.env.TOKEN_KEY + '',
+        {
+            expiresIn: process.env.TOKEN_DURATION
+        }
         );
 
-        return response.data.jwt;
+	//const response = await axios.get(
+	//`https://iot.infomediaservice.com/cws/jwt?u=${process.env.MQTT_USERNAME}&p=${process.env.MQTT_PASSWORD}&c=${process.env.MQTT_CLIENTID}`,
+	    //);
+
+	    // return response.data.jwt;
     }
 
     public validateUserToken = (req: Request, res: Response, next: NextFunction) => {
