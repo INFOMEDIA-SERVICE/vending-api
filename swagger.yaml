@@ -2182,4 +2182,4 @@ definitions:
         example: 'Error message'
 
 host: 20.65.46.44:3004
-basePath: /
+basePath: /api
