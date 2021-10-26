@@ -1,10 +1,11 @@
-import express, {Application} from 'express';
+import express, { Application } from 'express';
 import productsRoutes from './modules/products/products_routes';
 import vendingRoutes from './modules/vending/vending_routes';
 import usersRoutes from './modules/user/user_routes';
 import adminRoutes from './modules/admin/admin_routes';
 import clientsRoutes from './modules/clients/clients_routes';
 import servicesRoutes from './modules/services/services_routes';
+import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import http from 'http';
 import cors from 'cors';
@@ -13,12 +14,16 @@ const app: Application = express();
 
 export let server: http.Server = http.createServer(app);
 
+const publicPath: string = path.resolve(__dirname, '../public');
+
+app.use('/', express.static(publicPath));
+
 app.set('port', process.env.PORT || 3004);
 
 // Middelwares
 
 app.use(express.json());
-app.use(express.urlencoded({extended: false}));
+app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 
 // Routes

@@ -11,11 +11,14 @@ const user_routes_1 = __importDefault(require("./modules/user/user_routes"));
 const admin_routes_1 = __importDefault(require("./modules/admin/admin_routes"));
 const clients_routes_1 = __importDefault(require("./modules/clients/clients_routes"));
 const services_routes_1 = __importDefault(require("./modules/services/services_routes"));
+const path_1 = __importDefault(require("path"));
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const http_1 = __importDefault(require("http"));
 const cors_1 = __importDefault(require("cors"));
 const app = express_1.default();
 exports.server = http_1.default.createServer(app);
+const publicPath = path_1.default.resolve(__dirname, '../public');
+app.use('/', express_1.default.static(publicPath));
 app.set('port', process.env.PORT || 3004);
 // Middelwares
 app.use(express_1.default.json());

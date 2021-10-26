@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.socketController = void 0;
 const mqtt_1 = __importDefault(require("mqtt"));
+const uuid_1 = require("uuid");
 const machine_model_1 = require("./machine_model");
 const events_1 = require("events");
 const timers_1 = require("timers");
@@ -24,6 +25,8 @@ class Emitter extends events_1.EventEmitter {
 class SocketController {
     constructor() {
         this.topic = process.env.MACHINE_TOPIC || '';
+        this.machineRequestTopic = process.env.MACHINE_REQUEST_TOPIC || '';
+        this.machineResponseTopic = process.env.MACHINE_RESPONSE_TOPIC || '';
         this.lockersRequestTopic = process.env.LOCKERS_REQUEST_TOPIC || '';
         this.lockersResponseTopic = process.env.LOCKERS_RESPONSE_TOPIC || '';
         this.host = process.env.MQTT_HOST || '';
@@ -33,6 +36,7 @@ class SocketController {
         });
         this.onMessage = (socket, data, req) => __awaiter(this, void 0, void 0, function* () {
             const message = JSON.parse(data.toString());
+            console.log(message);
             switch (message.type) {
                 case 0:
                     this.saveUser(socket, message);
@@ -41,7 +45,7 @@ class SocketController {
                     this.dispense(socket, message);
                     break;
                 case 2:
-                    this.verifyStatus(socket, message);
+                    this.consultMachine(socket, message);
                     break;
                 case 3:
                     this.consultLocker(socket, message);
@@ -51,6 +55,9 @@ class SocketController {
                     break;
                 case 5:
                     this.openBox(socket, message);
+                    break;
+                case 9:
+                    this.machineList(socket, message);
                     break;
                 default:
                     socket.send(JSON.stringify({
@@ -62,50 +69,56 @@ class SocketController {
                     break;
             }
         });
-        this.verifyStatus = (socket, message) => __awaiter(this, void 0, void 0, function* () {
-            const machineId = message.data.machineId;
-            const options = {
-                clientId: `${process.env.MQTT_CLIENTID}:${machineId}`,
-                username: process.env.MQTT_USERNAME,
-                password: process.env.MQTT_PASSWORD,
-                port: parseInt(process.env.MQTT_PORT || '') || 10110
-            };
-            let client = mqtt_1.default.connect(this.host, options);
-            client.subscribe(`${this.topic}`);
-            client.on('connect', () => {
-                client.publish(`${this.topic}`, 'vmstatus');
-                client.on('message', (_, message) => {
-                    if (message.toString().toLowerCase().includes('date')) {
-                        return;
-                    }
-                    if (message.toString().toLowerCase().includes('vm')) {
-                        return;
-                    }
-                    const response = JSON.parse(message.toString());
-                    console.log(response);
-                    switch (response.action) {
-                        case 'session.idle':
-                            client.end();
-                            socket.send(JSON.stringify({
-                                type: 2,
-                                data: {
-                                    message: 'machine is available'
-                                }
-                            }));
-                        default: break;
-                    }
-                });
+        this.consultMachine = (socket, message) => __awaiter(this, void 0, void 0, function* () {
+            const user_id = message.data.user_id || uuid_1.v1();
+            const machine_id = message.data.machine_id || 'VM1004';
+            let client = this.createMQTTConnection(user_id);
+            client.subscribe(this.machineResponseTopic);
+            client.publish(this.machineRequestTopic, JSON.stringify({
+                action: 'machine.status',
+                device_id: machine_id,
+            }));
+            client.on('message', (_, message) => {
+                console.log('MESSAGE');
+                const response = JSON.parse(message.toString());
+                console.log(response);
+                switch (response.action) {
+                    case 'machine.status':
+                        socket.send(JSON.stringify({
+                            type: 2,
+                            data: response,
+                        }));
+                        client.end();
+                        break;
+                }
+            });
+        });
+        this.machineList = (socket, message) => __awaiter(this, void 0, void 0, function* () {
+            const user_id = message.data.user_id || uuid_1.v1();
+            let client = this.createMQTTConnection(user_id);
+            client.subscribe(`${this.machineResponseTopic}`);
+            client.publish(this.machineRequestTopic, JSON.stringify({
+                action: 'machine.list',
+            }));
+            client.on('message', (_, message) => {
+                const response = JSON.parse(message.toString());
+                console.log(response);
+                switch (response.action) {
+                    case 'machine.list':
+                        socket.send(JSON.stringify({
+                            type: 9,
+                            data: {
+                                machines: response.machines,
+                            }
+                        }));
+                        client.end();
+                        break;
+                }
             });
         });
         this.dispense = (socket, message) => __awaiter(this, void 0, void 0, function* () {
             const machineId = message.data.machineId;
-            const options = {
-                clientId: `${process.env.MQTT_CLIENTID}:${machineId}`,
-                username: process.env.MQTT_USERNAME,
-                password: process.env.MQTT_PASSWORD,
-                port: parseInt(process.env.MQTT_PORT || '') || 10110
-            };
-            const user_id = message.data.user_id;
+            const user_id = message.data.user_id || uuid_1.v1();
             const userResponse = yield machine_repository_1.machineRepository.updateRequests(user_id);
             if (!userResponse.ok) {
                 return socket.send(JSON.stringify({
@@ -116,7 +129,7 @@ class SocketController {
                 }));
             }
             const listener = new Emitter();
-            let client = mqtt_1.default.connect(this.host, options);
+            let client = this.createMQTTConnection(user_id);
             client.subscribe(`${this.topic}`);
             console.log({
                 products: message.data.products,
@@ -130,7 +143,7 @@ class SocketController {
                     if (counter < products.length) {
                         console.log(`Product #${counter + 1}`);
                         if (counter > 0) {
-                            client = mqtt_1.default.connect(this.host, options);
+                            client = this.createMQTTConnection(user_id);
                             client.subscribe(`${this.topic}`);
                         }
                         this.dispenseSecuense(client, socket, products[counter], listener, counter === products.length - 1);
@@ -279,22 +292,20 @@ class SocketController {
             machine_model_1.socketUsers.addUser(user);
         });
         this.consultAllLockers = (socket, message) => __awaiter(this, void 0, void 0, function* () {
-            const token = message.data.token;
-            const user_id = message.data.user_id || '';
+            const user_id = message.data.user_id || uuid_1.v1();
             const options = {
-                clientId: `${user_id}`,
+                clientId: user_id,
                 username: process.env.LOCKERS_USERNAME,
                 password: process.env.LOCKERS_PASSWORD,
                 port: parseInt(process.env.MQTT_PORT || '10110') || 10110,
             };
             let client = mqtt_1.default.connect(this.host, options);
-            client.publish(`${this.lockersRequestTopic}`, JSON.stringify({
+            client.publish(this.lockersRequestTopic, JSON.stringify({
                 'action': 'get.lockers',
             }));
             client.on('connect', () => {
-                client.subscribe(`${this.lockersResponseTopic}`);
+                client.subscribe(this.lockersResponseTopic);
             });
-            console.log(client.connected);
             client.on('message', (_, message) => {
                 const response = JSON.parse(message.toString());
                 console.log(response);
@@ -330,9 +341,9 @@ class SocketController {
                 'token': token,
                 'sender-id': user_id,
             };
-            client.publish(`${this.lockersRequestTopic}`, JSON.stringify(action));
+            client.publish(this.lockersRequestTopic, JSON.stringify(action));
             client.on('connect', () => {
-                client.subscribe(`${this.lockersResponseTopic}`);
+                client.subscribe(this.lockersResponseTopic);
             });
             client.on('message', (_, message) => {
                 const response = JSON.parse(message.toString());
@@ -366,18 +377,18 @@ class SocketController {
             const locker_name = message.data.locker_name;
             const token = message.data.token;
             const options = {
-                clientId: `${user_id}`,
+                clientId: user_id,
                 username: process.env.LOCKERS_USERNAME,
                 password: process.env.LOCKERS_PASSWORD,
-                port: parseInt(process.env.MQTT_PORT || '10110') || 10110,
+                port: parseInt(process.env.MQTT_PORT),
             };
             let client = mqtt_1.default.connect(this.host, options);
-            client.publish(`${this.lockersRequestTopic}`, JSON.stringify({
+            client.publish(this.lockersRequestTopic, JSON.stringify({
                 'action': 'get.status',
                 'locker-name': `${locker_name}`,
             }));
             client.on('connect', () => {
-                client.subscribe(`${this.lockersResponseTopic}`);
+                client.subscribe(this.lockersResponseTopic);
             });
             client.on('message', (_, message) => {
                 const response = JSON.parse(message.toString());
@@ -400,12 +411,16 @@ class SocketController {
                 }
             });
         });
+        this.createMQTTConnection = (clientId) => {
+            const options = {
+                clientId: 'andres.carrillo.1001',
+                username: process.env.MQTT_USERNAME,
+                password: process.env.MQTT_PASSWORD,
+                port: parseInt(process.env.MQTT_PORT || '') || 10110
+            };
+            return mqtt_1.default.connect(this.host, options);
+        };
     }
 }
 exports.socketController = new SocketController;
-/*
-    type:
-        -1: Error
-        0: new Connection || Save || OK
-*/
 //# sourceMappingURL=machine_controller.js.map
