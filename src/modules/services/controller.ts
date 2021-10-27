@@ -22,7 +22,6 @@ class ServiceController {
                 product.service_id = response.data.id;
                 await servicesRepository.insertProduct(product);
                 newService.products.push(product);
-                console.log(newService.products);
             }
 
             res.send({
@@ -40,6 +39,13 @@ class ServiceController {
         const response: IQueryResponse = await servicesRepository.getServicesByUser(req.params.id);
 
         if (response.ok) {
+
+            const services: IService[] = response.data;
+
+            for (const service of services) {
+                service.id = (service as any).service_id;
+                delete (service as any).service_id;
+            }
 
             res.send({
                 ok: true,
@@ -59,6 +65,14 @@ class ServiceController {
         const response: IQueryResponse = await servicesRepository.getServicesByMachine(req.params.id);
 
         if (response.ok) {
+
+            const services: IService[] = response.data;
+
+            for (const service of services) {
+                service.id = (service as any).service_id;
+                delete (service as any).service_id;
+            }
+
             res.send({
                 ok: true,
                 services: response.data
@@ -77,6 +91,13 @@ class ServiceController {
         const response: IQueryResponse = await servicesRepository.getAll();
 
         if (response.ok) {
+
+            const services: IService[] = response.data;
+
+            for (const service of services) {
+                service.id = (service as any).service_id;
+                delete (service as any).service_id;
+            }
 
             res.send({
                 ok: true,
@@ -113,11 +134,17 @@ class ServiceController {
 
         const user = req.body.user;
 
-        console.log(user.id);
-
         const response: IQueryResponse = await servicesRepository.getByUserId(user.id);
 
         if (response.ok) {
+
+            const services: IService[] = response.data;
+
+            for (const service of services) {
+                service.id = (service as any).service_id;
+                delete (service as any).service_id;
+            }
+
             res.send({
                 ok: true,
                 services: response.data
@@ -136,7 +163,6 @@ class ServiceController {
         const response: IQueryResponse = await servicesRepository.update(req.params.id, req.body);
 
         if (response.ok) {
-
             res.send({
                 ok: true,
                 service: response.data
@@ -165,22 +191,7 @@ class ServiceController {
             });
         }
     };
-
-    private parseObjectToSqlArray = (value: any[] | string) => {
-
-        let products;
-
-        for (let i = 0; i < value.length; i++) {
-
-            if (i === 0) products = products ?? '' + '{';
-            products = products + `{"id","${value[i].id}","dispensed",${value[i].dispensed},"price",${value[i].price}}`;
-            if (i !== value.length - 1) products = products + ',';
-            if (i === value.length - 1) products = products + '}';
-
-        }
-
-        return products
-    }
 }
 
 export const servicesController: ServiceController = new ServiceController;
+

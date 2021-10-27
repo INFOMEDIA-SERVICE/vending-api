@@ -6,6 +6,7 @@ import { EventEmitter } from 'events';
 import { setTimeout } from 'timers';
 import { machineRepository } from './repository';
 import { servicesController } from '../services/controller';
+import { delay } from '../../utils/methods';
 import { IProduct } from '../../interfaces/postgres_responses';
 
 interface IMessage {
@@ -53,8 +54,11 @@ class SocketController {
 
         this.saveUser(socket, message);
 
-        const user = socketUsers.getUserById(message.data.id)!;
-        user.mqtt = user.mqtt || this.createMQTTConnection(user.user_id);
+        const user = socketUsers.getUserById(message.data.user_id)!;
+
+        user.mqtt = (user?.mqtt || this.createMQTTConnection(message.data.user_id));
+
+        socketUsers.update(user);
 
         switch (message.type) {
 
@@ -95,19 +99,23 @@ class SocketController {
 
         user.mqtt!.on('message', (_, message) => {
 
-            console.log('MESSAGE');
-
             const response = JSON.parse(message.toString());
-
-            console.log(response);
 
             switch (response.action) {
                 case 'machine.status':
+                    if (response.status < 0) {
+                        user.socket!.send(JSON.stringify({
+                            type: -1,
+                            data: {
+                                message: response.message,
+                            },
+                        }));
+                        return;
+                    }
                     user.socket!.send(JSON.stringify({
                         type: 2,
                         data: response,
                     }));
-                    user.mqtt!.end();
                     break;
             }
 
@@ -125,11 +133,7 @@ class SocketController {
 
         user.mqtt!.on('message', (_, message) => {
 
-            console.log('MESSAGE');
-
             const response = JSON.parse(message.toString());
-
-            console.log(response);
 
             switch (response.action) {
                 case 'product.keys.response':
@@ -470,7 +474,7 @@ class SocketController {
 
     private createMQTTConnection = (clientId: string): mqtt.MqttClient => {
         const options: mqtt.IClientOptions = {
-            clientId: 'andres.carrillo.1001',
+            clientId: clientId,
             username: process.env.MQTT_USERNAME,
             password: process.env.MQTT_PASSWORD,
             port: parseInt(process.env.MQTT_PORT || '') || 10110

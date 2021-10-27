@@ -59,11 +59,10 @@ class ServicesRepository {
                         ok: true,
                         data: []
                     };
-                else
-                    return {
-                        ok: true,
-                        data: value.rows
-                    };
+                return {
+                    ok: true,
+                    data: value.rows
+                };
             }).catch((err) => {
                 return {
                     ok: false,
@@ -77,8 +76,7 @@ class ServicesRepository {
                     ok: true,
                     data: value.rows
                 };
-            })
-                .catch((err) => {
+            }).catch((err) => {
                 return {
                     ok: false,
                     data: err.message
@@ -91,8 +89,7 @@ class ServicesRepository {
                     ok: true,
                     data: value.rows
                 };
-            })
-                .catch((err) => {
+            }).catch((err) => {
                 return {
                     ok: false,
                     data: err.message
@@ -100,17 +97,24 @@ class ServicesRepository {
             });
         });
         this.getById = (id) => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`SELECT * FROM ${this.table} WHERE id = '${id}'`).then((value) => {
-                if (value.rowCount === 0)
+            return database_1.database.query(`SELECT * FROM ${this.table} WHERE id = '${id}';
+            SELECT * FROM dispensed_products WHERE service_id = '${id}'`).then((value) => {
+                if (value[0].rowCount === 0)
                     return {
                         ok: false,
                         data: 'service not found'
                     };
-                else
+                const service = value[0].rows[0];
+                if (!service)
                     return {
-                        ok: true,
-                        data: value.rows[0]
+                        ok: false,
+                        data: 'service not found',
                     };
+                service.products = value[1].rows;
+                return {
+                    ok: true,
+                    data: service,
+                };
             })
                 .catch((err) => {
                 return {

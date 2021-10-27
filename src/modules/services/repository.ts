@@ -67,7 +67,7 @@ class ServicesRepository {
                 data: []
             }
 
-            else return {
+            return {
                 ok: true,
                 data: value.rows
             }
@@ -88,13 +88,12 @@ class ServicesRepository {
                 ok: true,
                 data: value.rows
             }
-        })
-            .catch((err) => {
-                return {
-                    ok: false,
-                    data: err.message
-                }
-            });
+        }).catch((err) => {
+            return {
+                ok: false,
+                data: err.message
+            }
+        });
     }
 
     public getServicesByMachine = async (machine_id: string): Promise<IQueryResponse> => {
@@ -106,27 +105,38 @@ class ServicesRepository {
                 ok: true,
                 data: value.rows
             }
-        })
-            .catch((err) => {
-                return {
-                    ok: false,
-                    data: err.message
-                }
-            });
+        }).catch((err) => {
+            return {
+                ok: false,
+                data: err.message
+            }
+        });
     }
 
     public getById = async (id: string): Promise<IQueryResponse> => {
 
         return database.query(
-            `SELECT * FROM ${this.table} WHERE id = '${id}'`
+            `SELECT * FROM ${this.table} WHERE id = '${id}';
+            SELECT * FROM dispensed_products WHERE service_id = '${id}'`
         ).then((value) => {
-            if (value.rowCount === 0) return {
+
+            if ((value as any)[0].rowCount === 0) return {
                 ok: false,
                 data: 'service not found'
             }
-            else return {
+
+            const service: IService = (value as any)[0].rows[0];
+
+            if (!service) return {
+                ok: false,
+                data: 'service not found',
+            }
+
+            service.products = (value as any)[1].rows;
+
+            return {
                 ok: true,
-                data: value.rows[0]
+                data: service,
             }
         })
             .catch((err) => {
@@ -210,3 +220,4 @@ class ServicesRepository {
 }
 
 export const servicesRepository: ServicesRepository = new ServicesRepository;
+

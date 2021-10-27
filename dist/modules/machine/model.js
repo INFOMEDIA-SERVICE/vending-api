@@ -5,8 +5,10 @@ class SocketUsers {
     constructor() {
         this.users = [];
         this.addUser = (user) => {
-            let index = this.users.findIndex((u) => u.user_id === user.user_id);
-            if (index == -1) {
+            let index = this.users.findIndex((u) => {
+                return u.user_id === user.user_id;
+            });
+            if (index === -1) {
                 this.users.push(user);
             }
             else {
@@ -14,8 +16,10 @@ class SocketUsers {
                 this.users[index].active = true;
             }
         };
-        this.getUserById = (user_id) => {
-            let index = this.users.findIndex((u) => u.user_id === user_id);
+        this.getUserById = (userId) => {
+            let index = this.users.findIndex((u) => {
+                return u.user_id === userId;
+            });
             if (index === -1)
                 return;
             return this.users[index];
@@ -31,6 +35,13 @@ class SocketUsers {
             if (index === -1)
                 return false;
             this.users[index].active = !this.users[index].active;
+            return true;
+        };
+        this.update = (user) => {
+            let index = this.users.findIndex((u) => u.user_id === user.user_id);
+            if (index === -1)
+                return false;
+            this.users[index] = this.users[index];
             return true;
         };
         this.disconnectUser = (socket) => {

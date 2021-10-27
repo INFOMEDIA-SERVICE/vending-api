@@ -20,9 +20,11 @@ class SocketUsers {
 
     public addUser = (user: ISocketUser): void => {
 
-        let index: number = this.users.findIndex((u: ISocketUser): boolean => u.user_id === user.user_id);
+        let index: number = this.users.findIndex((u: ISocketUser): boolean => {
+            return u.user_id === user.user_id;
+        });
 
-        if (index == -1) {
+        if (index === -1) {
             this.users.push(user);
         } else {
             this.users[index].socket = user.socket!;
@@ -30,9 +32,11 @@ class SocketUsers {
         }
     };
 
-    public getUserById = (user_id: String): ISocketUser | undefined => {
+    public getUserById = (userId: String): ISocketUser | undefined => {
 
-        let index: number = this.users.findIndex((u: ISocketUser): boolean => u.user_id === user_id);
+        let index: number = this.users.findIndex((u: ISocketUser): boolean => {
+            return u.user_id === userId;
+        });
 
         if (index === -1) return;
 
@@ -54,6 +58,17 @@ class SocketUsers {
         if (index === -1) return false;
 
         this.users[index].active = !this.users[index].active;
+
+        return true;
+    };
+
+    public update = (user: ISocketUser): boolean => {
+
+        let index: number = this.users.findIndex((u: ISocketUser): boolean => u.user_id === user.user_id);
+
+        if (index === -1) return false;
+
+        this.users[index] = this.users[index];
 
         return true;
     };

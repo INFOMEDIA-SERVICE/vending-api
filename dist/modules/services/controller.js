@@ -24,7 +24,6 @@ class ServiceController {
                     product.service_id = response.data.id;
                     yield repository_1.servicesRepository.insertProduct(product);
                     newService.products.push(product);
-                    console.log(newService.products);
                 }
                 res.send({
                     service: newService,
@@ -39,6 +38,11 @@ class ServiceController {
         this.getServicesByUser = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const response = yield repository_1.servicesRepository.getServicesByUser(req.params.id);
             if (response.ok) {
+                const services = response.data;
+                for (const service of services) {
+                    service.id = service.service_id;
+                    delete service.service_id;
+                }
                 res.send({
                     ok: true,
                     services: response.data
@@ -54,6 +58,11 @@ class ServiceController {
         this.getServicesByMachine = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const response = yield repository_1.servicesRepository.getServicesByMachine(req.params.id);
             if (response.ok) {
+                const services = response.data;
+                for (const service of services) {
+                    service.id = service.service_id;
+                    delete service.service_id;
+                }
                 res.send({
                     ok: true,
                     services: response.data
@@ -69,6 +78,11 @@ class ServiceController {
         this.getAll = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const response = yield repository_1.servicesRepository.getAll();
             if (response.ok) {
+                const services = response.data;
+                for (const service of services) {
+                    service.id = service.service_id;
+                    delete service.service_id;
+                }
                 res.send({
                     ok: true,
                     services: response.data
@@ -98,9 +112,13 @@ class ServiceController {
         });
         this.me = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const user = req.body.user;
-            console.log(user.id);
             const response = yield repository_1.servicesRepository.getByUserId(user.id);
             if (response.ok) {
+                const services = response.data;
+                for (const service of services) {
+                    service.id = service.service_id;
+                    delete service.service_id;
+                }
                 res.send({
                     ok: true,
                     services: response.data
@@ -143,19 +161,6 @@ class ServiceController {
                 });
             }
         });
-        this.parseObjectToSqlArray = (value) => {
-            let products;
-            for (let i = 0; i < value.length; i++) {
-                if (i === 0)
-                    products = products !== null && products !== void 0 ? products : '' + '{';
-                products = products + `{"id","${value[i].id}","dispensed",${value[i].dispensed},"price",${value[i].price}}`;
-                if (i !== value.length - 1)
-                    products = products + ',';
-                if (i === value.length - 1)
-                    products = products + '}';
-            }
-            return products;
-        };
     }
 }
 exports.servicesController = new ServiceController;

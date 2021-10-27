@@ -33,7 +33,7 @@ const main = () => {
         databaseURL: 'https://abacox-vm.firebaseio.com'
     });
     app_1.server.listen(app_1.default.get('port'));
-    require('./modules/machine/machine_routes');
+    require('./modules/machine/routes');
     console.log(`Server on port ${app_1.default.get('port')}`);
 };
 main();

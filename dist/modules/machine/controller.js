@@ -52,8 +52,9 @@ class SocketController {
         this.onMessage = (socket, data) => __awaiter(this, void 0, void 0, function* () {
             const message = JSON.parse(data.toString());
             this.saveUser(socket, message);
-            const user = model_1.socketUsers.getUserById(message.data.id);
-            user.mqtt = user.mqtt || this.createMQTTConnection(user.user_id);
+            const user = model_1.socketUsers.getUserById(message.data.user_id);
+            user.mqtt = ((user === null || user === void 0 ? void 0 : user.mqtt) || this.createMQTTConnection(message.data.user_id));
+            model_1.socketUsers.update(user);
             switch (message.type) {
                 // Vendings
                 case MachineTypes.List:
@@ -98,16 +99,22 @@ class SocketController {
                 }));
             });
             user.mqtt.on('message', (_, message) => {
-                console.log('MESSAGE');
                 const response = JSON.parse(message.toString());
-                console.log(response);
                 switch (response.action) {
                     case 'machine.status':
+                        if (response.status < 0) {
+                            user.socket.send(JSON.stringify({
+                                type: -1,
+                                data: {
+                                    message: response.message,
+                                },
+                            }));
+                            return;
+                        }
                         user.socket.send(JSON.stringify({
                             type: 2,
                             data: response,
                         }));
-                        user.mqtt.end();
                         break;
                 }
             });
@@ -119,9 +126,7 @@ class SocketController {
                 device_id: message.data.machine_id,
             }));
             user.mqtt.on('message', (_, message) => {
-                console.log('MESSAGE');
                 const response = JSON.parse(message.toString());
-                console.log(response);
                 switch (response.action) {
                     case 'product.keys.response':
                         user.socket.send(JSON.stringify({
@@ -371,7 +376,7 @@ class SocketController {
         });
         this.createMQTTConnection = (clientId) => {
             const options = {
-                clientId: 'andres.carrillo.1001',
+                clientId: clientId,
                 username: process.env.MQTT_USERNAME,
                 password: process.env.MQTT_PASSWORD,
                 port: parseInt(process.env.MQTT_PORT || '') || 10110
