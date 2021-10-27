@@ -1,17 +1,17 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import { IQueryResponse } from '../../interfaces/postgres_responses';
-import {usersRepository} from './user_repository'
-import { IUser } from './users_model';
+import { usersRepository } from './repository'
+import { IUser } from './model';
 import { authController } from '../../utils/auth_controller';
 
 class UserController {
 
-    public signup = async(req: Request, res: Response): Promise<void> => {
+    public signup = async (req: Request, res: Response): Promise<void> => {
 
-        const {first_name, last_name, email, password}: IUser = req.body;
+        const { first_name, last_name, email, password }: IUser = req.body;
 
-        if(!first_name || first_name.match(' ')) {
+        if (!first_name || first_name.match(' ')) {
             res.status(400).json({
                 ok: false,
                 message: 'Invalid first_name'
@@ -19,7 +19,7 @@ class UserController {
             return;
         }
 
-        if(!last_name || last_name.match(' ')) {
+        if (!last_name || last_name.match(' ')) {
             res.status(400).json({
                 ok: false,
                 message: 'Invalid last_name'
@@ -29,14 +29,14 @@ class UserController {
 
         const newPass: string = bcrypt.hashSync(password || '', 10);
 
-        const response:IQueryResponse = await usersRepository.signup({
+        const response: IQueryResponse = await usersRepository.signup({
             first_name,
             last_name,
             email,
             password: newPass
         });
-        
-        if(response.ok) {
+
+        if (response.ok) {
             delete response.data.password;
             const token: string = await authController.generateToken(response.data);
             res.send({
@@ -52,17 +52,17 @@ class UserController {
         }
     }
 
-    public login = async(req: Request, res: Response): Promise<void> => {
+    public login = async (req: Request, res: Response): Promise<void> => {
 
-        const {email, password} = req.body;
+        const { email, password } = req.body;
 
-        const response:IQueryResponse = await usersRepository.login(email);
+        const response: IQueryResponse = await usersRepository.login(email);
 
-        if(response.ok) {
+        if (response.ok) {
 
             let pass = await bcrypt.compare(password, response.data.password);
 
-            if(!pass) {
+            if (!pass) {
                 res.status(400).json({
                     ok: false,
                     message: 'Email or Password does\'not match'
@@ -73,7 +73,7 @@ class UserController {
             delete response.data.password;
 
             const token: string = await authController.generateToken(response.data);
-            
+
             res.send({
                 ok: true,
                 user: response.data,
@@ -87,18 +87,18 @@ class UserController {
         }
     }
 
-    public googleLogin = async(req: Request, res: Response): Promise<void> => {
+    public googleLogin = async (req: Request, res: Response): Promise<void> => {
 
         const { token } = req.body;
 
         const response: IQueryResponse = await usersRepository.googleLogin(token);
 
-        if(response.ok) {
+        if (response.ok) {
 
             delete response.data.password;
 
             const jwtToken: string = await authController.generateToken(response.data);
-            
+
             res.send({
                 ok: true,
                 user: response.data,
@@ -113,18 +113,18 @@ class UserController {
         }
     }
 
-    public googleSignup = async(req: Request, res: Response): Promise<void> => {
+    public googleSignup = async (req: Request, res: Response): Promise<void> => {
 
         const { token } = req.body;
 
         const response: IQueryResponse = await usersRepository.googleSignup(token);
 
-        if(response.ok) {
+        if (response.ok) {
 
             delete response.data.password;
 
             const jwtToken: string = await authController.generateToken(response.data);
-            
+
             res.send({
                 ok: true,
                 user: response.data,
@@ -139,11 +139,11 @@ class UserController {
         }
     }
 
-    public getAll = async(req: Request, res: Response): Promise<void> => {
+    public getAll = async (req: Request, res: Response): Promise<void> => {
 
         const response = await usersRepository.getAll();
 
-        if(response.ok) {
+        if (response.ok) {
             response.data.forEach((user: any) => {
                 delete user.password;
                 return user;
@@ -161,13 +161,13 @@ class UserController {
 
     };
 
-    public me = async(req: Request, res: Response): Promise<void> => {
+    public me = async (req: Request, res: Response): Promise<void> => {
 
         const user = req.body.user;
 
         const response: IQueryResponse = await usersRepository.getById(user.id);
 
-        if(response.ok) {
+        if (response.ok) {
             delete response.data.password;
             res.send({
                 ok: true,
@@ -182,11 +182,11 @@ class UserController {
 
     };
 
-    public getById = async(req: Request, res: Response): Promise<void> => {
+    public getById = async (req: Request, res: Response): Promise<void> => {
 
         const response = await usersRepository.getById(req.params.id);
 
-        if(response.ok) {
+        if (response.ok) {
             delete response.data.password;
             res.send({
                 ok: true,
@@ -201,11 +201,11 @@ class UserController {
 
     };
 
-    public update = async(req: Request, res: Response): Promise<void> => {
+    public update = async (req: Request, res: Response): Promise<void> => {
 
-        const response:IQueryResponse = await usersRepository.update(req.params.id, req.body);
+        const response: IQueryResponse = await usersRepository.update(req.params.id, req.body);
 
-        if(response.ok) {
+        if (response.ok) {
             res.send({
                 ok: true,
                 user: response.data
@@ -218,11 +218,11 @@ class UserController {
         }
     };
 
-    public updateStatus = async(req: Request, res: Response): Promise<void> => {
+    public updateStatus = async (req: Request, res: Response): Promise<void> => {
 
         const response: IQueryResponse = await usersRepository.updateStatus(req.params.id, req.body);
 
-        if(response.ok) {
+        if (response.ok) {
             res.send({
                 ok: true,
                 user: response.data
@@ -235,11 +235,11 @@ class UserController {
         }
     };
 
-    public delete = async(req: Request, res: Response): Promise<void> => {
+    public delete = async (req: Request, res: Response): Promise<void> => {
 
-        const response:IQueryResponse = await usersRepository.delete(req.params.id);
+        const response: IQueryResponse = await usersRepository.delete(req.params.id);
 
-        if(response.ok) {
+        if (response.ok) {
             res.send({
                 ok: true,
                 message: 'User deleted successfully'

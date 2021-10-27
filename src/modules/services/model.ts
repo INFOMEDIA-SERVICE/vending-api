@@ -1,4 +1,4 @@
-import { IProduct } from "../../modules/products/products_model";
+import { IProduct } from '../../interfaces/postgres_responses';
 
 export interface IService {
     id?: string

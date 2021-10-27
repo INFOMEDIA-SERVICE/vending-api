@@ -1,17 +1,17 @@
 import { Request, Response } from 'express';
-import { servicesRepository } from './services_repository';
+import { servicesRepository } from './repository';
 import { IQueryResponse } from '../../interfaces/postgres_responses';
-import { IService } from './services_model';
+import { IService } from './model';
 
 class ServiceController {
 
-    public create = async(service: IService) => {
+    public create = async (service: IService) => {
 
         service.products = this.parseObjectToSqlArray(service.products) + '';
 
         const response: IQueryResponse = await servicesRepository.create(service);
 
-        if(response.ok) {
+        if (response.ok) {
 
             response.data.products = this.parseListToObject(response.data.products);
 
@@ -28,11 +28,11 @@ class ServiceController {
         }
     };
 
-    public getServicesByUser = async(req: Request, res: Response): Promise<void> => {
+    public getServicesByUser = async (req: Request, res: Response): Promise<void> => {
 
         const response: IQueryResponse = await servicesRepository.getServicesByUser(req.params.id);
 
-        if(response.ok) {
+        if (response.ok) {
 
             response.data.forEach((s: any) => {
 
@@ -54,11 +54,11 @@ class ServiceController {
 
     };
 
-    public getServicesByMachine = async(req: Request, res: Response): Promise<void> => {
+    public getServicesByMachine = async (req: Request, res: Response): Promise<void> => {
 
         const response: IQueryResponse = await servicesRepository.getServicesByMachine(req.params.id);
 
-        if(response.ok) {
+        if (response.ok) {
 
             response.data.forEach((s: any) => {
 
@@ -80,11 +80,11 @@ class ServiceController {
 
     };
 
-    public getAll = async(req: Request, res: Response): Promise<void> => {
+    public getAll = async (req: Request, res: Response): Promise<void> => {
 
         const response: IQueryResponse = await servicesRepository.getAll();
 
-        if(response.ok) {
+        if (response.ok) {
 
             response.data.forEach((s: any) => {
 
@@ -106,11 +106,11 @@ class ServiceController {
 
     };
 
-    public getById = async(req: Request, res: Response): Promise<void> => {
+    public getById = async (req: Request, res: Response): Promise<void> => {
 
         const response: IQueryResponse = await servicesRepository.getById(req.params.id);
 
-        if(response.ok) {
+        if (response.ok) {
 
             response.data.products = this.parseListToObject(response.data.products);
 
@@ -127,7 +127,7 @@ class ServiceController {
 
     };
 
-    public me = async(req: Request, res: Response): Promise<void> => {
+    public me = async (req: Request, res: Response): Promise<void> => {
 
         const user = req.body.user;
 
@@ -135,7 +135,7 @@ class ServiceController {
 
         const response: IQueryResponse = await servicesRepository.getByUserId(user.id);
 
-        if(response.ok) {
+        if (response.ok) {
 
             response.data.forEach((s: any) => {
 
@@ -157,11 +157,11 @@ class ServiceController {
 
     };
 
-    public update = async(req: Request, res: Response): Promise<void> => {
+    public update = async (req: Request, res: Response): Promise<void> => {
 
         const response: IQueryResponse = await servicesRepository.update(req.params.id, req.body);
 
-        if(response.ok) {
+        if (response.ok) {
 
             response.data.products = this.parseListToObject(response.data.products);
 
@@ -177,11 +177,11 @@ class ServiceController {
         }
     };
 
-    public delete = async(req: Request, res: Response): Promise<void> => {
+    public delete = async (req: Request, res: Response): Promise<void> => {
 
         const response: IQueryResponse = await servicesRepository.delete(req.params.id);
 
-        if(response.ok) {
+        if (response.ok) {
             res.send({
                 ok: true,
                 message: 'Product deleted successfully'
@@ -195,23 +195,23 @@ class ServiceController {
     };
 
     private parseObjectToSqlArray = (value: any[] | string) => {
-        
+
         let products;
 
         for (let i = 0; i < value.length; i++) {
-            
-            if(i === 0) products = products ?? '' + '{';
+
+            if (i === 0) products = products ?? '' + '{';
             products = products + `{"id","${value[i].id}","dispensed",${value[i].dispensed},"price",${value[i].price}}`;
-            if(i !== value.length-1) products = products + ',';
-            if(i === value.length-1) products = products + '}';
-            
+            if (i !== value.length - 1) products = products + ',';
+            if (i === value.length - 1) products = products + '}';
+
         }
 
         return products
     }
 
     private parseListToObject = (value: any[]) => {
-        
+
         let products: any[] = [];
 
         value.forEach((p: any) => {

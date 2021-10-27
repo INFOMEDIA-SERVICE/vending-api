@@ -2,7 +2,7 @@ import ws from 'ws'
 import { server } from '../../app';
 import { Request } from 'express';
 import url from 'url';
-import { socketController } from './machine_controller';
+import { socketController } from './controller';
 
 const wsServer: ws.Server = new ws.Server({ noServer: true });
 

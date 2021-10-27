@@ -1,12 +1,12 @@
 import ws from 'ws';
 import mqtt from 'mqtt';
 import { v1 } from 'uuid';
-import { Request } from 'express';
-import { ISocketUser, socketUsers } from './machine_model';
+import { ISocketUser, socketUsers } from './model';
 import { EventEmitter } from 'events';
 import { setTimeout } from 'timers';
-import { machineRepository } from './machine_repository';
-import { servicesController } from '../services/services_controller';
+import { machineRepository } from './repository';
+import { servicesController } from '../services/controller';
+import { IProduct } from '../../interfaces/postgres_responses';
 
 interface IMessage {
     type?: number
@@ -30,11 +30,6 @@ enum Types {
     Error = -1,
 }
 
-interface IProduct {
-    stock: number
-    key: string
-    value: number
-}
 
 class Emitter extends EventEmitter { }
 

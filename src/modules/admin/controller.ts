@@ -1,17 +1,17 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import { IQueryResponse } from '../../interfaces/postgres_responses';
-import { adminsRepository } from './admin_repository';
-import { IUser } from '../user/users_model';
+import { adminsRepository } from './repository';
+import { IUser } from '../user/model';
 import { authController } from '../../utils/auth_controller';
 
 class AdminController {
 
-    public signup = async(req: Request, res: Response): Promise<void> => {
+    public signup = async (req: Request, res: Response): Promise<void> => {
 
         const { first_name, last_name, email, password }: IUser = req.body;
 
-        if(!first_name || first_name.match(' ')) {
+        if (!first_name || first_name.match(' ')) {
 
             res.send({
                 ok: false,
@@ -21,7 +21,7 @@ class AdminController {
             return;
         }
 
-        if(!last_name || last_name.match(' ')) {
+        if (!last_name || last_name.match(' ')) {
 
             res.send({
                 ok: false,
@@ -39,8 +39,8 @@ class AdminController {
             email,
             password: newPass
         });
-        
-        if(response.ok) {
+
+        if (response.ok) {
 
             delete response.data.password;
 
@@ -62,30 +62,30 @@ class AdminController {
         }
     }
 
-    public login = async(req: Request, res: Response): Promise<void> => {
+    public login = async (req: Request, res: Response): Promise<void> => {
 
         const { email, password } = req.body;
 
         const response: IQueryResponse = await adminsRepository.login(email);
 
-        if(response.ok) {
+        if (response.ok) {
 
             let pass: boolean = await bcrypt.compare(password, response.data.password);
 
-            if(!pass) {
+            if (!pass) {
 
                 res.send({
                     ok: false,
                     message: 'Email or Password does\'not match'
                 });
-                
+
                 return;
             }
 
             delete response.data.password;
 
             const token: string = await authController.generateToken(response.data);
-            
+
             res.send({
                 ok: true,
                 user: response.data,
@@ -102,11 +102,11 @@ class AdminController {
         }
     }
 
-    public getAll = async(req: Request, res: Response): Promise<void> => {
+    public getAll = async (req: Request, res: Response): Promise<void> => {
 
         const response: IQueryResponse = await adminsRepository.getAll();
 
-        if(response.ok) {
+        if (response.ok) {
 
             response.data.forEach((user: any) => {
                 delete user.password;
@@ -129,11 +129,11 @@ class AdminController {
 
     };
 
-    public getById = async(req: Request, res: Response): Promise<void> => {
+    public getById = async (req: Request, res: Response): Promise<void> => {
 
         const response: IQueryResponse = await adminsRepository.getById(req.params.id);
 
-        if(response.ok) {
+        if (response.ok) {
             delete response.data.password;
             res.send({
                 ok: true,
@@ -148,13 +148,13 @@ class AdminController {
 
     };
 
-    public me = async(req: Request, res: Response): Promise<void> => {
+    public me = async (req: Request, res: Response): Promise<void> => {
 
         const user = req.body.user;
 
         const response: IQueryResponse = await adminsRepository.getById(user.id);
 
-        if(response.ok) {
+        if (response.ok) {
             delete response.data.password;
             res.send({
                 ok: true,
@@ -169,11 +169,11 @@ class AdminController {
 
     };
 
-    public update = async(req: Request, res: Response): Promise<void> => {
+    public update = async (req: Request, res: Response): Promise<void> => {
 
         const response: IQueryResponse = await adminsRepository.update(req.params.id, req.body);
 
-        if(response.ok) {
+        if (response.ok) {
             res.send({
                 ok: true,
                 user: response.data
@@ -186,11 +186,11 @@ class AdminController {
         }
     };
 
-    public delete = async(req: Request, res: Response): Promise<void> => {
+    public delete = async (req: Request, res: Response): Promise<void> => {
 
         const response: IQueryResponse = await adminsRepository.delete(req.params.id);
 
-        if(response.ok) {
+        if (response.ok) {
             res.send({
                 ok: true,
                 message: 'Admin deleted successfully'

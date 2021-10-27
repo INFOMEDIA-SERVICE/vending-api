@@ -1,27 +1,11 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-CREATE TABLE IF NOT EXISTS products(
-    id varchar(64) NOT NULL DEFAULT uuid_generate_v4(),
-    name text NOT NULL CHECK (name <> ''),
-    price integer NOT NULL,
-    image text,
-    description text,
-    quantity integer DEFAULT 0,
-    item text NOT NULL,
-    machine_id TEXT NOT NULL CHECK (machine_id <> ''),
-    status BOOLEAN DEFAULT true,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-    constraint pk_products primary key(id)
-);
-
 CREATE TABLE IF NOT EXISTS vendings(
     id varchar(64) NOT NULL DEFAULT uuid_generate_v4(),
     name text NOT NULL CHECK (name <> ''),
     machine_id TEXT NOT NULL UNIQUE CHECK (machine_id <> ''),
     errors integer DEFAULT 0,
     dispended integer DEFAULT 0,
-    image text,
     requests integer DEFAULT 0,
     status BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT NOW(),
@@ -50,10 +34,21 @@ CREATE TABLE IF NOT EXISTS services(
     machine_id TEXT NOT NULL,
     user_id TEXT NOT NULL,
     reference smallint DEFAULT nextval('serial'),
-    products text[][],
     value integer NOT NULL,
     success boolean default true,
+    FOREIGN KEY(id) REFERENCES dispensed_products(service_id),
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
     constraint pk_services primary key(id)
+);
+
+CREATE TABLE IF NOT EXISTS dispensed_products(
+    id varchar(64) NOT NULL DEFAULT uuid_generate_v4(),
+    service_id TEXT NOT NULL CHECK (service_id <> ''),,
+    dispensed boolean default true,
+    value real NOT NULL,
+    key varchar(64) NOT NULL CHECK (product_key <> ''),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    constraint pk_dispensed_products primary key(id)
 );
