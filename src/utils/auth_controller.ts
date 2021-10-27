@@ -27,93 +27,101 @@ class AuthController {
 
     public validateUserToken = (req: Request, res: Response, next: NextFunction) => {
 
-        const token: string = req.headers.authorization + '';
+        next();
 
-        return jwt.verify(token, process.env.TOKEN_KEY + '', (err) => {
+        // const token: string = req.headers.authorization + '';
 
-            if (err) return res.status(401).json({
-                ok: false,
-                message: err.message
-            });
+        // return jwt.verify(token, process.env.TOKEN_KEY + '', (err) => {
 
-            const user: IUser = jwt_decode(token);
+        //     if (err) return res.status(401).json({
+        //         ok: false,
+        //         message: err.message
+        //     });
 
-            if (user.role !== 2) if (user.role !== 0) return res.status(401).json({
-                ok: false,
-                message: 'insufficient privileges'
-            });
+        //     const user: IUser = jwt_decode(token);
 
-            req.body.user = user;
+        //     if (user.role !== 2) if (user.role !== 0) return res.status(401).json({
+        //         ok: false,
+        //         message: 'insufficient privileges'
+        //     });
 
-            next();
-        });
+        //     req.body.user = user;
+
+        //     next();
+        // });
     }
 
     public validateAccess = (req: Request, res: Response, next: NextFunction) => {
 
-        const token: string = req.headers.authorization + '';
+        next();
 
-        return jwt.verify(token, process.env.TOKEN_KEY + '', (err) => {
+        // const token: string = req.headers.authorization + '';
 
-            if (err) return res.status(401).json({
-                ok: false,
-                message: err.message
-            })
+        // return jwt.verify(token, process.env.TOKEN_KEY + '', (err) => {
 
-            const user: IUser = jwt_decode(token);
+        //     if (err) return res.status(401).json({
+        //         ok: false,
+        //         message: err.message
+        //     })
 
-            req.body.user = user;
+        //     const user: IUser = jwt_decode(token);
 
-            next();
-        });
+        //     req.body.user = user;
+
+        //     next();
+        // });
     }
 
     public validateClientToken = (req: Request, res: Response, next: NextFunction) => {
 
-        const token: string = req.headers.authorization + '';
+        next();
 
-        return jwt.verify(token, process.env.TOKEN_KEY + '', (err) => {
+        // const token: string = req.headers.authorization + '';
 
-            if (err) return res.status(401).json({
-                ok: false,
-                message: err.message
-            })
+        // return jwt.verify(token, process.env.TOKEN_KEY + '', (err) => {
 
-            const user: IUser = jwt_decode(token);
+        //     if (err) return res.status(401).json({
+        //         ok: false,
+        //         message: err.message
+        //     })
 
-            if (user.role !== 2) if (user.role !== 1) return res.status(401).json({
-                ok: false,
-                message: 'insufficient privileges'
-            });
+        //     const user: IUser = jwt_decode(token);
 
-            req.body.user = user;
+        //     if (user.role !== 2) if (user.role !== 1) return res.status(401).json({
+        //         ok: false,
+        //         message: 'insufficient privileges'
+        //     });
 
-            next();
-        });
+        //     req.body.user = user;
+
+        //     next();
+        // });
     }
 
     public validateAdminToken = (req: Request, res: Response, next: NextFunction) => {
 
-        const token: string = req.headers.authorization + '';
+        next();
 
-        return jwt.verify(token, process.env.TOKEN_KEY + '', (err) => {
+        // const token: string = req.headers.authorization + '';
 
-            if (err) return res.status(401).json({
-                ok: false,
-                message: err.message
-            });
+        // return jwt.verify(token, process.env.TOKEN_KEY + '', (err) => {
 
-            const user: IUser = jwt_decode(token);
+        //     if (err) return res.status(401).json({
+        //         ok: false,
+        //         message: err.message
+        //     });
 
-            if (user.role !== 2) return res.status(401).json({
-                ok: false,
-                message: 'insufficient privileges'
-            });
+        //     const user: IUser = jwt_decode(token);
 
-            req.body.user = user;
+        //     if (user.role !== 2) return res.status(401).json({
+        //         ok: false,
+        //         message: 'insufficient privileges'
+        //     });
 
-            next();
-        });
+        //     req.body.user = user;
+
+        //     next();
+        // });
     }
 
     public validateSocketAccess = (token: string | undefined) => {

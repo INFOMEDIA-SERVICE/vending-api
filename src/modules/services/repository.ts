@@ -1,10 +1,11 @@
 import { IService } from './model';
 import { database } from '../../database/database';
-import { IQueryResponse } from '../../interfaces/postgres_responses';
+import { IProduct, IQueryResponse } from '../../interfaces/postgres_responses';
 
 class ServicesRepository {
 
     private table: string = 'services';
+    private products_table: string = 'dispensed_products';
 
     public create = async (service: IService): Promise<IQueryResponse> => {
 
@@ -17,19 +18,48 @@ class ServicesRepository {
                 data: value.rows[0]
             }
 
-        })
-            .catch((err) => {
-                return {
-                    ok: false,
-                    data: err.message
-                }
-            });
+        }).catch((err) => {
+            return {
+                ok: false,
+                data: err.message
+            }
+        });
+    }
+
+    public insertProduct = async (product: IProduct): Promise<IQueryResponse> => {
+
+        return database.query(
+            `insert into ${this.products_table}(
+                service_id,
+                value,
+                key,
+                dispensed
+            ) values(
+                '${product.service_id}',
+                '${product.value}',
+                '${product.key}',
+                ${product.dispensed}
+            ) RETURNING *`
+        ).then((value) => {
+
+            return {
+                ok: true,
+                data: value.rows[0]
+            }
+
+        }).catch((err) => {
+            return {
+                ok: false,
+                data: err.message
+            }
+        });
     }
 
     public getAll = async (): Promise<IQueryResponse> => {
 
         return database.query(
-            `SELECT * FROM ${this.table}`
+            `SELECT * FROM ${this.table} S
+                INNER JOIN dispensed_products P ON P.service_id = S.id`
         ).then((value) => {
 
             if (value.rowCount === 0) return {
@@ -41,13 +71,12 @@ class ServicesRepository {
                 ok: true,
                 data: value.rows
             }
-        })
-            .catch((err) => {
-                return {
-                    ok: false,
-                    data: err.message
-                }
-            });
+        }).catch((err) => {
+            return {
+                ok: false,
+                data: err.message
+            }
+        });
     }
 
     public getServicesByUser = async (user_id: string): Promise<IQueryResponse> => {

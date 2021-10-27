@@ -1,30 +1,37 @@
 import { Request, Response } from 'express';
 import { servicesRepository } from './repository';
-import { IQueryResponse } from '../../interfaces/postgres_responses';
+import { IProduct, IQueryResponse } from '../../interfaces/postgres_responses';
 import { IService } from './model';
 
 class ServiceController {
 
-    public create = async (service: IService) => {
+    public create = async (req: Request, res: Response) => {
 
-        service.products = this.parseObjectToSqlArray(service.products) + '';
+        const service = req.body;
 
         const response: IQueryResponse = await servicesRepository.create(service);
 
         if (response.ok) {
 
-            response.data.products = this.parseListToObject(response.data.products);
+            let products: IProduct[] = service.products;
+            let newService: IService = response.data;
 
-            return {
-                ok: true,
-                service: response.data
-            };
+            newService.products = [];
 
+            for (let product of products) {
+                product.service_id = response.data.id;
+                await servicesRepository.insertProduct(product);
+                newService.products.push(product);
+                console.log(newService.products);
+            }
+
+            res.send({
+                service: newService,
+            });
         } else {
-            return {
-                ok: false,
+            res.send(400).json({
                 message: response.data
-            };
+            });
         }
     };
 
@@ -33,13 +40,6 @@ class ServiceController {
         const response: IQueryResponse = await servicesRepository.getServicesByUser(req.params.id);
 
         if (response.ok) {
-
-            response.data.forEach((s: any) => {
-
-                s.products = this.parseListToObject(s.products);
-
-                return s;
-            });
 
             res.send({
                 ok: true,
@@ -59,14 +59,6 @@ class ServiceController {
         const response: IQueryResponse = await servicesRepository.getServicesByMachine(req.params.id);
 
         if (response.ok) {
-
-            response.data.forEach((s: any) => {
-
-                s.products = this.parseListToObject(s.products);
-
-                return s;
-            });
-
             res.send({
                 ok: true,
                 services: response.data
@@ -86,13 +78,6 @@ class ServiceController {
 
         if (response.ok) {
 
-            response.data.forEach((s: any) => {
-
-                s.products = this.parseListToObject(s.products);
-
-                return s;
-            });
-
             res.send({
                 ok: true,
                 services: response.data
@@ -111,9 +96,6 @@ class ServiceController {
         const response: IQueryResponse = await servicesRepository.getById(req.params.id);
 
         if (response.ok) {
-
-            response.data.products = this.parseListToObject(response.data.products);
-
             res.send({
                 ok: true,
                 service: response.data
@@ -136,14 +118,6 @@ class ServiceController {
         const response: IQueryResponse = await servicesRepository.getByUserId(user.id);
 
         if (response.ok) {
-
-            response.data.forEach((s: any) => {
-
-                s.products = this.parseListToObject(s.products);
-
-                return s;
-            });
-
             res.send({
                 ok: true,
                 services: response.data
@@ -162,8 +136,6 @@ class ServiceController {
         const response: IQueryResponse = await servicesRepository.update(req.params.id, req.body);
 
         if (response.ok) {
-
-            response.data.products = this.parseListToObject(response.data.products);
 
             res.send({
                 ok: true,
@@ -208,22 +180,6 @@ class ServiceController {
         }
 
         return products
-    }
-
-    private parseListToObject = (value: any[]) => {
-
-        let products: any[] = [];
-
-        value.forEach((p: any) => {
-            products.push({
-                id: p[1],
-                dispensed: Boolean(p[3]),
-                price: p[5]
-            });
-        });
-
-        return products;
-
     }
 }
 

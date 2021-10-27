@@ -5,12 +5,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.server = void 0;
 const express_1 = __importDefault(require("express"));
-const products_routes_1 = __importDefault(require("./modules/products/products_routes"));
-const vending_routes_1 = __importDefault(require("./modules/vending/vending_routes"));
-const user_routes_1 = __importDefault(require("./modules/user/user_routes"));
-const admin_routes_1 = __importDefault(require("./modules/admin/admin_routes"));
-const clients_routes_1 = __importDefault(require("./modules/clients/clients_routes"));
-const services_routes_1 = __importDefault(require("./modules/services/services_routes"));
+const routes_1 = __importDefault(require("./modules/vending/routes"));
+const routes_2 = __importDefault(require("./modules/user/routes"));
+const routes_3 = __importDefault(require("./modules/admin/routes"));
+const routes_4 = __importDefault(require("./modules/services/routes"));
 const path_1 = __importDefault(require("path"));
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const http_1 = __importDefault(require("http"));
@@ -27,12 +25,10 @@ app.use(cors_1.default());
 // Routes
 const swaggerDocument = require('../swagger.json');
 app.use('/docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swaggerDocument));
-app.use('/api/users', user_routes_1.default);
-app.use('/api/users', user_routes_1.default);
-app.use('/api/clients', clients_routes_1.default);
-app.use('/api/vendings', vending_routes_1.default);
-app.use('/api/products', products_routes_1.default);
-app.use('/api/services', services_routes_1.default);
-app.use('/api/admins', admin_routes_1.default);
+app.use('/api/users', routes_2.default);
+app.use('/api/users', routes_2.default);
+app.use('/api/vendings', routes_1.default);
+app.use('/api/services', routes_4.default);
+app.use('/api/admins', routes_3.default);
 exports.default = app;
 //# sourceMappingURL=app.js.map

@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS vendings(
     status BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
-    constraint pk_vendings primary key(id)
+    CONSTRAINT pk_vendings PRIMARY KEY(id)
 );
 
 CREATE TABLE IF NOT EXISTS users(
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS users(
     status BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
-    constraint pk_users primary key(id)
+    CONSTRAINT pk_users PRIMARY KEY(id)
 );
 
 CREATE SEQUENCE serial START 1001;
@@ -36,19 +36,19 @@ CREATE TABLE IF NOT EXISTS services(
     reference smallint DEFAULT nextval('serial'),
     value integer NOT NULL,
     success boolean default true,
-    FOREIGN KEY(id) REFERENCES dispensed_products(service_id),
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
-    constraint pk_services primary key(id)
+    CONSTRAINT pk_services PRIMARY KEY(id)
 );
 
 CREATE TABLE IF NOT EXISTS dispensed_products(
     id varchar(64) NOT NULL DEFAULT uuid_generate_v4(),
-    service_id TEXT NOT NULL CHECK (service_id <> ''),,
+    service_id varchar(64) NOT NULL CHECK (service_id <> ''),
     dispensed boolean default true,
     value real NOT NULL,
-    key varchar(64) NOT NULL CHECK (product_key <> ''),
+    key varchar(64) NOT NULL CHECK (key <> ''),
+    FOREIGN KEY(service_id) REFERENCES services(id),
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
-    constraint pk_dispensed_products primary key(id)
+    CONSTRAINT pk_dispensed_products PRIMARY KEY(id)
 );

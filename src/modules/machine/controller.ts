@@ -245,23 +245,23 @@ class SocketController {
                 value += p.value
             });
 
-            const response = await servicesController.create({
-                machine_id,
-                user_id: user.user_id,
-                products,
-                value,
-                success: value >= 0
-            });
+            // const response = await servicesController.create({
+            //     machine_id,
+            //     user_id: user.user_id,
+            //     products,
+            //     value,
+            //     success: value >= 0
+            // });
 
-            console.log(`RESPONSE SERVICE: ${response.service} MESSAGE ${response.message}`);
+            // console.log(`RESPONSE SERVICE: ${response.service} MESSAGE ${response.message}`);
 
-            return user.socket!.send(JSON.stringify({
-                type: 0,
-                data: {
-                    message: 'sale summary',
-                    service: response.service
-                }
-            }));
+            // return user.socket!.send(JSON.stringify({
+            //     type: 0,
+            //     data: {
+            //         message: 'sale summary',
+            //         service: response.service
+            //     }
+            // }));
         });
     }
 
