@@ -24,12 +24,12 @@ class Emitter extends events_1.EventEmitter {
 }
 class SocketController {
     constructor() {
-        this.topic = process.env.MACHINE_TOPIC || '';
-        this.machineRequestTopic = process.env.MACHINE_REQUEST_TOPIC || '';
-        this.machineResponseTopic = process.env.MACHINE_RESPONSE_TOPIC || '';
-        this.lockersRequestTopic = process.env.LOCKERS_REQUEST_TOPIC || '';
-        this.lockersResponseTopic = process.env.LOCKERS_RESPONSE_TOPIC || '';
-        this.host = process.env.MQTT_HOST || '';
+        this.defaultMachineId = 'VM10003';
+        this.machineRequestTopic = process.env.MACHINE_REQUEST_TOPIC;
+        this.machineResponseTopic = process.env.MACHINE_RESPONSE_TOPIC;
+        this.lockersRequestTopic = process.env.LOCKERS_REQUEST_TOPIC;
+        this.lockersResponseTopic = process.env.LOCKERS_RESPONSE_TOPIC;
+        this.host = process.env.MQTT_HOST;
         this.onConnect = (socket, req) => __awaiter(this, void 0, void 0, function* () {
             console.log('User connected');
             socket.on('message', (data) => this.onMessage(socket, data, req));
@@ -56,8 +56,11 @@ class SocketController {
                 case 5:
                     this.openBox(socket, message);
                     break;
-                case 9:
+                case 6:
                     this.machineList(socket, message);
+                    break;
+                case 7:
+                    this.getMachineProducts(socket, message);
                     break;
                 default:
                     socket.send(JSON.stringify({
@@ -71,13 +74,15 @@ class SocketController {
         });
         this.consultMachine = (socket, message) => __awaiter(this, void 0, void 0, function* () {
             const user_id = message.data.user_id || uuid_1.v1();
-            const machine_id = message.data.machine_id || 'VM1004';
+            const machine_id = message.data.machine_id || this.defaultMachineId;
             let client = this.createMQTTConnection(user_id);
             client.subscribe(this.machineResponseTopic);
-            client.publish(this.machineRequestTopic, JSON.stringify({
-                action: 'machine.status',
-                device_id: machine_id,
-            }));
+            client.on('connect', () => {
+                client.publish(this.machineRequestTopic, JSON.stringify({
+                    action: 'machine.status',
+                    device_id: machine_id,
+                }));
+            });
             client.on('message', (_, message) => {
                 console.log('MESSAGE');
                 const response = JSON.parse(message.toString());
@@ -93,20 +98,48 @@ class SocketController {
                 }
             });
         });
+        this.getMachineProducts = (socket, message) => __awaiter(this, void 0, void 0, function* () {
+            const user_id = message.data.user_id || uuid_1.v1();
+            const machine_id = message.data.machine_id || this.defaultMachineId;
+            let client = this.createMQTTConnection(user_id);
+            client.subscribe(this.machineResponseTopic);
+            client.on('connect', () => {
+                client.publish(this.machineRequestTopic, JSON.stringify({
+                    action: 'product.keys.request',
+                    device_id: machine_id,
+                }));
+            });
+            client.on('message', (_, message) => {
+                console.log('MESSAGE');
+                const response = JSON.parse(message.toString());
+                console.log(response);
+                switch (response.action) {
+                    case 'product.keys.response':
+                        socket.send(JSON.stringify({
+                            type: 7,
+                            data: response,
+                        }));
+                        client.end();
+                        break;
+                }
+            });
+        });
         this.machineList = (socket, message) => __awaiter(this, void 0, void 0, function* () {
             const user_id = message.data.user_id || uuid_1.v1();
             let client = this.createMQTTConnection(user_id);
             client.subscribe(`${this.machineResponseTopic}`);
-            client.publish(this.machineRequestTopic, JSON.stringify({
-                action: 'machine.list',
-            }));
+            client.on('connect', () => {
+                client.publish(this.machineRequestTopic, JSON.stringify({
+                    action: 'machine.list',
+                }));
+            });
             client.on('message', (_, message) => {
                 const response = JSON.parse(message.toString());
                 console.log(response);
                 switch (response.action) {
                     case 'machine.list':
                         socket.send(JSON.stringify({
-                            type: 9,
+                            type: 6,
                             data: {
                                 machines: response.machines,
                             }
@@ -130,7 +163,7 @@ class SocketController {
             }
             const listener = new Emitter();
             let client = this.createMQTTConnection(user_id);
-            client.subscribe(`${this.topic}`);
+            client.subscribe(`${this.machineResponseTopic}`);
             console.log({
                 products: message.data.products,
                 user_id: message.data.user_id
@@ -144,7 +177,7 @@ class SocketController {
                         console.log(`Product #${counter + 1}`);
                         if (counter > 0) {
                             client = this.createMQTTConnection(user_id);
-                            client.subscribe(`${this.topic}`);
+                            client.subscribe(`${this.machineResponseTopic}`);
                         }
                         this.dispenseSecuense(client, socket, products[counter], listener, counter === products.length - 1);
                         counter++;
@@ -183,7 +216,7 @@ class SocketController {
         this.dispenseSecuense = (client, socket, product, listener, isLast) => {
             // STARTING
             let dispensed;
-            client.publish(`${this.topic}`, 'vmstart');
+            client.publish(`${this.machineRequestTopic}`, 'vend.dispensing');
             client.on('message', (_, message) => {
                 if (message.toString().toLowerCase().includes('date')) {
                     return;
@@ -194,60 +227,7 @@ class SocketController {
                 const response = JSON.parse(message.toString());
                 console.log(response);
                 switch (response.action) {
-                    case 'session.active':
-                        socket.send(JSON.stringify({
-                            type: 0,
-                            data: {
-                                message: 'machine started'
-                            }
-                        }));
-                        client.publish(`${this.topic}`, `vmkey=${product.item}`);
-                        break;
-                    case 'session.status':
-                        socket.send(JSON.stringify({
-                            type: -1,
-                            data: {
-                                message: 'the machine is busy'
-                            }
-                        }));
-                        break;
-                    case 'vend.request':
-                        socket.send(JSON.stringify({
-                            type: 0,
-                            data: {
-                                message: 'approving sale'
-                            }
-                        }));
-                        client.publish(`${this.topic}`, `vmok`);
-                        break;
-                    case 'vend.approved':
-                        socket.send(JSON.stringify({
-                            type: 0,
-                            data: {
-                                message: 'sale approved'
-                            }
-                        }));
-                        break;
-                    case 'session.timeout':
-                        socket.send(JSON.stringify({
-                            type: -1,
-                            data: {
-                                product,
-                                message: `machine is off`
-                            }
-                        }));
-                        break;
-                    case 'vend.fails':
-                        dispensed = false;
-                        socket.send(JSON.stringify({
-                            type: -1,
-                            data: {
-                                product,
-                                message: `product ${product.name} not dispensed`
-                            }
-                        }));
-                        break;
-                    case 'vend.sucess':
+                    case 'vend.dispensing':
                         dispensed = true;
                         socket.send(JSON.stringify({
                             type: 0,
@@ -257,7 +237,7 @@ class SocketController {
                             }
                         }));
                         break;
-                    case 'session.closed':
+                    case 'vend.closed':
                         client.end();
                         if (dispensed)
                             machine_repository_1.machineRepository.editProduct(product.id);

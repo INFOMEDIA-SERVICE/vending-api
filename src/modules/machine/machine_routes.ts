@@ -11,11 +11,11 @@ wsServer.on('connection', socketController.onConnect);
 server.on('upgrade', (req: Request, socket, head) => {
 
     const pathname: string = url.parse(req.url).pathname + '';
-    
-    if(pathname === '/connection/') {
+
+    if (pathname === '/connection/') {
 
         wsServer.handleUpgrade(req, socket, head, socket => {
-            wsServer.emit('connection', socket, req);
+            wsServer.emit('connection', socket);
         });
 
     }

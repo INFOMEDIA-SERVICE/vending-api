@@ -1,40 +1,81 @@
 import ws from 'ws';
+import mqtt from 'mqtt';
 
 export interface ISocketUser {
-    client: ws
     user_id: string
-    userName: string
+    socket?: ws
+    mqtt?: mqtt.MqttClient
+    active?: boolean
+    createdAt?: Date
+    updatedAt?: Date
 }
 
 class SocketUsers {
 
-    private users: ISocketUser[];
+    private users: ISocketUser[] = [];
 
     constructor() {
         this.users = [];
     }
 
-    public addUser = (user:ISocketUser):void => {
-        this.users.push(user);
+    public addUser = (user: ISocketUser): void => {
+
+        let index: number = this.users.findIndex((u: ISocketUser): boolean => u.user_id === user.user_id);
+
+        if (index == -1) {
+            this.users.push(user);
+        } else {
+            this.users[index].socket = user.socket!;
+            this.users[index].active = true;
+        }
     };
 
-    public getUserById = (user_id:String) => {
+    public getUserById = (user_id: String): ISocketUser | undefined => {
 
-        const user:ISocketUser = this.users.filter(user => {
-            return user.user_id === user_id;
-        })[0];
+        let index: number = this.users.findIndex((u: ISocketUser): boolean => u.user_id === user_id);
 
-        return user;
+        if (index === -1) return;
+
+        return this.users[index];
     };
 
-    public getUsers = () => {
+    public getActiveUsers = (): ISocketUser[] => {
+        return this.users.filter((u: ISocketUser) => u.active);
+    };
+
+    public getUsers = (): ISocketUser[] => {
         return this.users;
     };
 
-    public deleteUser = (user_id:String):void => {
-        this.users = this.users.filter(user => user.user_id !== user_id);
+    public editUserStatus = (user: ISocketUser): boolean => {
+
+        let index: number = this.users.findIndex((u: ISocketUser): boolean => u.user_id === user.user_id);
+
+        if (index === -1) return false;
+
+        this.users[index].active = !this.users[index].active;
+
+        return true;
+    };
+
+    public disconnectUser = (socket: ws): void => {
+
+        let index: number = this.users.findIndex(
+            (u: ISocketUser): boolean => {
+                if (!u?.socket) return false;
+                return (u.socket as any).id === (socket as any).id;
+            },
+        );
+
+        if (index === -1) return;
+
+        this.editUserStatus(this.users[index]);
+
+        console.log(`User disconnect ${this.users[index].user_id}`);
+
+        this.users = this.users;
     };
 
 }
 
-export const socketUsers:SocketUsers = new SocketUsers();
+export const socketUsers: SocketUsers = new SocketUsers();
