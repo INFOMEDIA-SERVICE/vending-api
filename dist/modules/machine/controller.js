@@ -18,7 +18,6 @@ const uuid_1 = require("uuid");
 const model_1 = require("./model");
 const events_1 = require("events");
 const timers_1 = require("timers");
-const repository_1 = require("./repository");
 var MachineTypes;
 (function (MachineTypes) {
     MachineTypes[MachineTypes["List"] = 0] = "List";
@@ -46,15 +45,17 @@ class SocketController {
         this.lockersResponseTopic = process.env.LOCKERS_RESPONSE_TOPIC;
         this.host = process.env.MQTT_HOST;
         this.onConnect = (socket) => __awaiter(this, void 0, void 0, function* () {
-            console.log('User connected');
             socket.on('message', (data) => this.onMessage(socket, data));
         });
         this.onMessage = (socket, data) => __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const message = JSON.parse(data.toString());
             this.saveUser(socket, message);
             const user = model_1.socketUsers.getUserById(message.data.user_id);
-            user.mqtt = ((user === null || user === void 0 ? void 0 : user.mqtt) || this.createMQTTConnection(message.data.user_id));
-            model_1.socketUsers.update(user);
+            if (!((_a = user.mqtt) === null || _a === void 0 ? void 0 : _a.connected)) {
+                user.mqtt = this.createMQTTConnection(message.data.user_id);
+                this.saveUser(socket, message);
+            }
             switch (message.type) {
                 // Vendings
                 case MachineTypes.List:
@@ -89,31 +90,21 @@ class SocketController {
                     break;
             }
         });
-        this.consultMachine = (user, message) => __awaiter(this, void 0, void 0, function* () {
-            const machine_id = message.data.machine_id;
+        this.machineList = (user, message) => __awaiter(this, void 0, void 0, function* () {
             user.mqtt.subscribe(this.machineResponseTopic);
-            user.mqtt.on('connect', () => {
-                user.mqtt.publish(this.machineRequestTopic, JSON.stringify({
-                    action: 'machine.status',
-                    device_id: machine_id,
-                }));
-            });
+            user.mqtt.publish(this.machineRequestTopic, JSON.stringify({
+                action: 'machine.list',
+            }));
             user.mqtt.on('message', (_, message) => {
                 const response = JSON.parse(message.toString());
+                console.log(response);
                 switch (response.action) {
-                    case 'machine.status':
-                        if (response.status < 0) {
-                            user.socket.send(JSON.stringify({
-                                type: -1,
-                                data: {
-                                    message: response.message,
-                                },
-                            }));
-                            return;
-                        }
+                    case 'machine.list':
                         user.socket.send(JSON.stringify({
-                            type: 2,
-                            data: response,
+                            type: 0,
+                            data: {
+                                machines: response.machines,
+                            }
                         }));
                         break;
                 }
@@ -130,28 +121,36 @@ class SocketController {
                 switch (response.action) {
                     case 'product.keys.response':
                         user.socket.send(JSON.stringify({
-                            type: 7,
+                            type: 3,
                             data: response,
                         }));
-                        user.mqtt.end();
                         break;
                 }
             });
         });
-        this.machineList = (user, message) => __awaiter(this, void 0, void 0, function* () {
+        this.consultMachine = (user, message) => __awaiter(this, void 0, void 0, function* () {
+            const machine_id = message.data.machine_id;
+            user.mqtt.subscribe(this.machineResponseTopic);
             user.mqtt.publish(this.machineRequestTopic, JSON.stringify({
-                action: 'machine.list',
+                action: 'machine.status',
+                device_id: machine_id,
             }));
             user.mqtt.on('message', (_, message) => {
                 const response = JSON.parse(message.toString());
-                console.log(response);
                 switch (response.action) {
-                    case 'machine.list':
+                    case 'machine.status':
+                        if (response.status < 0) {
+                            user.socket.send(JSON.stringify({
+                                type: -1,
+                                data: {
+                                    message: response.message
+                                },
+                            }));
+                            return;
+                        }
                         user.socket.send(JSON.stringify({
-                            type: 6,
-                            data: {
-                                machines: response.machines,
-                            }
+                            type: 2,
+                            data: response,
                         }));
                         break;
                 }
@@ -160,12 +159,21 @@ class SocketController {
         this.dispense = (user, message) => __awaiter(this, void 0, void 0, function* () {
             const machineId = message.data.machineId;
             const user_id = message.data.user_id || uuid_1.v1();
-            const userResponse = yield repository_1.machineRepository.updateRequests(user_id);
-            if (!userResponse.ok) {
+            // const userResponse = await machineRepository.updateRequests(user_id);
+            // if (!userResponse.ok) {
+            //     return user.socket!.send(JSON.stringify({
+            //         type: Types.Error,
+            //         data: {
+            //             message: `${userResponse.data}`
+            //         }
+            //     }));
+            // }
+            const products = message.data.products;
+            if (!products) {
                 return user.socket.send(JSON.stringify({
                     type: Types.Error,
                     data: {
-                        message: `${userResponse.data}`
+                        message: `products is required`
                     }
                 }));
             }
@@ -175,23 +183,48 @@ class SocketController {
                 products: message.data.products,
                 user_id: message.data.user_id
             });
-            user.mqtt.on('connect', () => {
-                const products = message.data.products;
-                let counter = 0;
-                this.createService(listener, user, machineId);
-                listener.on('next', () => {
-                    if (counter < products.length) {
-                        console.log(`Product #${counter + 1}`);
-                        if (counter > 0) {
-                            user.mqtt = this.createMQTTConnection(user_id);
-                            user.mqtt.subscribe(`${this.machineResponseTopic}`);
-                        }
-                        this.dispenseSecuense(user, products[counter], listener, counter === products.length - 1);
-                        counter++;
-                    }
-                });
-                listener.emit('next');
+            user.mqtt.on('message', (_, message) => {
+                const response = JSON.parse(message.toString());
+                console.log(response);
+                switch (response.action) {
+                    case 'vend.dispensing':
+                        user.socket.send(JSON.stringify({
+                            type: 0,
+                            data: {}
+                        }));
+                        break;
+                    case 'vend.closed':
+                        listener.emit('save');
+                        user.socket.send(JSON.stringify({
+                            type: 3,
+                            data: {
+                                message: 'sale finished'
+                            }
+                        }));
+                        break;
+                }
             });
+            // user.mqtt!.on('connect', () => {
+            //     let counter = 0;
+            //     this.createService(listener, user, machineId);
+            //     listener.on('next', () => {
+            //         if (counter < products.length) {
+            //             console.log(`Product #${counter + 1}`);
+            //             if (counter > 0) {
+            //                 user.mqtt = this.createMQTTConnection(user_id);
+            //                 user.mqtt!.subscribe(`${this.machineResponseTopic}`);
+            //             }
+            //             this.dispenseSecuense(
+            //                 user,
+            //                 products[counter],
+            //                 listener,
+            //                 counter === products.length - 1
+            //             );
+            //             counter++;
+            //         }
+            //     });
+            //     listener.emit('next');
+            // });
         });
         this.createService = (listener, user, machine_id) => {
             let products = [];

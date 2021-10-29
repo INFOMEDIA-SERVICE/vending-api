@@ -64,7 +64,9 @@ class SocketUsers {
 
     public update = (user: ISocketUser): boolean => {
 
-        let index: number = this.users.findIndex((u: ISocketUser): boolean => u.user_id === user.user_id);
+        let index: number = this.users.findIndex((u: ISocketUser): boolean => {
+            return u.user_id === user.user_id;
+        });
 
         if (index === -1) return false;
 

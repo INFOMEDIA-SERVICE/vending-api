@@ -38,7 +38,9 @@ class SocketUsers {
             return true;
         };
         this.update = (user) => {
-            let index = this.users.findIndex((u) => u.user_id === user.user_id);
+            let index = this.users.findIndex((u) => {
+                return u.user_id === user.user_id;
+            });
             if (index === -1)
                 return false;
             this.users[index] = this.users[index];
