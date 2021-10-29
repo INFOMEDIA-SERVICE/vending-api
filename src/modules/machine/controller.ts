@@ -171,8 +171,7 @@ class SocketController {
 
     public dispense = async (user: ISocketUser, message: IMessage): Promise<void> => {
 
-        const machineId: string = message.data.machineId;
-
+        const machine_id: string = message.data.machine_id;
         const user_id: string = message.data.user_id || v1();
 
         // const userResponse = await machineRepository.updateRequests(user_id);
@@ -201,10 +200,20 @@ class SocketController {
 
         user.mqtt!.subscribe(`${this.machineResponseTopic}`);
 
-        console.log({
-            products: message.data.products,
-            user_id: message.data.user_id
-        });
+        const params = {
+            action: 'vend.request',
+            device_id: machine_id,
+            credit: 1000,
+            tid: '6789A3456',
+            items: products,
+        };
+
+        console.log(params);
+
+        user.mqtt!.publish(
+            `${this.machineRequestTopic}`,
+            JSON.stringify(params)
+        );
 
         user.mqtt!.on('message', (_, message) => {
 
@@ -214,11 +223,10 @@ class SocketController {
 
             switch (response.action) {
                 case 'vend.dispensing':
+                    delete response.action;
                     user.socket!.send(JSON.stringify({
-                        type: 0,
-                        data: {
-
-                        }
+                        type: 3,
+                        data: response,
                     }));
                     break;
 
@@ -235,38 +243,6 @@ class SocketController {
                     break;
             }
         });
-
-        // user.mqtt!.on('connect', () => {
-
-        //     let counter = 0;
-
-        //     this.createService(listener, user, machineId);
-
-        //     listener.on('next', () => {
-
-        //         if (counter < products.length) {
-
-        //             console.log(`Product #${counter + 1}`);
-
-        //             if (counter > 0) {
-
-        //                 user.mqtt = this.createMQTTConnection(user_id);
-        //                 user.mqtt!.subscribe(`${this.machineResponseTopic}`);
-        //             }
-
-        //             this.dispenseSecuense(
-        //                 user,
-        //                 products[counter],
-        //                 listener,
-        //                 counter === products.length - 1
-        //             );
-
-        //             counter++;
-        //         }
-        //     });
-
-        //     listener.emit('next');
-        // });
     };
 
     private createService = (listener: Emitter, user: ISocketUser, machine_id: string) => {
@@ -303,70 +279,6 @@ class SocketController {
             // }));
         });
     }
-
-    private dispenseSecuense = (user: ISocketUser, product: IProduct, listener: Emitter, isLast: boolean) => {
-
-        // STARTING
-
-        let dispensed: boolean;
-
-        user.mqtt!.publish(`${this.machineRequestTopic}`, 'vend.dispensing');
-
-        user.mqtt!.on('message', (_, message) => {
-
-            if (message.toString().toLowerCase().includes('date')) {
-                return;
-            }
-
-            if (message.toString().toLowerCase().includes('vm')) {
-                return;
-            }
-
-            const response = JSON.parse(message.toString());
-
-            console.log(response);
-
-            switch (response.action) {
-                case 'vend.dispensing':
-                    dispensed = true;
-                    user.socket!.send(JSON.stringify({
-                        type: 0,
-                        data: {
-                            product,
-                            message: `product ${product.key} dispensed`
-                        }
-                    }));
-                    break;
-
-                case 'vend.closed':
-
-                    user.mqtt!.end();
-
-                    listener.emit('addProduct', {
-                        key: product.key,
-                        dispensed,
-                        price: product.value || 0
-                    });
-
-                    if (isLast) {
-                        listener.emit('save');
-                        user.socket!.send(JSON.stringify({
-                            type: 0,
-                            data: {
-                                message: 'sale finished'
-                            }
-                        }));
-                    }
-
-                    setTimeout(() => {
-                        listener.emit('next');
-                    }, 1000);
-
-                    break;
-            }
-        });
-
-    };
 
     private saveUser = async (socket: ws, message: IMessage): Promise<void> => {
 

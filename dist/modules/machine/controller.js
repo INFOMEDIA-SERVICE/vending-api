@@ -17,7 +17,6 @@ const mqtt_1 = __importDefault(require("mqtt"));
 const uuid_1 = require("uuid");
 const model_1 = require("./model");
 const events_1 = require("events");
-const timers_1 = require("timers");
 var MachineTypes;
 (function (MachineTypes) {
     MachineTypes[MachineTypes["List"] = 0] = "List";
@@ -157,7 +156,7 @@ class SocketController {
             });
         });
         this.dispense = (user, message) => __awaiter(this, void 0, void 0, function* () {
-            const machineId = message.data.machineId;
+            const machine_id = message.data.machine_id;
             const user_id = message.data.user_id || uuid_1.v1();
             // const userResponse = await machineRepository.updateRequests(user_id);
             // if (!userResponse.ok) {
@@ -179,18 +178,24 @@ class SocketController {
             }
             const listener = new Emitter();
             user.mqtt.subscribe(`${this.machineResponseTopic}`);
-            console.log({
-                products: message.data.products,
-                user_id: message.data.user_id
-            });
+            const params = {
+                action: 'vend.request',
+                device_id: machine_id,
+                credit: 1000,
+                tid: '6789A3456',
+                items: products,
+            };
+            console.log(params);
+            user.mqtt.publish(`${this.machineRequestTopic}`, JSON.stringify(params));
             user.mqtt.on('message', (_, message) => {
                 const response = JSON.parse(message.toString());
                 console.log(response);
                 switch (response.action) {
                     case 'vend.dispensing':
+                        delete response.action;
                         user.socket.send(JSON.stringify({
-                            type: 0,
-                            data: {}
+                            type: 3,
+                            data: response,
                         }));
                         break;
                     case 'vend.closed':
@@ -204,27 +209,6 @@ class SocketController {
                         break;
                 }
             });
-            // user.mqtt!.on('connect', () => {
-            //     let counter = 0;
-            //     this.createService(listener, user, machineId);
-            //     listener.on('next', () => {
-            //         if (counter < products.length) {
-            //             console.log(`Product #${counter + 1}`);
-            //             if (counter > 0) {
-            //                 user.mqtt = this.createMQTTConnection(user_id);
-            //                 user.mqtt!.subscribe(`${this.machineResponseTopic}`);
-            //             }
-            //             this.dispenseSecuense(
-            //                 user,
-            //                 products[counter],
-            //                 listener,
-            //                 counter === products.length - 1
-            //             );
-            //             counter++;
-            //         }
-            //     });
-            //     listener.emit('next');
-            // });
         });
         this.createService = (listener, user, machine_id) => {
             let products = [];
@@ -252,53 +236,6 @@ class SocketController {
                 //     }
                 // }));
             }));
-        };
-        this.dispenseSecuense = (user, product, listener, isLast) => {
-            // STARTING
-            let dispensed;
-            user.mqtt.publish(`${this.machineRequestTopic}`, 'vend.dispensing');
-            user.mqtt.on('message', (_, message) => {
-                if (message.toString().toLowerCase().includes('date')) {
-                    return;
-                }
-                if (message.toString().toLowerCase().includes('vm')) {
-                    return;
-                }
-                const response = JSON.parse(message.toString());
-                console.log(response);
-                switch (response.action) {
-                    case 'vend.dispensing':
-                        dispensed = true;
-                        user.socket.send(JSON.stringify({
-                            type: 0,
-                            data: {
-                                product,
-                                message: `product ${product.key} dispensed`
-                            }
-                        }));
-                        break;
-                    case 'vend.closed':
-                        user.mqtt.end();
-                        listener.emit('addProduct', {
-                            key: product.key,
-                            dispensed,
-                            price: product.value || 0
-                        });
-                        if (isLast) {
-                            listener.emit('save');
-                            user.socket.send(JSON.stringify({
-                                type: 0,
-                                data: {
-                                    message: 'sale finished'
-                                }
-                            }));
-                        }
-                        timers_1.setTimeout(() => {
-                            listener.emit('next');
-                        }, 1000);
-                        break;
-                }
-            });
         };
         this.saveUser = (socket, message) => __awaiter(this, void 0, void 0, function* () {
             const user = {
