@@ -110,7 +110,9 @@ class SocketController {
             });
         });
         this.getMachineProducts = (user, message) => __awaiter(this, void 0, void 0, function* () {
-            user.mqtt.subscribe(this.machineResponseTopic);
+            const machine_id = message.data.machine_id.replace('VM', '');
+            const topic = 'infomedia/vmachines/' + machine_id;
+            user.mqtt.subscribe(topic.toLocaleLowerCase());
             user.mqtt.publish(this.machineRequestTopic, JSON.stringify({
                 action: 'product.keys.request',
                 device_id: message.data.machine_id,
@@ -118,10 +120,12 @@ class SocketController {
             user.mqtt.on('message', (_, message) => {
                 const response = JSON.parse(message.toString());
                 switch (response.action) {
-                    case 'product.keys.response':
+                    case 'product.list.response':
                         user.socket.send(JSON.stringify({
-                            type: 3,
-                            data: response,
+                            type: MachineTypes.GetProducts,
+                            data: {
+                                products: response.products,
+                            },
                         }));
                         break;
                 }

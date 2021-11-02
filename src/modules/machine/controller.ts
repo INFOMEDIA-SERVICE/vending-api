@@ -112,8 +112,10 @@ class SocketController {
 
     private getMachineProducts = async (user: ISocketUser, message: IMessage): Promise<void> => {
 
-        user.mqtt!.subscribe(this.machineResponseTopic);
+        const machine_id: string = (message.data.machine_id as string).replace('VM', '');
+        const topic: string = 'infomedia/vmachines/' + machine_id;
 
+        user.mqtt!.subscribe(topic.toLocaleLowerCase());
         user.mqtt!.publish(this.machineRequestTopic, JSON.stringify({
             action: 'product.keys.request',
             device_id: message.data.machine_id,
@@ -124,10 +126,12 @@ class SocketController {
             const response = JSON.parse(message.toString());
 
             switch (response.action) {
-                case 'product.keys.response':
+                case 'product.list.response':
                     user.socket!.send(JSON.stringify({
-                        type: 3,
-                        data: response,
+                        type: MachineTypes.GetProducts,
+                        data: {
+                            products: response.products,
+                        },
                     }));
                     break;
             }
