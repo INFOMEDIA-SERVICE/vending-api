@@ -1,5 +1,4 @@
 import express, { Application } from 'express';
-import vendingRoutes from './modules/vending/routes';
 import usersRoutes from './modules/user/routes';
 import adminRoutes from './modules/admin/routes';
 import servicesRoutes from './modules/services/routes';
@@ -32,7 +31,6 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use('/api/users', usersRoutes);
 app.use('/api/users', usersRoutes);
-app.use('/api/vendings', vendingRoutes);
 app.use('/api/services', servicesRoutes);
 app.use('/api/admins', adminRoutes);
 

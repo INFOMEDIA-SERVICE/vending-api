@@ -18,10 +18,6 @@
       "description": "Rutas de usuarios"
     },
     {
-      "name": "products",
-      "description": "Rutas de productos"
-    },
-    {
       "name": "vendings",
       "description": "Rutas de vendings"
     },
@@ -682,735 +678,20 @@
         }
       }
     },
-    "/products/": {
-      "get": {
-        "tags": [
-          "products"
-        ],
-        "summary": "Obtener todos los productos",
-        "operationId": "getProducts",
-        "description": "Retorna todos los productos disponibles\n",
-        "produces": [
-          "application/json"
-        ],
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "header",
-            "name": "Authorization",
-            "type": "string",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Lista de productos disponibles en la base de datos",
-            "schema": {
-              "properties": {
-                "ok": {
-                  "type": "boolean"
-                },
-                "products": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/definitions/Product"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Error message",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "admins"
-        ],
-        "summary": "Crear producto",
-        "operationId": "createProduct",
-        "description": "Retorna el producto creado\n",
-        "produces": [
-          "application/json"
-        ],
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/Product"
-            }
-          },
-          {
-            "in": "header",
-            "name": "Authorization",
-            "type": "string",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Producto creado",
-            "schema": {
-              "properties": {
-                "ok": {
-                  "type": "boolean"
-                },
-                "product": {
-                  "$ref": "#/definitions/Product"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Error message",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          }
-        }
-      }
-    },
-    "/products/{id}": {
-      "get": {
-        "tags": [
-          "products"
-        ],
-        "summary": "Obtener producto por id",
-        "operationId": "getProductById",
-        "description": "Retorna el producto del id\n",
-        "produces": [
-          "application/json"
-        ],
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "type": "string",
-            "required": true,
-            "description": "Id del producto"
-          },
-          {
-            "in": "header",
-            "name": "Authorization",
-            "type": "string",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Producto buscado",
-            "schema": {
-              "properties": {
-                "ok": {
-                  "type": "boolean"
-                },
-                "product": {
-                  "$ref": "#/definitions/Product"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Error message",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "admins"
-        ],
-        "summary": "Eliminar producto",
-        "operationId": "deleteProduct",
-        "description": "Retorna el producto eliminado\n",
-        "produces": [
-          "application/json"
-        ],
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "type": "string",
-            "required": true,
-            "description": "Product id."
-          },
-          {
-            "in": "header",
-            "name": "Authorization",
-            "type": "string",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Producto eliminado",
-            "schema": {
-              "properties": {
-                "ok": {
-                  "type": "boolean"
-                },
-                "product": {
-                  "$ref": "#/definitions/Product"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Error message",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "admins"
-        ],
-        "summary": "Editar producto",
-        "operationId": "editProduct",
-        "description": "Retorna el producto editado\n",
-        "produces": [
-          "application/json"
-        ],
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/Product"
-            }
-          },
-          {
-            "in": "path",
-            "name": "id",
-            "type": "string",
-            "required": true,
-            "description": "User id."
-          },
-          {
-            "in": "header",
-            "name": "Authorization",
-            "type": "string",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Producto editado",
-            "schema": {
-              "properties": {
-                "ok": {
-                  "type": "boolean"
-                },
-                "product": {
-                  "$ref": "#/definitions/Product"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Error message",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          }
-        }
-      }
-    },
-    "/vendings": {
-      "post": {
-        "tags": [
-          "admins"
-        ],
-        "summary": "Crear nueva vending",
-        "operationId": "createVending",
-        "description": "Retorna la vending creada\n",
-        "produces": [
-          "application/json"
-        ],
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "schema": {
-              "properties": {
-                "name": {
-                  "type": "string",
-                  "example": "Vending #1"
-                },
-                "image": {
-                  "type": "string",
-                  "example": "https://example.com/mypicture.jpg"
-                },
-                "machine_id": {
-                  "type": "string",
-                  "example": "STM32-1234567891"
-                }
-              }
-            }
-          },
-          {
-            "in": "header",
-            "name": "Authorization",
-            "type": "string",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Vending creada",
-            "schema": {
-              "properties": {
-                "ok": {
-                  "type": "boolean"
-                },
-                "vending": {
-                  "$ref": "#/definitions/Vending"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Error message",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          }
-        }
-      },
-      "get": {
-        "tags": [
-          "vendings"
-        ],
-        "summary": "Obtener todas las vendings disponibles",
-        "operationId": "getVendings",
-        "description": "Retorna las vendings disponibles\n",
-        "produces": [
-          "application/json"
-        ],
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "header",
-            "name": "Authorization",
-            "type": "string",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Vendings disponibles",
-            "schema": {
-              "properties": {
-                "ok": {
-                  "type": "boolean"
-                },
-                "vendings": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/definitions/Vending"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Error message",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          }
-        }
-      }
-    },
-    "/vendings/{id}": {
-      "get": {
-        "tags": [
-          "vendings"
-        ],
-        "summary": "Obtener vending machine por id",
-        "operationId": "getVendingById",
-        "description": "Retorna la vending requerida\n",
-        "produces": [
-          "application/json"
-        ],
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "type": "string",
-            "required": true,
-            "description": "User id."
-          },
-          {
-            "in": "header",
-            "name": "Authorization",
-            "type": "string",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Vending de la consulta",
-            "schema": {
-              "properties": {
-                "ok": {
-                  "type": "boolean"
-                },
-                "vending": {
-                  "$ref": "#/definitions/Vending"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Error message",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "admins"
-        ],
-        "summary": "Editar vending",
-        "operationId": "editVending",
-        "description": "Retorna la vending editada\n",
-        "produces": [
-          "application/json"
-        ],
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/Vending"
-            }
-          },
-          {
-            "in": "path",
-            "name": "id",
-            "type": "string",
-            "required": true,
-            "description": "User id."
-          },
-          {
-            "in": "header",
-            "name": "Authorization",
-            "type": "string",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Vending editada",
-            "schema": {
-              "properties": {
-                "ok": {
-                  "type": "boolean"
-                },
-                "vending": {
-                  "$ref": "#/definitions/Vending"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Error message",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "admins"
-        ],
-        "summary": "Eliminar Vending",
-        "operationId": "deleteVending",
-        "description": "Retorna el vending eliminada\n",
-        "produces": [
-          "application/json"
-        ],
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "type": "string",
-            "required": true,
-            "description": "Vending id."
-          },
-          {
-            "in": "header",
-            "name": "Authorization",
-            "type": "string",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Vending eliminada",
-            "schema": {
-              "properties": {
-                "ok": {
-                  "type": "boolean"
-                },
-                "vending": {
-                  "$ref": "#/definitions/Vending"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Error message",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          }
-        }
-      }
-    },
-    "/vendings/{id}/products": {
-      "get": {
-        "tags": [
-          "vendings"
-        ],
-        "summary": "Obtener productos de la máquina",
-        "operationId": "getProductsByMachine",
-        "description": "Se recibe el id de la máquina y se retorna los productos disponibles de la misma\n",
-        "produces": [
-          "application/json"
-        ],
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "type": "string",
-            "required": true,
-            "description": "Id de la máquina"
-          },
-          {
-            "in": "header",
-            "name": "Authorization",
-            "type": "string",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Lista de productos disponibles en la máquina",
-            "schema": {
-              "properties": {
-                "ok": {
-                  "type": "boolean"
-                },
-                "products": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/definitions/Product"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Error message",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "schema": {
-              "$ref": "#/definitions/ErrorResponse"
-            }
-          }
-        }
-      }
-    },
     "/vendings/": {
       "get": {
         "tags": [
           "vendings"
         ],
-        "summary": "Ejecutar ordenes a la máquina",
-        "operationId": "ordersToMachine",
-        "description": "Conexión web socket\nEjecutar ordenes a la máquina\nLas ordenes disponibles actualmente son dispensar productos y obtener el estado de la máquina\n\nLa orden de pedir el estado de la máquina se realiza con el \"type\" 2, el cuál devolverá un mensaje con el estado de la máquina (Si la respuesta nunca llega, significa que la máquina está apagada)\nLa orden de dispensar productos se realiza con el \"type\" 1 y se le envian los productos como en el ejemplo del body\n\ntype: Es la orden a ejecutar\ndata: Es el objeto que lleva todo el mensaje de la orden\n\nPara dispensar productos\nDentro de data debe ir una lista de productos con el key \"products\"\nLa lista de los productos será una lista de objetos que deberá llevar la siguiente estructura:\n\nid: ID del producto\nname: Nombre del producto\nitem: Es la ubicación del producto en la vending\nprice: Precio del producto\n\nAdemás de la lista de productos, el objeto \"data\" deberá contener lo siguiente\n\nmachineId: ID de la máquina, mismo id que devuelve el código QR\nuser_id: ID del usuario que está haciendo la solicitud\ntoken: Token de acceso\n\nSi todo está marchando bien, el socket le devolverá un \"type\": 0\nDe lo contrario, la respuesta será un \"type\": -1\n\n\n\nPATH: ws://yourdomain.com/connection/\n",
+        "summary": "Ejecutar ordenes a vendings",
+        "operationId": "ordersToVendings",
+        "description": "Conexión web socket\nEjecutar ordenes a la las vendings\nLas ordenes disponibles actualmente son consultar todos los lockers, consultar si un locker está abierto o cerrado\n\ntype: Es la orden a ejecutar\ndata: Es el objeto que lleva todo el mensaje de la orden\n\nSi todo está marchando bien, el socket le devolverá el mismo \"type\" que mandaste\nDe lo contrario, la respuesta será un \"type\": -1\n\nPATH: ws://yourdomain.com/connection/\n",
         "produces": [
           "application/json"
         ],
         "security": [
           {
             "Bearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "header",
-            "name": "Authorization",
-            "type": "string",
-            "required": true
-          },
-          {
-            "in": "body",
-            "name": "body",
-            "schema": {
-              "properties": {
-                "type": {
-                  "type": "number",
-                  "example": 1
-                },
-                "data": {
-                  "properties": {
-                    "products": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/definitions/SocketProduct"
-                      }
-                    },
-                    "machineId": {
-                      "type": "string",
-                      "example": "STM32-1234567891"
-                    },
-                    "user_id": {
-                      "type": "string",
-                      "format": "uuid"
-                    },
-                    "token": {
-                      "type": "string",
-                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
-                    }
-                  }
-                }
-              }
-            }
           }
         ],
         "responses": {
@@ -1459,6 +740,465 @@
                     "message": {
                       "type": "string",
                       "example": "product De toditos not dispensed"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error message",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": -1
+                },
+                "data": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "jwt must be provided"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/vendings/type/0": {
+      "get": {
+        "tags": [
+          "vendings"
+        ],
+        "summary": "Obtener todas las vendings",
+        "operationId": "consultVendings",
+        "description": "\ntype: Es la orden a ejecutar\ndata: Es el objeto que lleva todo el mensaje de la orden\n\nSi todo está marchando bien, el socket le devolverá el mismo \"type\" que mandaste\nDe lo contrario, la respuesta será un \"type\": -1\n\nSe debe mandar los siguientes parametros en el objeto \"data\"\n\nuser_id: Identificador único del usuario\ntoken: JWT de autenticacion\n",
+        "produces": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": 3
+                },
+                "data": {
+                  "properties": {
+                    "user_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "token": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vendings disponibles",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": 3
+                },
+                "data": {
+                  "properties": {
+                    "locker_name": {
+                      "type": "string",
+                      "example": "the locker name"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": -1
+                },
+                "data": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "locker not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error message",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": -1
+                },
+                "data": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "jwt must be provided"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/vendings/type/1": {
+      "get": {
+        "tags": [
+          "vendings"
+        ],
+        "summary": "Consultar los productos de una vending",
+        "operationId": "consultVendingProducts",
+        "description": "\ntype: Es la orden a ejecutar\ndata: Es el objeto que lleva todo el mensaje de la orden\n\nSi todo está marchando bien, el socket le devolverá el mismo \"type\" que mandaste\nDe lo contrario, la respuesta será un \"type\": -1\n\nSe debe mandar los siguientes parametros en el objeto \"data\"\n\nuser_id: Identificador único del usuario\nmachine_id: Identificador de la vending\ntoken: JWT de autenticacion\n",
+        "produces": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": 4
+                },
+                "data": {
+                  "properties": {
+                    "user_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "token": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vendings disponibles",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": 4
+                },
+                "data": {
+                  "properties": {
+                    "locker_name": {
+                      "type": "string",
+                      "example": "the locker name"
+                    },
+                    "boxes": {
+                      "type": "array",
+                      "items": {
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "example": "Box1_name"
+                          },
+                          "is_open": {
+                            "type": "boolean",
+                            "example": false
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": -1
+                },
+                "data": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "lockers not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error message",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": -1
+                },
+                "data": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "jwt must be provided"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/vendings/type/2": {
+      "get": {
+        "tags": [
+          "vendings"
+        ],
+        "summary": "Obtener detalles de una vending",
+        "operationId": "getMachineDetails",
+        "description": "\ntype: Es la orden a ejecutar\ndata: Es el objeto que lleva todo el mensaje de la orden\n\nSi todo está marchando bien, el socket le devolverá el mismo \"type\" que mandaste\nDe lo contrario, la respuesta será un \"type\": -1\n\nSe debe mandar los siguientes parametros en el objeto \"data\"\n\nuser_id: Identificador único del usuario\nlocker_name: Nombre del locker a consultar\nbox_name: Nombre de la caja que se quiere abrir\ntoken: JWT de autenticacion\n",
+        "produces": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": 5
+                },
+                "data": {
+                  "properties": {
+                    "user_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "locker_name": {
+                      "type": "string",
+                      "example": "locker-10001/"
+                    },
+                    "box_name": {
+                      "type": "string",
+                      "example": "Box1_name"
+                    },
+                    "token": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vendings disponibles",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": 5
+                },
+                "data": {
+                  "properties": {
+                    "locker_name": {
+                      "type": "string",
+                      "example": "the locker name"
+                    },
+                    "box_name": {
+                      "type": "string",
+                      "example": "Box1_name"
+                    },
+                    "is_open": {
+                      "type": "boolean",
+                      "example": false
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": -1
+                },
+                "data": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "locker not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error message",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": -1
+                },
+                "data": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "jwt must be provided"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/vendings/type/3": {
+      "get": {
+        "tags": [
+          "vendings"
+        ],
+        "summary": "Dispensar productos",
+        "operationId": "dispenseProducts",
+        "description": "\ntype: Es la orden a ejecutar\ndata: Es el objeto que lleva todo el mensaje de la orden\n\nSi todo está marchando bien, el socket le devolverá el mismo \"type\" que mandaste\nDe lo contrario, la respuesta será un \"type\": -1\n\nSe debe mandar los siguientes parametros en el objeto \"data\"\n\nuser_id: Identificador único del usuario\nlocker_name: Nombre del locker a consultar\nbox_name: Nombre de la caja que se quiere abrir\ntoken: JWT de autenticacion\n",
+        "produces": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": 5
+                },
+                "data": {
+                  "properties": {
+                    "user_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "locker_name": {
+                      "type": "string",
+                      "example": "locker-10001/"
+                    },
+                    "box_name": {
+                      "type": "string",
+                      "example": "Box1_name"
+                    },
+                    "token": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vendings disponibles",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": 5
+                },
+                "data": {
+                  "properties": {
+                    "locker_name": {
+                      "type": "string",
+                      "example": "the locker name"
+                    },
+                    "box_name": {
+                      "type": "string",
+                      "example": "Box1_name"
+                    },
+                    "is_open": {
+                      "type": "boolean",
+                      "example": false
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": -1
+                },
+                "data": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "locker not found"
                     }
                   }
                 }
@@ -1577,7 +1317,7 @@
         }
       }
     },
-    "/lockers/type/3": {
+    "/lockers/type/4": {
       "get": {
         "tags": [
           "lockers"
@@ -1699,7 +1439,7 @@
         }
       }
     },
-    "/lockers/type/4": {
+    "/lockers/type/5": {
       "get": {
         "tags": [
           "lockers"
@@ -1817,7 +1557,7 @@
         }
       }
     },
-    "/lockers/type/5": {
+    "/lockers/type/6": {
       "get": {
         "tags": [
           "lockers"

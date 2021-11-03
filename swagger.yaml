@@ -20,8 +20,6 @@ info:
 tags:
 - name: users
   description: Rutas de usuarios
-- name: products
-  description: Rutas de productos
 - name: vendings
   description: Rutas de vendings
 - name: lockers
@@ -464,514 +462,28 @@ paths:
           schema:
             $ref: '#/definitions/ErrorResponse'
 
-  /products/:
-    get:
-      tags:
-      - products
-      summary: Obtener todos los productos 
-      operationId: getProducts
-      description: |
-        Retorna todos los productos disponibles
-      produces:
-      - application/json
-      security:
-      - Bearer: []
-      parameters:
-        - in: header
-          name: Authorization
-          type: string
-          required: true
-      responses:
-        200:
-          description: Lista de productos disponibles en la base de datos
-          schema:
-            properties:
-              ok: 
-                type: boolean
-              products:
-                type: array
-                items:
-                  $ref: '#/definitions/Product'
-        400:
-          description: Error message
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-        401:
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-    post:
-      tags:
-      - admins
-      summary: Crear producto
-      operationId: createProduct
-      description: |
-        Retorna el producto creado
-      produces:
-      - application/json
-      security:
-      - Bearer: []
-      parameters:
-        - in: body
-          name: body
-          required: true
-          schema:
-            $ref: '#/definitions/Product'
-        - in: header
-          name: Authorization
-          type: string
-          required: true
-      responses:
-        200:
-          description: Producto creado
-          schema:
-            properties:
-              ok: 
-                type: boolean
-              product:
-                $ref: '#/definitions/Product'
-        400:
-          description: Error message
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-        401:
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-  /products/{id}:
-    get:
-      tags:
-      - products
-      summary: Obtener producto por id
-      operationId: getProductById
-      description: |
-        Retorna el producto del id
-      produces:
-      - application/json
-      security:
-      - Bearer: []
-      parameters:
-        - in: path
-          name: id
-          type: string
-          required: true
-          description: Id del producto
-        - in: header
-          name: Authorization
-          type: string
-          required: true
-      responses:
-        200:
-          description: Producto buscado
-          schema:
-            properties:
-              ok: 
-                type: boolean
-              product:
-                $ref: '#/definitions/Product'
-        400:
-          description: Error message
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-        401:
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-    delete:
-      tags:
-      - admins
-      summary: Eliminar producto
-      operationId: deleteProduct
-      description: |
-        Retorna el producto eliminado
-      produces:
-      - application/json
-      security:
-      - Bearer: []
-      parameters:
-        - in: path
-          name: id
-          type: string
-          required: true
-          description: Product id.
-        - in: header
-          name: Authorization
-          type: string
-          required: true
-      responses:
-        200:
-          description: Producto eliminado
-          schema:
-            properties:
-              ok: 
-                type: boolean
-              product:
-                $ref: '#/definitions/Product'
-        400:
-          description: Error message
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-        401:
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-    put:
-      tags:
-      - admins
-      summary: Editar producto
-      operationId: editProduct
-      description: |
-        Retorna el producto editado
-      produces:
-      - application/json
-      security:
-      - Bearer: []
-      parameters:
-        - in: body
-          name: body
-          required: true
-          schema:
-            $ref: '#/definitions/Product'
-        - in: path
-          name: id
-          type: string
-          required: true
-          description: User id.
-        - in: header
-          name: Authorization
-          type: string
-          required: true
-      responses:
-        200:
-          description: Producto editado
-          schema:
-            properties:
-              ok: 
-                type: boolean
-              product:
-                $ref: '#/definitions/Product'
-        400:
-          description: Error message
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-        401:
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-
-  /vendings:
-    post:
-      tags:
-      - admins
-      summary: Crear nueva vending
-      operationId: createVending
-      description: |
-        Retorna la vending creada
-      produces:
-      - application/json
-      security:
-      - Bearer: []
-      parameters:
-        - in: body
-          name: body
-          schema:
-            properties:
-              name:
-                type: string
-                example: "Vending #1"
-              image:
-                type: string
-                example: 'https://example.com/mypicture.jpg'
-              machine_id:
-                type: string
-                example: "STM32-1234567891"
-        - in: header
-          name: Authorization
-          type: string
-          required: true
-      responses:
-        200:
-          description: Vending creada
-          schema:
-            properties:
-              ok: 
-                type: boolean
-              vending:
-                $ref: '#/definitions/Vending'
-        400:
-          description: Error message
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-        401:
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-    get:
-      tags:
-      - vendings
-      summary: Obtener todas las vendings disponibles
-      operationId: getVendings
-      description: |
-        Retorna las vendings disponibles
-      produces:
-      - application/json
-      security:
-      - Bearer: []
-      parameters:
-        - in: header
-          name: Authorization
-          type: string
-          required: true
-      responses:
-        200:
-          description: Vendings disponibles
-          schema:
-            properties:
-              ok: 
-                type: boolean
-              vendings:
-                type: array
-                items:
-                  $ref: '#/definitions/Vending'
-        400:
-          description: Error message
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-        401:
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-  /vendings/{id}:
-    get:
-      tags:
-      - vendings
-      summary: Obtener vending machine por id
-      operationId: getVendingById
-      description: |
-        Retorna la vending requerida
-      produces:
-      - application/json
-      security:
-      - Bearer: []
-      parameters:
-        - in: path
-          name: id
-          type: string
-          required: true
-          description: User id.
-        - in: header
-          name: Authorization
-          type: string
-          required: true
-      responses:
-        200:
-          description: Vending de la consulta
-          schema:
-            properties:
-              ok: 
-                type: boolean
-              vending:
-                $ref: '#/definitions/Vending'
-        400:
-          description: Error message
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-        401:
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-    put:
-      tags:
-      - admins
-      summary: Editar vending
-      operationId: editVending
-      description: |
-        Retorna la vending editada
-      produces:
-      - application/json
-      security:
-      - Bearer: []
-      parameters:
-        - in: body
-          name: body
-          required: true
-          schema:
-            $ref: '#/definitions/Vending'
-        - in: path
-          name: id
-          type: string
-          required: true
-          description: User id.
-        - in: header
-          name: Authorization
-          type: string
-          required: true
-      responses:
-        200:
-          description: Vending editada
-          schema:
-            properties:
-              ok: 
-                type: boolean
-              vending:
-                $ref: '#/definitions/Vending'
-        400:
-          description: Error message
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-        401:
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-    delete:
-      tags:
-      - admins
-      summary: Eliminar Vending
-      operationId: deleteVending
-      description: |
-        Retorna el vending eliminada
-      produces:
-      - application/json
-      security:
-      - Bearer: []
-      parameters:
-        - in: path
-          name: id
-          type: string
-          required: true
-          description: Vending id.
-        - in: header
-          name: Authorization
-          type: string
-          required: true
-      responses:
-        200:
-          description: Vending eliminada
-          schema:
-            properties:
-              ok: 
-                type: boolean
-              vending:
-                $ref: '#/definitions/Vending'
-        400:
-          description: Error message
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-        401:
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-  /vendings/{id}/products:
-    get:
-      tags:
-      - vendings
-      summary: Obtener productos de la máquina
-      operationId: getProductsByMachine
-      description: |
-        Se recibe el id de la máquina y se retorna los productos disponibles de la misma
-      produces:
-      - application/json
-      security:
-      - Bearer: []
-      parameters:
-        - in: path
-          name: id
-          type: string
-          required: true
-          description: Id de la máquina
-        - in: header
-          name: Authorization
-          type: string
-          required: true
-      responses:
-        200:
-          description: Lista de productos disponibles en la máquina
-          schema:
-            properties:
-              ok: 
-                type: boolean
-              products:
-                type: array
-                items:
-                  $ref: '#/definitions/Product'
-        400:
-          description: Error message
-          schema:
-            $ref: '#/definitions/ErrorResponse'
-        401:
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/ErrorResponse'
   /vendings/:
     get:
       tags:
       - vendings
-      summary: Ejecutar ordenes a la máquina
-      operationId: ordersToMachine
+      summary: Ejecutar ordenes a vendings
+      operationId: ordersToVendings
       description: |
         Conexión web socket
-        Ejecutar ordenes a la máquina
-        Las ordenes disponibles actualmente son dispensar productos y obtener el estado de la máquina
-        
-        La orden de pedir el estado de la máquina se realiza con el "type" 2, el cuál devolverá un mensaje con el estado de la máquina (Si la respuesta nunca llega, significa que la máquina está apagada)
-        La orden de dispensar productos se realiza con el "type" 1 y se le envian los productos como en el ejemplo del body
+        Ejecutar ordenes a la las vendings
+        Las ordenes disponibles actualmente son consultar todos los lockers, consultar si un locker está abierto o cerrado
         
         type: Es la orden a ejecutar
         data: Es el objeto que lleva todo el mensaje de la orden
         
-        Para dispensar productos
-        Dentro de data debe ir una lista de productos con el key "products"
-        La lista de los productos será una lista de objetos que deberá llevar la siguiente estructura:
-        
-        id: ID del producto
-        name: Nombre del producto
-        item: Es la ubicación del producto en la vending
-        price: Precio del producto
-        
-        Además de la lista de productos, el objeto "data" deberá contener lo siguiente
-        
-        machineId: ID de la máquina, mismo id que devuelve el código QR
-        user_id: ID del usuario que está haciendo la solicitud
-        token: Token de acceso
-        
-        Si todo está marchando bien, el socket le devolverá un "type": 0
+        Si todo está marchando bien, el socket le devolverá el mismo "type" que mandaste
         De lo contrario, la respuesta será un "type": -1
-        
-        
         
         PATH: ws://yourdomain.com/connection/
       produces:
       - application/json
       security:
       - Bearer: []
-      parameters:
-        - in: header
-          name: Authorization
-          type: string
-          required: true
-        - in: body
-          name: body
-          schema:
-            properties:
-              type: 
-                type: number
-                example: 1
-              data:
-                properties:
-                  products:
-                    type: array
-                    items:
-                      $ref: '#/definitions/SocketProduct'
-                  machineId:
-                    type: string
-                    example: "STM32-1234567891"
-                  user_id:
-                    type: string
-                    format: uuid
-                    
-                  token:
-                    type: string
-                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
       responses:
         200:
           description: Vendings disponibles
@@ -1019,6 +531,360 @@ paths:
                     type: string
                     example: "jwt must be provided"
   
+  /vendings/type/0:
+    get:
+      tags:
+      - vendings
+      summary: Obtener todas las vendings
+      operationId: consultVendings
+      description: |
+        
+        type: Es la orden a ejecutar
+        data: Es el objeto que lleva todo el mensaje de la orden
+        
+        Si todo está marchando bien, el socket le devolverá el mismo "type" que mandaste
+        De lo contrario, la respuesta será un "type": -1
+        
+        Se debe mandar los siguientes parametros en el objeto "data"
+        
+        user_id: Identificador único del usuario
+        token: JWT de autenticacion
+
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: body
+          name: body
+          schema:
+            properties:
+              type: 
+                type: number
+                example: 3
+              data:
+                properties:
+                  user_id: 
+                    type: string
+                    format: uuid
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+
+      responses:
+        200:
+          description: Vendings disponibles
+          schema:
+            properties:
+              type: 
+                type: number
+                example: 3
+              data:
+                properties:
+                  locker_name:
+                    type: string
+                    example: "the locker name"
+        400:
+          description: Error message
+          schema:
+            properties:
+              type:
+                type: number
+                example: -1
+              data:
+                properties:
+                  message:
+                    type: string
+                    example: "locker not found"
+        401:
+          description: Error message
+          schema:
+            properties:
+              type:
+                type: number
+                example: -1
+              data:
+                properties:
+                  message:
+                    type: string
+                    example: "jwt must be provided"
+  
+  
+  /vendings/type/1:
+    get:
+      tags:
+      - vendings
+      summary: Consultar los productos de una vending
+      operationId: consultVendingProducts
+      description: |
+        
+        type: Es la orden a ejecutar
+        data: Es el objeto que lleva todo el mensaje de la orden
+        
+        Si todo está marchando bien, el socket le devolverá el mismo "type" que mandaste
+        De lo contrario, la respuesta será un "type": -1
+        
+        Se debe mandar los siguientes parametros en el objeto "data"
+        
+        user_id: Identificador único del usuario
+        machine_id: Identificador de la vending
+        token: JWT de autenticacion
+
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: body
+          name: body
+          schema:
+            properties:
+              type: 
+                type: number
+                example: 4
+              data:
+                properties:
+                  user_id: 
+                    type: string
+                    format: uuid
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+
+      responses:
+        200:
+          description: Vendings disponibles
+          schema:
+            properties:
+              type: 
+                type: number
+                example: 4
+              data:
+                properties:
+                  locker_name:
+                    type: string
+                    example: "the locker name"
+                  boxes:
+                    type: array
+                    items:
+                      properties:
+                        name:
+                          type: string
+                          example: "Box1_name"
+                        is_open:
+                          type: boolean
+                          example: false
+        400:
+          description: Error message
+          schema:
+            properties:
+              type:
+                type: number
+                example: -1
+              data:
+                properties:
+                  message:
+                    type: string
+                    example: "lockers not found"
+        401:
+          description: Error message
+          schema:
+            properties:
+              type:
+                type: number
+                example: -1
+              data:
+                properties:
+                  message:
+                    type: string
+                    example: "jwt must be provided"
+  
+  
+  /vendings/type/2:
+    get:
+      tags:
+      - vendings
+      summary: Obtener detalles de una vending
+      operationId: getMachineDetails
+      description: |
+        
+        type: Es la orden a ejecutar
+        data: Es el objeto que lleva todo el mensaje de la orden
+        
+        Si todo está marchando bien, el socket le devolverá el mismo "type" que mandaste
+        De lo contrario, la respuesta será un "type": -1
+        
+        Se debe mandar los siguientes parametros en el objeto "data"
+        
+        user_id: Identificador único del usuario
+        locker_name: Nombre del locker a consultar
+        box_name: Nombre de la caja que se quiere abrir
+        token: JWT de autenticacion
+
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: body
+          name: body
+          schema:
+            properties:
+              type: 
+                type: number
+                example: 5
+              data:
+                properties:
+                  user_id: 
+                    type: string
+                    format: uuid
+                  locker_name:
+                    type: string
+                    example: "locker-10001/"
+                  box_name:
+                    type: string
+                    example: "Box1_name"
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+
+      responses:
+        200:
+          description: Vendings disponibles
+          schema:
+            properties:
+              type: 
+                type: number
+                example: 5
+              data:
+                properties:
+                  locker_name:
+                    type: string
+                    example: "the locker name"
+                  box_name:
+                    type: string
+                    example: "Box1_name"
+                  is_open:
+                    type: boolean
+                    example: false
+        400:
+          description: Error message
+          schema:
+            properties:
+              type:
+                type: number
+                example: -1
+              data:
+                properties:
+                  message:
+                    type: string
+                    example: "locker not found"
+        401:
+          description: Error message
+          schema:
+            properties:
+              type:
+                type: number
+                example: -1
+              data:
+                properties:
+                  message:
+                    type: string
+                    example: "jwt must be provided"
+  
+  /vendings/type/3:
+    get:
+      tags:
+      - vendings
+      summary: Dispensar productos
+      operationId: dispenseProducts
+      description: |
+        
+        type: Es la orden a ejecutar
+        data: Es el objeto que lleva todo el mensaje de la orden
+        
+        Si todo está marchando bien, el socket le devolverá el mismo "type" que mandaste
+        De lo contrario, la respuesta será un "type": -1
+        
+        Se debe mandar los siguientes parametros en el objeto "data"
+        
+        user_id: Identificador único del usuario
+        locker_name: Nombre del locker a consultar
+        box_name: Nombre de la caja que se quiere abrir
+        token: JWT de autenticacion
+
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: body
+          name: body
+          schema:
+            properties:
+              type: 
+                type: number
+                example: 5
+              data:
+                properties:
+                  user_id: 
+                    type: string
+                    format: uuid
+                  locker_name:
+                    type: string
+                    example: "locker-10001/"
+                  box_name:
+                    type: string
+                    example: "Box1_name"
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+
+      responses:
+        200:
+          description: Vendings disponibles
+          schema:
+            properties:
+              type: 
+                type: number
+                example: 5
+              data:
+                properties:
+                  locker_name:
+                    type: string
+                    example: "the locker name"
+                  box_name:
+                    type: string
+                    example: "Box1_name"
+                  is_open:
+                    type: boolean
+                    example: false
+        400:
+          description: Error message
+          schema:
+            properties:
+              type:
+                type: number
+                example: -1
+              data:
+                properties:
+                  message:
+                    type: string
+                    example: "locker not found"
+        401:
+          description: Error message
+          schema:
+            properties:
+              type:
+                type: number
+                example: -1
+              data:
+                properties:
+                  message:
+                    type: string
+                    example: "jwt must be provided"
+  
+
   /lockers/:
     get:
       tags:
@@ -1088,7 +954,7 @@ paths:
                     type: string
                     example: "jwt must be provided"
   
-  /lockers/type/3:
+  /lockers/type/4:
     get:
       tags:
       - lockers
@@ -1181,7 +1047,7 @@ paths:
                     example: "jwt must be provided"
   
   
-  /lockers/type/4:
+  /lockers/type/5:
     get:
       tags:
       - lockers
@@ -1270,7 +1136,7 @@ paths:
                     example: "jwt must be provided"
   
   
-  /lockers/type/5:
+  /lockers/type/6:
     get:
       tags:
       - lockers

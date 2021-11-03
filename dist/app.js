@@ -5,10 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.server = void 0;
 const express_1 = __importDefault(require("express"));
-const routes_1 = __importDefault(require("./modules/vending/routes"));
-const routes_2 = __importDefault(require("./modules/user/routes"));
-const routes_3 = __importDefault(require("./modules/admin/routes"));
-const routes_4 = __importDefault(require("./modules/services/routes"));
+const routes_1 = __importDefault(require("./modules/user/routes"));
+const routes_2 = __importDefault(require("./modules/admin/routes"));
+const routes_3 = __importDefault(require("./modules/services/routes"));
 const path_1 = __importDefault(require("path"));
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const http_1 = __importDefault(require("http"));
@@ -25,10 +24,9 @@ app.use(cors_1.default());
 // Routes
 const swaggerDocument = require('../swagger.json');
 app.use('/docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swaggerDocument));
-app.use('/api/users', routes_2.default);
-app.use('/api/users', routes_2.default);
-app.use('/api/vendings', routes_1.default);
-app.use('/api/services', routes_4.default);
-app.use('/api/admins', routes_3.default);
+app.use('/api/users', routes_1.default);
+app.use('/api/users', routes_1.default);
+app.use('/api/services', routes_3.default);
+app.use('/api/admins', routes_2.default);
 exports.default = app;
 //# sourceMappingURL=app.js.map
