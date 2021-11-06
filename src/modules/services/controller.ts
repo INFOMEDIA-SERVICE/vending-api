@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { servicesRepository } from './repository';
 import { IProduct, IQueryResponse } from '../../interfaces/postgres_responses';
 import { IService } from './model';
+import { IUser } from '../../modules/user/model';
 
 class ServiceController {
 
@@ -24,6 +25,8 @@ class ServiceController {
 
     public createNoRequest = async (service: IService): Promise<IQueryResponse> => {
         const response: IQueryResponse = await servicesRepository.create(service);
+
+        console.log(`SERVICE ${JSON.stringify(response.data)}`);
 
         if (response.ok) {
 
@@ -152,9 +155,9 @@ class ServiceController {
 
     public me = async (req: Request, res: Response): Promise<void> => {
 
-        const user = req.body.user;
+        const user: IUser | null = req.body.user;
 
-        const response: IQueryResponse = await servicesRepository.getByUserId(user.id);
+        const response: IQueryResponse = await servicesRepository.getByUserId(user?.id ?? '');
 
         if (response.ok) {
 

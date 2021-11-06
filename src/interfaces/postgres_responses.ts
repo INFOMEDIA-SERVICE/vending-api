@@ -4,10 +4,11 @@ export interface IQueryResponse {
 }
 
 export interface IProduct {
-    stock: number
-    key: string
-    value: number
-    quantity: number
+    stock?: number
+    key?: string
+    description?: string
+    value?: number
+    quantity?: number
     service_id?: string
-    dispensed?: string
+    dispensed?: boolean
 }

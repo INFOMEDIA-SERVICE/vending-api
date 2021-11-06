@@ -29,6 +29,7 @@ class ServiceController {
         });
         this.createNoRequest = (service) => __awaiter(this, void 0, void 0, function* () {
             const response = yield repository_1.servicesRepository.create(service);
+            console.log(`SERVICE ${JSON.stringify(response.data)}`);
             if (response.ok) {
                 let products = service.products;
                 let newService = response.data;
@@ -130,8 +131,9 @@ class ServiceController {
             }
         });
         this.me = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const user = req.body.user;
-            const response = yield repository_1.servicesRepository.getByUserId(user.id);
+            const response = yield repository_1.servicesRepository.getByUserId((_a = user === null || user === void 0 ? void 0 : user.id) !== null && _a !== void 0 ? _a : '');
             if (response.ok) {
                 const services = response.data;
                 for (const service of services) {
