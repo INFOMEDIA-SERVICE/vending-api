@@ -7,8 +7,22 @@ class ServiceController {
 
     public create = async (req: Request, res: Response) => {
 
-        const service = req.body;
+        const service: IService = req.body;
 
+        const response = await this.createNoRequest(service);
+
+        if (response.ok) {
+            res.send({
+                service: response.data,
+            });
+        } else {
+            res.send(400).json({
+                message: response.data
+            });
+        }
+    };
+
+    public createNoRequest = async (service: IService): Promise<IQueryResponse> => {
         const response: IQueryResponse = await servicesRepository.create(service);
 
         if (response.ok) {
@@ -24,13 +38,19 @@ class ServiceController {
                 newService.products.push(product);
             }
 
-            res.send({
-                service: newService,
-            });
+            return {
+                ok: true,
+                data: {
+                    service: newService,
+                }
+            }
         } else {
-            res.send(400).json({
-                message: response.data
-            });
+            return {
+                ok: false,
+                data: {
+                    message: response.data,
+                },
+            };
         }
     };
 

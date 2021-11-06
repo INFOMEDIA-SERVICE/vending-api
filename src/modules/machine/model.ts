@@ -58,6 +58,7 @@ class SocketUsers {
         if (index === -1) return false;
 
         this.users[index].active = !this.users[index].active;
+        this.users[index].mqtt = undefined;
 
         return true;
     };

@@ -15,6 +15,19 @@ class ServiceController {
     constructor() {
         this.create = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const service = req.body;
+            const response = yield this.createNoRequest(service);
+            if (response.ok) {
+                res.send({
+                    service: response.data,
+                });
+            }
+            else {
+                res.send(400).json({
+                    message: response.data
+                });
+            }
+        });
+        this.createNoRequest = (service) => __awaiter(this, void 0, void 0, function* () {
             const response = yield repository_1.servicesRepository.create(service);
             if (response.ok) {
                 let products = service.products;
@@ -25,14 +38,20 @@ class ServiceController {
                     yield repository_1.servicesRepository.insertProduct(product);
                     newService.products.push(product);
                 }
-                res.send({
-                    service: newService,
-                });
+                return {
+                    ok: true,
+                    data: {
+                        service: newService,
+                    }
+                };
             }
             else {
-                res.send(400).json({
-                    message: response.data
-                });
+                return {
+                    ok: false,
+                    data: {
+                        message: response.data,
+                    },
+                };
             }
         });
         this.getServicesByUser = (req, res) => __awaiter(this, void 0, void 0, function* () {

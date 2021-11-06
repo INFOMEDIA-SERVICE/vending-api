@@ -17,6 +17,7 @@ const mqtt_1 = __importDefault(require("mqtt"));
 const uuid_1 = require("uuid");
 const model_1 = require("./model");
 const events_1 = require("events");
+const controller_1 = require("../services/controller");
 var MachineTypes;
 (function (MachineTypes) {
     MachineTypes[MachineTypes["List"] = 0] = "List";
@@ -45,6 +46,7 @@ class SocketController {
         this.host = process.env.MQTT_HOST;
         this.onConnect = (socket) => __awaiter(this, void 0, void 0, function* () {
             socket.on('message', (data) => this.onMessage(socket, data));
+            socket.on('close', () => this.onDisconnectedUser(socket));
         });
         this.onMessage = (socket, data) => __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -180,16 +182,19 @@ class SocketController {
                     }
                 }));
             }
-            const listener = new Emitter();
             user.mqtt.subscribe(`${this.machineResponseTopic}`);
             const params = {
                 action: 'vend.request',
                 device_id: machine_id,
                 credit: 1000,
                 tid: '6789A3456',
-                items: products,
+                items: products.map((p) => {
+                    return {
+                        key: p.key,
+                        qty: p.quantity,
+                    };
+                }),
             };
-            console.log(params);
             user.mqtt.publish(`${this.machineRequestTopic}`, JSON.stringify(params));
             user.mqtt.on('message', (_, message) => {
                 const response = JSON.parse(message.toString());
@@ -199,11 +204,15 @@ class SocketController {
                         delete response.action;
                         user.socket.send(JSON.stringify({
                             type: 3,
-                            data: response,
+                            data: {
+                                success: response.sucess === 'true',
+                                products_dispensed: response.pcount,
+                                item: response.item,
+                            },
                         }));
                         break;
                     case 'vend.closed':
-                        listener.emit('save');
+                        this.createService(user, machine_id);
                         user.socket.send(JSON.stringify({
                             type: 3,
                             data: {
@@ -214,33 +223,21 @@ class SocketController {
                 }
             });
         });
-        this.createService = (listener, user, machine_id) => {
+        this.createService = (user, machine_id) => __awaiter(this, void 0, void 0, function* () {
             let products = [];
             let value = 0;
-            listener.on('addProduct', (data) => {
-                products.push(data);
+            products.forEach((p) => {
+                value += p.value;
             });
-            listener.on('save', () => __awaiter(this, void 0, void 0, function* () {
-                products.forEach((p) => {
-                    value += p.value;
-                });
-                // const response = await servicesController.create({
-                //     machine_id,
-                //     user_id: user.user_id,
-                //     products,
-                //     value,
-                //     success: value >= 0
-                // });
-                // console.log(`RESPONSE SERVICE: ${response.service} MESSAGE ${response.message}`);
-                // return user.socket!.send(JSON.stringify({
-                //     type: 0,
-                //     data: {
-                //         message: 'sale summary',
-                //         service: response.service
-                //     }
-                // }));
-            }));
-        };
+            const response = yield controller_1.servicesController.createNoRequest({
+                machine_id,
+                user_id: user.user_id,
+                products,
+                value,
+                success: value >= 0
+            });
+            console.log(`RESPONSE SERVICE: ${response.data.service} MESSAGE ${response.data.message}`);
+        });
         this.saveUser = (socket, message) => __awaiter(this, void 0, void 0, function* () {
             const user = {
                 socket,
@@ -357,6 +354,9 @@ class SocketController {
             };
             return mqtt_1.default.connect(this.host, options);
         };
+        this.onDisconnectedUser = (socket) => __awaiter(this, void 0, void 0, function* () {
+            model_1.socketUsers.disconnectUser(socket);
+        });
     }
 }
 exports.socketController = new SocketController;

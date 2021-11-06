@@ -44,6 +44,7 @@ class SocketController {
 
     public onConnect = async (socket: ws): Promise<void> => {
         socket.on('message', (data) => this.onMessage(socket, data));
+        socket.on('close', () => this.onDisconnectedUser(socket));
     };
 
     private onMessage = async (socket: ws, data: ws.Data): Promise<void> => {
@@ -200,8 +201,6 @@ class SocketController {
             }));
         }
 
-        const listener: Emitter = new Emitter();
-
         user.mqtt!.subscribe(`${this.machineResponseTopic}`);
 
         const params = {
@@ -209,10 +208,13 @@ class SocketController {
             device_id: machine_id,
             credit: 1000,
             tid: '6789A3456',
-            items: products,
+            items: products.map((p) => {
+                return {
+                    key: p.key,
+                    qty: p.quantity,
+                };
+            }),
         };
-
-        console.log(params);
 
         user.mqtt!.publish(
             `${this.machineRequestTopic}`,
@@ -230,13 +232,16 @@ class SocketController {
                     delete response.action;
                     user.socket!.send(JSON.stringify({
                         type: 3,
-                        data: response,
+                        data: {
+                            success: response.sucess === 'true',
+                            products_dispensed: response.pcount,
+                            item: response.item,
+                        },
                     }));
                     break;
 
                 case 'vend.closed':
-
-                    listener.emit('save');
+                    this.createService(user, machine_id);
                     user.socket!.send(JSON.stringify({
                         type: 3,
                         data: {
@@ -249,39 +254,24 @@ class SocketController {
         });
     };
 
-    private createService = (listener: Emitter, user: ISocketUser, machine_id: string) => {
+    private createService = async (user: ISocketUser, machine_id: string): Promise<void> => {
 
         let products: IProduct[] = [];
         let value: number = 0;
 
-        listener.on('addProduct', (data) => {
-            products.push(data);
+        products.forEach((p) => {
+            value += p.value
         });
 
-        listener.on('save', async () => {
-
-            products.forEach((p) => {
-                value += p.value
-            });
-
-            // const response = await servicesController.create({
-            //     machine_id,
-            //     user_id: user.user_id,
-            //     products,
-            //     value,
-            //     success: value >= 0
-            // });
-
-            // console.log(`RESPONSE SERVICE: ${response.service} MESSAGE ${response.message}`);
-
-            // return user.socket!.send(JSON.stringify({
-            //     type: 0,
-            //     data: {
-            //         message: 'sale summary',
-            //         service: response.service
-            //     }
-            // }));
+        const response = await servicesController.createNoRequest({
+            machine_id,
+            user_id: user.user_id,
+            products,
+            value,
+            success: value >= 0
         });
+
+        console.log(`RESPONSE SERVICE: ${response.data.service} MESSAGE ${response.data.message}`);
     }
 
     private saveUser = async (socket: ws, message: IMessage): Promise<void> => {
@@ -432,6 +422,10 @@ class SocketController {
         };
 
         return mqtt.connect(this.host, options);
+    }
+
+    private onDisconnectedUser = async (socket: ws): Promise<void> => {
+        socketUsers.disconnectUser(socket);
     }
 }
 
