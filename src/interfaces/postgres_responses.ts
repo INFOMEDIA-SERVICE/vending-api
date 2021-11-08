@@ -6,6 +6,7 @@ export interface IQueryResponse {
 export interface IProduct {
     stock?: number
     key?: string
+    name?: string
     description?: string
     value?: number
     quantity?: number

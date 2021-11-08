@@ -29,6 +29,7 @@ var MachineActions;
     MachineActions["Dispensing"] = "vending.dispensing";
     MachineActions["VendFinished"] = "vending.vend.finished";
     MachineActions["StartingVend"] = "vending.vend.startind";
+    MachineActions["RequestingVend"] = "vend.request";
 })(MachineActions || (MachineActions = {}));
 var LockersTypes;
 (function (LockersTypes) {
@@ -51,12 +52,14 @@ class SocketController {
         this.host = process.env.MQTT_HOST;
         this.listener = new Emitter();
         this.onConnect = (socket) => __awaiter(this, void 0, void 0, function* () {
+            console.log('user connected');
             socket.on('message', (data) => this.onMessage(socket, data));
             socket.on('close', () => this.onDisconnectedUser(socket));
         });
         this.onMessage = (socket, data) => __awaiter(this, void 0, void 0, function* () {
             var _a;
             const message = JSON.parse(data.toString());
+            console.log(message);
             this.saveUser(socket, message);
             const user = model_1.socketUsers.getUserById(message.data.user_id);
             if (!((_a = user.mqtt) === null || _a === void 0 ? void 0 : _a.connected)) {
@@ -130,7 +133,6 @@ class SocketController {
                 console.log(response);
                 switch (response.action) {
                     case 'product.list.response':
-                        this.listener.emit('products_list', response.products);
                         if (responseToUser) {
                             user.socket.send(JSON.stringify({
                                 type: MachineTypes.GetProducts,
@@ -138,6 +140,9 @@ class SocketController {
                                     products: response.products,
                                 },
                             }));
+                        }
+                        else {
+                            this.listener.emit('products_list', response.products);
                         }
                         break;
                 }
@@ -174,106 +179,119 @@ class SocketController {
         this.dispense = (user, message) => __awaiter(this, void 0, void 0, function* () {
             this.getMachineProducts(user, message, false);
             this.listener.on('products_list', (data) => {
-                const allProducts = data;
-                const machine_id = message.data.machine_id;
-                const user_id = message.data.user_id;
-                const products = message.data.products;
-                var serviceProducts = [];
-                if (!products) {
+                this.listener.removeAllListeners('products_list');
+                this.dispenseExecution(user, message, data);
+            });
+        });
+        this.dispenseExecution = (user, message, data) => __awaiter(this, void 0, void 0, function* () {
+            const allProducts = data;
+            const machine_id = message.data.machine_id;
+            const user_id = message.data.user_id;
+            const products = message.data.products;
+            var serviceProducts = [];
+            if (!products) {
+                return user.socket.send(JSON.stringify({
+                    type: Types.Error,
+                    data: {
+                        message: `products are required`,
+                    }
+                }));
+            }
+            for (const product of products) {
+                const index = allProducts.findIndex((p) => {
+                    return product.key === p.key;
+                });
+                if (index === -1) {
+                    const productIndex = products.findIndex((p) => {
+                        return product.key === p.key;
+                    });
+                    products.splice(productIndex, 1);
                     return user.socket.send(JSON.stringify({
                         type: Types.Error,
                         data: {
-                            message: `products are required`,
+                            message: `product ${product.key} does'nt exists`,
                         }
                     }));
                 }
-                for (const product of products) {
-                    const index = allProducts.findIndex((p) => {
-                        return product.key === p.key;
-                    });
-                    if (index === -1) {
-                        const productIndex = products.findIndex((p) => {
-                            return product.key === p.key;
-                        });
-                        products.splice(productIndex, 1);
-                        return user.socket.send(JSON.stringify({
-                            type: Types.Error,
+                product.value = allProducts[index].value;
+            }
+            let value = 0;
+            products.forEach((p) => {
+                return value += p.value * p.quantity;
+            });
+            user.mqtt.subscribe(`${this.machineResponseTopic}`);
+            const params = {
+                action: 'vend.request',
+                device_id: machine_id,
+                credit: value,
+                tid: Math.random().toString(36).substring(2, 9),
+                items: products.map((p) => {
+                    return {
+                        key: p.key,
+                        qty: p.quantity,
+                    };
+                }),
+            };
+            user.mqtt.publish(`${this.machineRequestTopic}`, JSON.stringify(params));
+            user.mqtt.on('message', (_, message) => {
+                const response = JSON.parse(message.toString());
+                console.log('ACTION:' + response.action);
+                switch (response.action) {
+                    case 'machine.vend.start':
+                        user.socket.send(JSON.stringify({
+                            type: MachineTypes.Dispense,
+                            action: MachineActions.StartingVend,
                             data: {
-                                message: `product ${product.key} does'nt exists`,
+                                message: 'starting vend',
+                            },
+                        }));
+                        break;
+                    case 'vend.request':
+                        user.socket.send(JSON.stringify({
+                            type: MachineTypes.Dispense,
+                            action: MachineActions.RequestingVend,
+                            data: {
+                                message: 'requesting vend',
+                            },
+                        }));
+                        break;
+                    case 'vend.dispensing':
+                        delete response.action;
+                        serviceProducts.push({
+                            key: response.item,
+                            dispensed: response.sucess === 'true',
+                            quantity: response.pcount,
+                            value: response.value,
+                        });
+                        user.socket.send(JSON.stringify({
+                            type: MachineTypes.Dispense,
+                            action: MachineActions.Dispensing,
+                            data: {
+                                success: response.sucess === 'true',
+                                products_dispensed: response.pcount,
+                                key: response.item,
+                            },
+                        }));
+                        break;
+                    case 'vend.closed':
+                        console.log(JSON.stringify(serviceProducts));
+                        const service = {
+                            machine_id,
+                            user_id: user_id,
+                            products: serviceProducts,
+                            value,
+                            success: serviceProducts.findIndex((p) => p.dispensed || false) !== -1,
+                        };
+                        user.socket.send(JSON.stringify({
+                            type: MachineTypes.Dispense,
+                            action: MachineActions.VendFinished,
+                            data: {
+                                message: 'sale finished'
                             }
                         }));
-                    }
-                    product.value = allProducts[index].value;
+                        controller_1.servicesController.createNoRequest(service);
+                        break;
                 }
-                let value = 0;
-                products.forEach((p) => {
-                    return value += p.value * p.quantity;
-                });
-                user.mqtt.subscribe(`${this.machineResponseTopic}`);
-                const params = {
-                    action: 'vend.request',
-                    device_id: machine_id,
-                    credit: value,
-                    tid: '6789A3456',
-                    items: products.map((p) => {
-                        return {
-                            key: p.key,
-                            qty: p.quantity,
-                        };
-                    }),
-                };
-                user.mqtt.publish(`${this.machineRequestTopic}`, JSON.stringify(params));
-                user.mqtt.on('message', (_, message) => {
-                    const response = JSON.parse(message.toString());
-                    console.log(response);
-                    switch (response.action) {
-                        case 'machine.vend.start':
-                            user.socket.send(JSON.stringify({
-                                type: MachineTypes.Dispense,
-                                action: MachineActions.StartingVend,
-                                data: {
-                                    message: 'starting vend',
-                                },
-                            }));
-                            break;
-                        case 'vend.dispensing':
-                            delete response.action;
-                            serviceProducts.push({
-                                key: response.item,
-                                dispensed: response.sucess === 'true',
-                                quantity: response.pcount,
-                                value: response.value,
-                            });
-                            user.socket.send(JSON.stringify({
-                                type: MachineTypes.Dispense,
-                                action: MachineActions.Dispensing,
-                                data: {
-                                    success: response.sucess === 'true',
-                                    products_dispensed: response.pcount,
-                                    key: response.item,
-                                },
-                            }));
-                            break;
-                        case 'vend.closed':
-                            console.log(JSON.stringify(serviceProducts));
-                            const service = {
-                                machine_id,
-                                user_id: user_id,
-                                products: serviceProducts,
-                                value,
-                                success: serviceProducts.findIndex((p) => p.dispensed || false) !== -1,
-                            };
-                            user.socket.send(JSON.stringify({
-                                type: MachineTypes.Dispense,
-                                action: MachineActions.VendFinished,
-                                data: {
-                                    message: 'sale finished'
-                                }
-                            }));
-                            controller_1.servicesController.createNoRequest(service);
-                            break;
-                    }
-                });
             });
         });
         this.saveUser = (socket, message) => __awaiter(this, void 0, void 0, function* () {

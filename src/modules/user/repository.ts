@@ -11,20 +11,18 @@ class UsersRepository {
 
         return database.query(
             `insert into ${this.table}(first_name, last_name, email, password, role) values('${user.first_name}', '${user.last_name}', '${user.email}', '${user.password}', 0) RETURNING *`
-        )
-            .then((value) => {
-                return {
-                    ok: true,
-                    data: value.rows[0]
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-                return {
-                    ok: false,
-                    data: err.message
-                }
-            });
+        ).then((value) => {
+            return {
+                ok: true,
+                data: value.rows[0]
+            }
+        }).catch((err) => {
+            console.log(err);
+            return {
+                ok: false,
+                data: err.message
+            }
+        });
     }
 
     public login = async (email: string): Promise<IQueryResponse> => {

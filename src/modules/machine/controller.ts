@@ -22,7 +22,8 @@ enum MachineTypes {
 enum MachineActions {
     Dispensing = 'vending.dispensing',
     VendFinished = 'vending.vend.finished',
-    StartingVend = 'vending.vend.startind'
+    StartingVend = 'vending.vend.startind',
+    RequestingVend = 'vend.request',
 }
 
 enum LockersTypes {
@@ -48,6 +49,7 @@ class SocketController {
     private listener: Emitter = new Emitter();
 
     public onConnect = async (socket: ws): Promise<void> => {
+        console.log('user connected');
         socket.on('message', (data) => this.onMessage(socket, data));
         socket.on('close', () => this.onDisconnectedUser(socket));
     };
@@ -55,6 +57,8 @@ class SocketController {
     private onMessage = async (socket: ws, data: ws.Data): Promise<void> => {
 
         const message: IMessage = JSON.parse(data.toString());
+
+        console.log(message);
 
         this.saveUser(socket, message);
 
@@ -127,7 +131,6 @@ class SocketController {
             device_id: message.data.machine_id,
         }));
 
-
         user.mqtt!.on('message', (_, message) => {
 
             const response = JSON.parse(message.toString());
@@ -136,7 +139,6 @@ class SocketController {
 
             switch (response.action) {
                 case 'product.list.response':
-                    this.listener.emit('products_list', response.products);
                     if (responseToUser) {
                         user.socket!.send(JSON.stringify({
                             type: MachineTypes.GetProducts,
@@ -144,6 +146,8 @@ class SocketController {
                                 products: response.products,
                             },
                         }));
+                    } else {
+                        this.listener.emit('products_list', response.products);
                     }
                     break;
             }
@@ -190,135 +194,149 @@ class SocketController {
         this.getMachineProducts(user, message, false);
 
         this.listener.on('products_list', (data) => {
+            this.listener.removeAllListeners('products_list')
+            this.dispenseExecution(user, message, data);
+        });
+    };
 
-            const allProducts: IProduct[] = data;
-            const machine_id: string = message.data.machine_id;
-            const user_id: string = message.data.user_id;
+    public dispenseExecution = async (user: ISocketUser, message: IMessage, data: any): Promise<void> => {
 
-            const products: IProduct[] = message.data.products;
+        const allProducts: IProduct[] = data;
+        const machine_id: string = message.data.machine_id;
+        const user_id: string = message.data.user_id;
 
-            var serviceProducts: IProduct[] = [];
+        const products: IProduct[] = message.data.products;
 
-            if (!products) {
+        var serviceProducts: IProduct[] = [];
+
+        if (!products) {
+            return user.socket!.send(JSON.stringify({
+                type: Types.Error,
+                data: {
+                    message: `products are required`,
+                }
+            }));
+        }
+
+        for (const product of products) {
+            const index: number = allProducts.findIndex((p: IProduct): boolean => {
+                return product.key === p.key;
+            });
+
+            if (index === -1) {
+
+                const productIndex: number = products.findIndex((p: IProduct): boolean => {
+                    return product.key === p.key;
+                });
+
+                products.splice(productIndex, 1);
                 return user.socket!.send(JSON.stringify({
                     type: Types.Error,
                     data: {
-                        message: `products are required`,
+                        message: `product ${product.key} does'nt exists`,
                     }
                 }));
             }
 
-            for (const product of products) {
-                const index: number = allProducts.findIndex((p: IProduct): boolean => {
-                    return product.key === p.key;
-                });
+            product.value = allProducts[index].value;
+        }
 
-                if (index === -1) {
+        let value: number = 0;
 
-                    const productIndex: number = products.findIndex((p: IProduct): boolean => {
-                        return product.key === p.key;
+        products.forEach((p) => {
+            return value += p.value! * p.quantity!;
+        });
+
+        user.mqtt!.subscribe(`${this.machineResponseTopic}`);
+
+        const params = {
+            action: 'vend.request',
+            device_id: machine_id,
+            credit: value,
+            tid: Math.random().toString(36).substring(2, 9),
+            items: products.map((p) => {
+                return {
+                    key: p.key,
+                    qty: p.quantity,
+                };
+            }),
+        };
+
+        user.mqtt!.publish(
+            `${this.machineRequestTopic}`,
+            JSON.stringify(params)
+        );
+
+        user.mqtt!.on('message', (_, message) => {
+
+            const response = JSON.parse(message.toString());
+
+            console.log('ACTION:' + response.action);
+
+            switch (response.action) {
+                case 'machine.vend.start':
+                    user.socket!.send(JSON.stringify({
+                        type: MachineTypes.Dispense,
+                        action: MachineActions.StartingVend,
+                        data: {
+                            message: 'starting vend',
+                        },
+                    }));
+                    break;
+                case 'vend.request':
+                    user.socket!.send(JSON.stringify({
+                        type: MachineTypes.Dispense,
+                        action: MachineActions.RequestingVend,
+                        data: {
+                            message: 'requesting vend',
+                        },
+                    }));
+                    break;
+                case 'vend.dispensing':
+                    delete response.action;
+
+                    serviceProducts.push({
+                        key: response.item,
+                        dispensed: response.sucess === 'true',
+                        quantity: response.pcount,
+                        value: response.value,
                     });
 
-                    products.splice(productIndex, 1);
-                    return user.socket!.send(JSON.stringify({
-                        type: Types.Error,
+                    user.socket!.send(JSON.stringify({
+                        type: MachineTypes.Dispense,
+                        action: MachineActions.Dispensing,
                         data: {
-                            message: `product ${product.key} does'nt exists`,
+                            success: response.sucess === 'true',
+                            products_dispensed: response.pcount,
+                            key: response.item,
+                        },
+                    }));
+                    break;
+
+                case 'vend.closed':
+
+                    console.log(JSON.stringify(serviceProducts));
+
+                    const service: IService = {
+                        machine_id,
+                        user_id: user_id,
+                        products: serviceProducts,
+                        value,
+                        success: serviceProducts.findIndex((p: IProduct): boolean => p.dispensed || false) !== -1,
+                    };
+
+                    user.socket!.send(JSON.stringify({
+                        type: MachineTypes.Dispense,
+                        action: MachineActions.VendFinished,
+                        data: {
+                            message: 'sale finished'
                         }
                     }));
-                }
 
-                product.value = allProducts[index].value;
+                    servicesController.createNoRequest(service);
+
+                    break;
             }
-
-            let value: number = 0;
-
-            products.forEach((p) => {
-                return value += p.value! * p.quantity!;
-            });
-
-            user.mqtt!.subscribe(`${this.machineResponseTopic}`);
-
-            const params = {
-                action: 'vend.request',
-                device_id: machine_id,
-                credit: value,
-                tid: '6789A3456',
-                items: products.map((p) => {
-                    return {
-                        key: p.key,
-                        qty: p.quantity,
-                    };
-                }),
-            };
-
-            user.mqtt!.publish(
-                `${this.machineRequestTopic}`,
-                JSON.stringify(params)
-            );
-
-            user.mqtt!.on('message', (_, message) => {
-
-                const response = JSON.parse(message.toString());
-
-                console.log(response);
-
-                switch (response.action) {
-                    case 'machine.vend.start':
-                        user.socket!.send(JSON.stringify({
-                            type: MachineTypes.Dispense,
-                            action: MachineActions.StartingVend,
-                            data: {
-                                message: 'starting vend',
-                            },
-                        }));
-                        break;
-                    case 'vend.dispensing':
-                        delete response.action;
-
-                        serviceProducts.push({
-                            key: response.item,
-                            dispensed: response.sucess === 'true',
-                            quantity: response.pcount,
-                            value: response.value,
-                        });
-
-                        user.socket!.send(JSON.stringify({
-                            type: MachineTypes.Dispense,
-                            action: MachineActions.Dispensing,
-                            data: {
-                                success: response.sucess === 'true',
-                                products_dispensed: response.pcount,
-                                key: response.item,
-                            },
-                        }));
-                        break;
-
-                    case 'vend.closed':
-
-                        console.log(JSON.stringify(serviceProducts));
-
-                        const service: IService = {
-                            machine_id,
-                            user_id: user_id,
-                            products: serviceProducts,
-                            value,
-                            success: serviceProducts.findIndex((p: IProduct): boolean => p.dispensed || false) !== -1,
-                        };
-
-                        user.socket!.send(JSON.stringify({
-                            type: MachineTypes.Dispense,
-                            action: MachineActions.VendFinished,
-                            data: {
-                                message: 'sale finished'
-                            }
-                        }));
-
-                        servicesController.createNoRequest(service);
-
-                        break;
-                }
-            });
         });
     };
 

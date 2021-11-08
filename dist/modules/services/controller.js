@@ -29,7 +29,6 @@ class ServiceController {
         });
         this.createNoRequest = (service) => __awaiter(this, void 0, void 0, function* () {
             const response = yield repository_1.servicesRepository.create(service);
-            console.log(`SERVICE ${JSON.stringify(response.data)}`);
             if (response.ok) {
                 let products = service.products;
                 let newService = response.data;

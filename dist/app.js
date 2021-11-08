@@ -25,7 +25,6 @@ app.use(cors_1.default());
 const swaggerDocument = require('../swagger.json');
 app.use('/docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swaggerDocument));
 app.use('/api/users', routes_1.default);
-app.use('/api/users', routes_1.default);
 app.use('/api/services', routes_3.default);
 app.use('/api/admins', routes_2.default);
 exports.default = app;

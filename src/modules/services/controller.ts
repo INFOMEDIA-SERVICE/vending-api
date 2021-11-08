@@ -26,8 +26,6 @@ class ServiceController {
     public createNoRequest = async (service: IService): Promise<IQueryResponse> => {
         const response: IQueryResponse = await servicesRepository.create(service);
 
-        console.log(`SERVICE ${JSON.stringify(response.data)}`);
-
         if (response.ok) {
 
             let products: IProduct[] = service.products;

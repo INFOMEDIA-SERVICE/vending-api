@@ -30,7 +30,6 @@ const swaggerDocument: any = require('../swagger.json');
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use('/api/users', usersRoutes);
-app.use('/api/users', usersRoutes);
 app.use('/api/services', servicesRoutes);
 app.use('/api/admins', adminRoutes);
 
