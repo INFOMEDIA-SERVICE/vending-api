@@ -59,7 +59,6 @@ class SocketController {
         this.onMessage = (socket, data) => __awaiter(this, void 0, void 0, function* () {
             var _a;
             const message = JSON.parse(data.toString());
-            console.log(message);
             this.saveUser(socket, message);
             const user = model_1.socketUsers.getUserById(message.data.user_id);
             if (!((_a = user.mqtt) === null || _a === void 0 ? void 0 : _a.connected)) {
@@ -82,10 +81,10 @@ class SocketController {
                     break;
                 // Lockers
                 case LockersTypes.List:
-                    this.consultLocker(user, message);
+                    this.consultAllLockers(socket, message);
                     break;
                 case LockersTypes.GetLocker:
-                    this.consultAllLockers(socket, message);
+                    this.consultLocker(user, message);
                     break;
                 case LockersTypes.OpenLocker:
                     this.openBox(user, message);
@@ -130,7 +129,6 @@ class SocketController {
             }));
             user.mqtt.on('message', (_, message) => {
                 const response = JSON.parse(message.toString());
-                console.log(response);
                 switch (response.action) {
                     case 'product.list.response':
                         if (responseToUser) {
@@ -235,7 +233,6 @@ class SocketController {
             user.mqtt.publish(`${this.machineRequestTopic}`, JSON.stringify(params));
             user.mqtt.on('message', (_, message) => {
                 const response = JSON.parse(message.toString());
-                console.log('ACTION:' + response.action);
                 switch (response.action) {
                     case 'machine.vend.start':
                         user.socket.send(JSON.stringify({
@@ -310,13 +307,12 @@ class SocketController {
                 password: process.env.LOCKERS_PASSWORD,
                 port: parseInt(process.env.MQTT_PORT || '10110') || 10110,
             };
+            console.log(user_id);
             let client = mqtt_1.default.connect(this.host, options);
+            client.subscribe(this.lockersResponseTopic);
             client.publish(this.lockersRequestTopic, JSON.stringify({
                 'action': 'get.lockers',
             }));
-            client.on('connect', () => {
-                client.subscribe(this.lockersResponseTopic);
-            });
             client.on('message', (_, message) => {
                 const response = JSON.parse(message.toString());
                 console.log(response);
@@ -337,6 +333,14 @@ class SocketController {
             const token = message.data.token;
             const locker_name = message.data.locker_name;
             const box_name = message.data.box_name;
+            const user_id = message.data.user_id;
+            const options = {
+                clientId: user_id,
+                username: process.env.LOCKERS_USERNAME,
+                password: token,
+                port: parseInt(process.env.MQTT_PORT),
+            };
+            console.log(user_id);
             const action = {
                 'action': 'box.open',
                 'locker-name': locker_name,
@@ -344,9 +348,10 @@ class SocketController {
                 'token': token,
                 'sender-id': user.user_id,
             };
-            user.mqtt.publish(this.lockersRequestTopic, JSON.stringify(action));
-            user.mqtt.subscribe(this.lockersResponseTopic);
-            user.mqtt.on('message', (_, message) => {
+            let client = mqtt_1.default.connect(this.host, options);
+            client.subscribe(this.lockersResponseTopic);
+            client.publish(this.lockersRequestTopic, JSON.stringify(action));
+            client.on('message', (_, message) => {
                 const response = JSON.parse(message.toString());
                 console.log(response);
                 switch (response.action) {
@@ -359,7 +364,6 @@ class SocketController {
                                 is_open: response.state !== 0,
                             }
                         }));
-                        user.mqtt.end();
                         break;
                     case 'box.open.error':
                         user.socket.send(JSON.stringify({
@@ -368,7 +372,6 @@ class SocketController {
                                 message: response.error,
                             }
                         }));
-                        user.mqtt.end();
                         break;
                 }
             });
@@ -381,8 +384,10 @@ class SocketController {
                 'locker-name': `${locker_name}`,
             }));
             user.mqtt.on('message', (_, message) => {
+                var _a;
                 const response = JSON.parse(message.toString());
-                response.boxes = response.boxes.map((box) => {
+                console.log(response);
+                response.boxes = (_a = response.boxes) === null || _a === void 0 ? void 0 : _a.map((box) => {
                     box.is_open = (box.state !== 0);
                     delete box.state;
                     return box;
@@ -390,7 +395,7 @@ class SocketController {
                 switch (response.action) {
                     case 'locker.status':
                         user.socket.send(JSON.stringify({
-                            type: 3,
+                            type: LockersTypes.GetLocker,
                             data: {
                                 locker_name: response['locker-name'],
                                 boxes: response.boxes,
