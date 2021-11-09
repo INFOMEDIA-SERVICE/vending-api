@@ -319,7 +319,7 @@ class SocketController {
                 switch (response.action) {
                     case 'locker.list':
                         socket.send(JSON.stringify({
-                            type: 4,
+                            type: LockersTypes.List,
                             data: {
                                 lockers: response.lockers,
                             }
@@ -337,27 +337,26 @@ class SocketController {
             const options = {
                 clientId: user_id,
                 username: process.env.LOCKERS_USERNAME,
-                password: token,
+                password: process.env.LOCKERS_PASSWORD,
                 port: parseInt(process.env.MQTT_PORT),
             };
-            console.log(user_id);
+            let client = mqtt_1.default.connect(this.host, options);
             const action = {
                 'action': 'box.open',
                 'locker-name': locker_name,
                 'box-name': box_name,
-                'token': token,
-                'sender-id': user.user_id,
             };
-            let client = mqtt_1.default.connect(this.host, options);
-            client.subscribe(this.lockersResponseTopic);
+            console.log(action);
             client.publish(this.lockersRequestTopic, JSON.stringify(action));
+            client.on('connect', () => {
+                client.subscribe(`${this.lockersResponseTopic}`);
+            });
             client.on('message', (_, message) => {
                 const response = JSON.parse(message.toString());
-                console.log(response);
                 switch (response.action) {
                     case 'locker-box-change':
                         user.socket.send(JSON.stringify({
-                            type: 5,
+                            type: LockersTypes.OpenLocker,
                             data: {
                                 locker_name: response['locker-name'],
                                 box_name: response['box-name'],
@@ -401,7 +400,6 @@ class SocketController {
                                 boxes: response.boxes,
                             }
                         }));
-                        user.mqtt.end();
                         break;
                 }
             });
