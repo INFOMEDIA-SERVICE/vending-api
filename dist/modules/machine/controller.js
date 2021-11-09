@@ -303,8 +303,8 @@ class SocketController {
             const user_id = message.data.user_id;
             const options = {
                 clientId: user_id,
-                username: process.env.LOCKERS_USERNAME,
-                password: process.env.LOCKERS_PASSWORD,
+                username: process.env.MQTT_USERNAME,
+                password: process.env.MQTT_PASSWORD,
                 port: parseInt(process.env.MQTT_PORT || '10110') || 10110,
             };
             console.log(user_id);
@@ -336,21 +336,19 @@ class SocketController {
             const user_id = message.data.user_id;
             const options = {
                 clientId: user_id,
-                username: process.env.LOCKERS_USERNAME,
-                password: process.env.LOCKERS_PASSWORD,
+                username: process.env.MQTT_USERNAME,
+                password: token,
                 port: parseInt(process.env.MQTT_PORT),
             };
             let client = mqtt_1.default.connect(this.host, options);
             const action = {
                 'action': 'box.open',
-                'locker-name': locker_name,
-                'box-name': box_name,
+                'locker-name': locker_name.toLocaleLowerCase(),
+                'box-name': box_name.toLocaleLowerCase(),
+                'sender-id': user_id,
             };
-            console.log(action);
+            client.subscribe(`${this.lockersResponseTopic}`);
             client.publish(this.lockersRequestTopic, JSON.stringify(action));
-            client.on('connect', () => {
-                client.subscribe(`${this.lockersResponseTopic}`);
-            });
             client.on('message', (_, message) => {
                 const response = JSON.parse(message.toString());
                 switch (response.action) {
@@ -363,6 +361,7 @@ class SocketController {
                                 is_open: response.state !== 0,
                             }
                         }));
+                        client.end();
                         break;
                     case 'box.open.error':
                         user.socket.send(JSON.stringify({
@@ -371,6 +370,7 @@ class SocketController {
                                 message: response.error,
                             }
                         }));
+                        client.end();
                         break;
                 }
             });
