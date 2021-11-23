@@ -43,7 +43,7 @@ class UserController {
             });
             if (response.ok) {
                 delete response.data.password;
-                const token = yield auth_controller_1.authController.generateToken(response.data);
+                const token = auth_controller_1.authController.generateToken(response.data);
                 res.send({
                     ok: true,
                     user: response.data,
@@ -70,7 +70,7 @@ class UserController {
                     return;
                 }
                 delete response.data.password;
-                const token = yield auth_controller_1.authController.generateToken(response.data);
+                const token = auth_controller_1.authController.generateToken(response.data);
                 res.send({
                     ok: true,
                     user: response.data,
@@ -89,7 +89,7 @@ class UserController {
             const response = yield repository_1.usersRepository.googleLogin(token);
             if (response.ok) {
                 delete response.data.password;
-                const jwtToken = yield auth_controller_1.authController.generateToken(response.data);
+                const jwtToken = auth_controller_1.authController.generateToken(response.data);
                 res.send({
                     ok: true,
                     user: response.data,
@@ -108,7 +108,7 @@ class UserController {
             const response = yield repository_1.usersRepository.googleSignup(token);
             if (response.ok) {
                 delete response.data.password;
-                const jwtToken = yield auth_controller_1.authController.generateToken(response.data);
+                const jwtToken = auth_controller_1.authController.generateToken(response.data);
                 res.send({
                     ok: true,
                     user: response.data,

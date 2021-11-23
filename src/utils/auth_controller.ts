@@ -1,12 +1,16 @@
 import jwt from 'jsonwebtoken';
+import moment from 'moment';
+import randToken from 'rand-token';
 import jwt_decode from 'jwt-decode';
 import { IUser } from '../modules/user/model';
 import { NextFunction, Request, Response } from 'express';
+import { IToken } from '../interfaces/postgres_responses';
 
 class AuthController {
 
-    public generateToken = async (user: IUser) => {
-        return jwt.sign({
+    public generateToken = (user: IUser): IToken => {
+
+        const token = jwt.sign({
             email: user.email,
             role: user.role,
             id: user.id
@@ -17,11 +21,20 @@ class AuthController {
             }
         );
 
-        //const response = await axios.get(
-        //`https://iot.infomediaservice.com/cws/jwt?u=${process.env.MQTT_USERNAME}&p=${process.env.MQTT_PASSWORD}&c=${process.env.MQTT_CLIENTID}`,
-        //);
+        const date = moment();
+        const hours: number = +process.env.TOKEN_DURATION?.replace('h', '')!;
+        const expireAt = moment(date).add(hours, 'h').toDate();
+        const refreshToken = randToken.uid(256);
 
-        // return response.data.jwt;
+        return {
+            expireAt,
+            refreshToken,
+            token,
+        }
+    }
+
+    public decodeToken = (token: string) => {
+        return jwt_decode(token || '');
     }
 
     public validateUserToken = (req: Request, res: Response, next: NextFunction) => {

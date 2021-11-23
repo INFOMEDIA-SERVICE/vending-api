@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
-import { IQueryResponse } from '../../interfaces/postgres_responses';
+import { IQueryResponse, IToken } from '../../interfaces/postgres_responses';
 import { adminsRepository } from './repository';
 import { IUser } from '../user/model';
 import { authController } from '../../utils/auth_controller';
@@ -44,7 +44,7 @@ class AdminController {
 
             delete response.data.password;
 
-            const token: string = await authController.generateToken(response.data);
+            const token: IToken = authController.generateToken(response.data);
 
             res.send({
                 ok: true,
@@ -84,7 +84,7 @@ class AdminController {
 
             delete response.data.password;
 
-            const token: string = await authController.generateToken(response.data);
+            const token: IToken = authController.generateToken(response.data);
 
             res.send({
                 ok: true,

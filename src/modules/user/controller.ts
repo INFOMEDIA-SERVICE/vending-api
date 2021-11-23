@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
-import { IQueryResponse } from '../../interfaces/postgres_responses';
+import { IQueryResponse, IToken } from '../../interfaces/postgres_responses';
 import { usersRepository } from './repository'
 import { IUser } from './model';
 import { authController } from '../../utils/auth_controller';
@@ -38,7 +38,7 @@ class UserController {
 
         if (response.ok) {
             delete response.data.password;
-            const token: string = await authController.generateToken(response.data);
+            const token: IToken = authController.generateToken(response.data);
             res.send({
                 ok: true,
                 user: response.data,
@@ -72,7 +72,7 @@ class UserController {
 
             delete response.data.password;
 
-            const token: string = await authController.generateToken(response.data);
+            const token: IToken = authController.generateToken(response.data);
 
             res.send({
                 ok: true,
@@ -97,7 +97,7 @@ class UserController {
 
             delete response.data.password;
 
-            const jwtToken: string = await authController.generateToken(response.data);
+            const jwtToken: IToken = authController.generateToken(response.data);
 
             res.send({
                 ok: true,
@@ -123,7 +123,7 @@ class UserController {
 
             delete response.data.password;
 
-            const jwtToken: string = await authController.generateToken(response.data);
+            const jwtToken: IToken = authController.generateToken(response.data);
 
             res.send({
                 ok: true,

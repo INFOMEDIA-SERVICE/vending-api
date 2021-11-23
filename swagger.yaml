@@ -82,8 +82,7 @@ paths:
               user:
                 $ref: '#/definitions/User'
               token:
-                type: string
-                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                $ref: '#/definitions/Token'
                 
         400:
           description: Error message
@@ -163,8 +162,7 @@ paths:
               user:
                 $ref: '#/definitions/User'
               token:
-                type: string
-                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                $ref: '#/definitions/Token'
                 
         400:
           description: Error message
@@ -205,8 +203,7 @@ paths:
               user:
                 $ref: '#/definitions/User'
               token:
-                type: string
-                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                $ref: '#/definitions/Token'
                 
         400:
           description: Error message
@@ -236,7 +233,7 @@ paths:
               token:
                 type: string
                 format: uuid
-              
+
       responses:
         200:
           description: Usuario
@@ -247,8 +244,7 @@ paths:
               user:
                 $ref: '#/definitions/User'
               token:
-                type: string
-                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                $ref: '#/definitions/Token'
                 
         400:
           description: Error message
@@ -568,8 +564,7 @@ paths:
                     type: string
                     format: uuid
                   token:
-                    type: string
-                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                    $ref: '#/definitions/Token'
 
       responses:
         200:
@@ -648,8 +643,7 @@ paths:
                     type: string
                     format: uuid
                   token:
-                    type: string
-                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                    $ref: '#/definitions/Token'
 
       responses:
         200:
@@ -745,8 +739,7 @@ paths:
                     type: string
                     example: "Box1_name"
                   token:
-                    type: string
-                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                    $ref: '#/definitions/Token'
 
       responses:
         200:
@@ -837,8 +830,7 @@ paths:
                     type: string
                     example: "Box1_name"
                   token:
-                    type: string
-                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                    $ref: '#/definitions/Token'
 
       responses:
         200:
@@ -995,8 +987,7 @@ paths:
                     type: string
                     example: "locker-10001/"
                   token:
-                    type: string
-                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                    $ref: '#/definitions/Token'
 
       responses:
         200:
@@ -1084,8 +1075,7 @@ paths:
                     type: string
                     format: uuid
                   token:
-                    type: string
-                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                    $ref: '#/definitions/Token'
 
       responses:
         200:
@@ -1181,8 +1171,7 @@ paths:
                     type: string
                     example: "Box1_name"
                   token:
-                    type: string
-                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                    $ref: '#/definitions/Token'
 
       responses:
         200:
@@ -1548,8 +1537,7 @@ paths:
               user:
                 $ref: '#/definitions/User'
               token:
-                type: string
-                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                $ref: '#/definitions/Token'
                 
         400:
           description: Error message
@@ -1629,8 +1617,7 @@ paths:
               user:
                 $ref: '#/definitions/User'
               token:
-                type: string
-                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzk5NzUzNDUsImlkIjoiNWUyYzc0YTE5YThjNGQ0YWQ2YzRjY2QxIiwicm9sZSI6IjEifQ.FIEc5P6x31i2UuCd0kL2cOH6nbwnLTDAyWbhU9QzpgU"
+                $ref: '#/definitions/Token'
                 
         400:
           description: Error message
@@ -1852,52 +1839,28 @@ definitions:
     type: object
     required:
       - name
-      - price
-      - image
+      - value
       - item
       - description
-      - quantity
-      - machine_id
+      - stock
     properties:
-      id:
-        type: string
-        format: uuid
-        example: 'd290f1ee-6c54-4b01-90e6-d701748f0851'
       name:
         type: string
         example: 'De toditos de limón'
-      price:
+      value:
         type: number
         format: integer
         example: 15000
-      image:
-        type: string
-        example: 'https://example.com/mypicture.jpg'
-      item:
+      key:
         type: string
         example: "15"
       description:
         type: string
         example: "product description product description product description"
-      quantity:
+      stock:
         type: number
         format: integer
         example: 10
-      machine_id:
-        type: string
-        example: "STM32-1234567891"
-      status:
-        type: boolean
-        example: true
-        default: true
-      created_at:
-        type: string
-        format: datetime
-        example: '2019-12-11T19:22:49.503Z'
-      updated_at:
-        type: string
-        format: datetime
-        example: '2019-12-11T19:22:49.503Z'
   SocketProduct:
     type: object
     required:
@@ -2046,6 +2009,21 @@ definitions:
       message:
         type: string
         example: 'Error message'
+  Token:
+    required:
+      - token
+      - message
+    properties:
+      token:
+        type: string
+        default: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFuZHJlc0B0ZXN0LmNvbSIsInJvbGUiOjAsImlkIjoiNWNhOTI2YzgtNDRlZi00ZWU3LWFkOTItYTZmNGNmNTFmYzk1IiwiaWF0IjoxNjM3NjI4ODM1LCJleHAiOjE2Mzc2NzIwMzV9.FyOrfI50rM7bGFeMo5zO8xX9OM42iTs5Lw-KRKeAo8A
+      refreshToken:
+        type: string
+        default: CRVDc7vlQDzSXA0Bt7LKRd3ioUJubM2629ORpB4Bm7sP2WmbUzyH0iLv00O8vQkxdLJxRzySwFOo6ILfpH5mUVw6DbMOA4OEB34jKsUH4QHEzc5iMQMpHVvAuQ3FrC6Uqnp26tpUloXpbmpA3L8ManC6HKUJg3GLF9DJA5QWkn2tSEh7CP3Q7cwKAygSOz1EtO3RJkyC4E3lOm7vNU5S8iW4gsYRWA3AKzTyiETDWIypmt56oB229Wbz18O2vphD
+      expireAt:
+        type: string
+        format: datetime
+        example: '2019-12-11T19:22:49.503Z'
 
 host: 20.65.46.44:3004
 basePath: /api

@@ -39,3 +39,12 @@ CREATE TABLE IF NOT EXISTS dispensed_products(
     updated_at TIMESTAMP DEFAULT NOW(),
     CONSTRAINT pk_dispensed_products PRIMARY KEY(id)
 );
+
+CREATE TABLE IF NOT EXISTS tokens(
+    id varchar(64) NOT NULL DEFAULT uuid_generate_v4(),
+    refresh_token text NOT NULL CHECK (key <> ''),
+    token text NOT NULL CHECK (key <> ''),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    CONSTRAINT pk_tokens PRIMARY KEY(id)
+);

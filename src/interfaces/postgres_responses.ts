@@ -13,3 +13,9 @@ export interface IProduct {
     service_id?: string
     dispensed?: boolean
 }
+
+export interface IToken {
+    token: string
+    expireAt: Date
+    refreshToken: string
+}

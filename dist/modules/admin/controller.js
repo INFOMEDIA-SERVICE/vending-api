@@ -43,7 +43,7 @@ class AdminController {
             });
             if (response.ok) {
                 delete response.data.password;
-                const token = yield auth_controller_1.authController.generateToken(response.data);
+                const token = auth_controller_1.authController.generateToken(response.data);
                 res.send({
                     ok: true,
                     user: response.data,
@@ -70,7 +70,7 @@ class AdminController {
                     return;
                 }
                 delete response.data.password;
-                const token = yield auth_controller_1.authController.generateToken(response.data);
+                const token = auth_controller_1.authController.generateToken(response.data);
                 res.send({
                     ok: true,
                     user: response.data,
