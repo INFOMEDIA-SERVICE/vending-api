@@ -1,208 +1,191 @@
-import { Request, Response } from 'express';
-import bcrypt from 'bcryptjs';
-import { IQueryResponse, IToken } from '../../interfaces/postgres_responses';
-import { adminsRepository } from './repository';
-import { IUser } from '../user/model';
-import { authController } from '../../utils/auth_controller';
+import { Request, Response } from "express";
+import bcrypt from "bcryptjs";
+import { IQueryResponse, IToken } from "../../interfaces/postgres_responses";
+import { adminsRepository } from "./repository";
+import { IUser } from "../user/model";
+import { authController } from "../../utils/auth_controller";
 
 class AdminController {
+  public signup = async (req: Request, res: Response): Promise<void> => {
+    const { first_name, last_name, email, password }: IUser = req.body;
 
-    public signup = async (req: Request, res: Response): Promise<void> => {
+    if (!first_name || first_name.match(" ")) {
+      res.send({
+        ok: false,
+        message: "Invalid first_name",
+      });
 
-        const { first_name, last_name, email, password }: IUser = req.body;
+      return;
+    }
 
-        if (!first_name || first_name.match(' ')) {
+    if (!last_name || last_name.match(" ")) {
+      res.send({
+        ok: false,
+        message: "Invalid last_name",
+      });
 
-            res.send({
-                ok: false,
-                message: 'Invalid first_name'
-            });
+      return;
+    }
 
-            return;
-        }
+    const newPass: string = bcrypt.hashSync(password || "", 15);
 
-        if (!last_name || last_name.match(' ')) {
+    const response: IQueryResponse = await adminsRepository.signup({
+      first_name,
+      last_name,
+      email,
+      password: newPass,
+    });
 
-            res.send({
-                ok: false,
-                message: 'Invalid last_name'
-            });
+    if (response.ok) {
+      delete response.data.password;
 
-            return;
-        }
+      const token: IToken = await authController.generateToken(response.data);
 
-        const newPass: string = bcrypt.hashSync(password || '', 15);
+      res.send({
+        ok: true,
+        user: response.data,
+        token,
+      });
+    } else {
+      res.status(400).json({
+        ok: false,
+        message: response.data,
+      });
+    }
+  };
 
-        const response: IQueryResponse = await adminsRepository.signup({
-            first_name,
-            last_name,
-            email,
-            password: newPass
+  public login = async (req: Request, res: Response): Promise<void> => {
+    const { email, password } = req.body;
+
+    const response: IQueryResponse = await adminsRepository.login(email);
+
+    if (response.ok) {
+      let pass: boolean = await bcrypt.compare(
+        password,
+        response.data.password
+      );
+
+      if (!pass) {
+        res.send({
+          ok: false,
+          message: "Email or Password does'not match",
         });
 
-        if (response.ok) {
+        return;
+      }
 
-            delete response.data.password;
+      delete response.data.password;
 
-            const token: IToken = authController.generateToken(response.data);
+      const token: IToken = await authController.generateToken(response.data);
 
-            res.send({
-                ok: true,
-                user: response.data,
-                token
-            });
-
-        } else {
-
-            res.status(400).json({
-                ok: false,
-                message: response.data
-            });
-
-        }
+      res.send({
+        ok: true,
+        user: response.data,
+        token,
+      });
+    } else {
+      res.status(400).json({
+        ok: false,
+        message: response.data,
+      });
     }
+  };
 
-    public login = async (req: Request, res: Response): Promise<void> => {
+  public getAll = async (req: Request, res: Response): Promise<void> => {
+    const response: IQueryResponse = await adminsRepository.getAll();
 
-        const { email, password } = req.body;
+    if (response.ok) {
+      response.data.forEach((user: any) => {
+        delete user.password;
+        return user;
+      });
 
-        const response: IQueryResponse = await adminsRepository.login(email);
-
-        if (response.ok) {
-
-            let pass: boolean = await bcrypt.compare(password, response.data.password);
-
-            if (!pass) {
-
-                res.send({
-                    ok: false,
-                    message: 'Email or Password does\'not match'
-                });
-
-                return;
-            }
-
-            delete response.data.password;
-
-            const token: IToken = authController.generateToken(response.data);
-
-            res.send({
-                ok: true,
-                user: response.data,
-                token
-            });
-
-        } else {
-
-            res.status(400).json({
-                ok: false,
-                message: response.data
-            });
-
-        }
+      res.send({
+        ok: true,
+        admins: response.data,
+      });
+    } else {
+      res.status(400).json({
+        ok: false,
+        message: response.data,
+      });
     }
+  };
 
-    public getAll = async (req: Request, res: Response): Promise<void> => {
+  public getById = async (req: Request, res: Response): Promise<void> => {
+    const response: IQueryResponse = await adminsRepository.getById(
+      req.params.id
+    );
 
-        const response: IQueryResponse = await adminsRepository.getAll();
+    if (response.ok) {
+      delete response.data.password;
+      res.send({
+        ok: true,
+        user: response.data,
+      });
+    } else {
+      res.status(400).json({
+        ok: false,
+        message: response.data,
+      });
+    }
+  };
 
-        if (response.ok) {
+  public me = async (req: Request, res: Response): Promise<void> => {
+    const user = req.body.user;
 
-            response.data.forEach((user: any) => {
-                delete user.password;
-                return user;
-            });
+    const response: IQueryResponse = await adminsRepository.getById(user.id);
 
-            res.send({
-                ok: true,
-                admins: response.data
-            });
+    if (response.ok) {
+      delete response.data.password;
+      res.send({
+        ok: true,
+        user: response.data,
+      });
+    } else {
+      res.status(400).json({
+        ok: false,
+        message: response.data,
+      });
+    }
+  };
 
-        } else {
+  public update = async (req: Request, res: Response): Promise<void> => {
+    const response: IQueryResponse = await adminsRepository.update(
+      req.params.id,
+      req.body
+    );
 
-            res.status(400).json({
-                ok: false,
-                message: response.data
-            });
+    if (response.ok) {
+      res.send({
+        ok: true,
+        user: response.data,
+      });
+    } else {
+      res.status(400).json({
+        ok: false,
+        message: response.data,
+      });
+    }
+  };
 
-        }
+  public delete = async (req: Request, res: Response): Promise<void> => {
+    const response: IQueryResponse = await adminsRepository.delete(
+      req.params.id
+    );
 
-    };
-
-    public getById = async (req: Request, res: Response): Promise<void> => {
-
-        const response: IQueryResponse = await adminsRepository.getById(req.params.id);
-
-        if (response.ok) {
-            delete response.data.password;
-            res.send({
-                ok: true,
-                user: response.data
-            });
-        } else {
-            res.status(400).json({
-                ok: false,
-                message: response.data
-            });
-        }
-
-    };
-
-    public me = async (req: Request, res: Response): Promise<void> => {
-
-        const user = req.body.user;
-
-        const response: IQueryResponse = await adminsRepository.getById(user.id);
-
-        if (response.ok) {
-            delete response.data.password;
-            res.send({
-                ok: true,
-                user: response.data
-            });
-        } else {
-            res.status(400).json({
-                ok: false,
-                message: response.data
-            });
-        }
-
-    };
-
-    public update = async (req: Request, res: Response): Promise<void> => {
-
-        const response: IQueryResponse = await adminsRepository.update(req.params.id, req.body);
-
-        if (response.ok) {
-            res.send({
-                ok: true,
-                user: response.data
-            });
-        } else {
-            res.status(400).json({
-                ok: false,
-                message: response.data
-            });
-        }
-    };
-
-    public delete = async (req: Request, res: Response): Promise<void> => {
-
-        const response: IQueryResponse = await adminsRepository.delete(req.params.id);
-
-        if (response.ok) {
-            res.send({
-                ok: true,
-                message: 'Admin deleted successfully'
-            });
-        } else {
-            res.status(400).json({
-                ok: false,
-                message: response.data
-            });
-        }
-
-    };
+    if (response.ok) {
+      res.send({
+        ok: true,
+        message: "Admin deleted successfully",
+      });
+    } else {
+      res.status(400).json({
+        ok: false,
+        message: response.data,
+      });
+    }
+  };
 }
 
-export const adminController = new AdminController;
+export const adminController = new AdminController();

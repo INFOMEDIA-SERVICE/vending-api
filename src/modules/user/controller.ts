@@ -1,257 +1,249 @@
-import { Request, Response } from 'express';
-import bcrypt from 'bcryptjs';
-import { IQueryResponse, IToken } from '../../interfaces/postgres_responses';
-import { usersRepository } from './repository'
-import { IUser } from './model';
-import { authController } from '../../utils/auth_controller';
+import { Request, Response } from "express";
+import bcrypt from "bcryptjs";
+import { IQueryResponse, IToken } from "../../interfaces/postgres_responses";
+import { usersRepository } from "./repository";
+import { IUser } from "./model";
+import { authController } from "../../utils/auth_controller";
 
 class UserController {
+  public signup = async (req: Request, res: Response): Promise<void> => {
+    const { first_name, last_name, email, password }: IUser = req.body;
 
-    public signup = async (req: Request, res: Response): Promise<void> => {
+    if (!first_name || first_name.match(" ")) {
+      res.status(400).json({
+        ok: false,
+        message: "Invalid first_name",
+      });
+      return;
+    }
 
-        const { first_name, last_name, email, password }: IUser = req.body;
+    if (!last_name || last_name.match(" ")) {
+      res.status(400).json({
+        ok: false,
+        message: "Invalid last_name",
+      });
+      return;
+    }
 
-        if (!first_name || first_name.match(' ')) {
-            res.status(400).json({
-                ok: false,
-                message: 'Invalid first_name'
-            });
-            return;
-        }
+    const newPass: string = bcrypt.hashSync(password || "", 10);
 
-        if (!last_name || last_name.match(' ')) {
-            res.status(400).json({
-                ok: false,
-                message: 'Invalid last_name'
-            });
-            return;
-        }
+    const response: IQueryResponse = await usersRepository.signup({
+      first_name,
+      last_name,
+      email,
+      password: newPass,
+    });
 
-        const newPass: string = bcrypt.hashSync(password || '', 10);
+    if (response.ok) {
+      delete response.data.password;
+      const token: IToken = await authController.generateToken(response.data);
+      res.send({
+        ok: true,
+        user: response.data,
+        token,
+      });
+    } else {
+      res.status(400).json({
+        ok: false,
+        message: response.data,
+      });
+    }
+  };
 
-        const response: IQueryResponse = await usersRepository.signup({
-            first_name,
-            last_name,
-            email,
-            password: newPass
+  public login = async (req: Request, res: Response): Promise<void> => {
+    const { email, password } = req.body;
+
+    const response: IQueryResponse = await usersRepository.login(email);
+
+    if (response.ok) {
+      let pass = await bcrypt.compare(password, response.data.password);
+
+      if (!pass) {
+        res.status(400).json({
+          ok: false,
+          message: "Email or Password does'not match",
         });
+        return;
+      }
 
-        if (response.ok) {
-            delete response.data.password;
-            const token: IToken = authController.generateToken(response.data);
-            res.send({
-                ok: true,
-                user: response.data,
-                token
-            });
-        } else {
-            res.status(400).json({
-                ok: false,
-                message: response.data
-            });
-        }
+      delete response.data.password;
+
+      const token: IToken = await authController.generateToken(response.data);
+
+      res.send({
+        ok: true,
+        user: response.data,
+        token,
+      });
+    } else {
+      res.status(400).json({
+        ok: false,
+        message: response.data,
+      });
     }
+  };
 
-    public login = async (req: Request, res: Response): Promise<void> => {
+  public googleLogin = async (req: Request, res: Response): Promise<void> => {
+    const { token } = req.body;
 
-        const { email, password } = req.body;
+    const response: IQueryResponse = await usersRepository.googleLogin(token);
 
-        const response: IQueryResponse = await usersRepository.login(email);
+    if (response.ok) {
+      delete response.data.password;
 
-        if (response.ok) {
+      const jwtToken: IToken = await authController.generateToken(
+        response.data
+      );
 
-            let pass = await bcrypt.compare(password, response.data.password);
-
-            if (!pass) {
-                res.status(400).json({
-                    ok: false,
-                    message: 'Email or Password does\'not match'
-                });
-                return;
-            }
-
-            delete response.data.password;
-
-            const token: IToken = authController.generateToken(response.data);
-
-            res.send({
-                ok: true,
-                user: response.data,
-                token
-            });
-        } else {
-            res.status(400).json({
-                ok: false,
-                message: response.data
-            });
-        }
+      res.send({
+        ok: true,
+        user: response.data,
+        token: jwtToken,
+      });
+    } else {
+      res.status(400).json({
+        ok: false,
+        message: response.data,
+      });
     }
+  };
 
-    public googleLogin = async (req: Request, res: Response): Promise<void> => {
+  public googleSignup = async (req: Request, res: Response): Promise<void> => {
+    const { token } = req.body;
 
-        const { token } = req.body;
+    const response: IQueryResponse = await usersRepository.googleSignup(token);
 
-        const response: IQueryResponse = await usersRepository.googleLogin(token);
+    if (response.ok) {
+      delete response.data.password;
 
-        if (response.ok) {
+      const jwtToken: IToken = await authController.generateToken(
+        response.data
+      );
 
-            delete response.data.password;
-
-            const jwtToken: IToken = authController.generateToken(response.data);
-
-            res.send({
-                ok: true,
-                user: response.data,
-                token: jwtToken
-            });
-
-        } else {
-            res.status(400).json({
-                ok: false,
-                message: response.data
-            });
-        }
+      res.send({
+        ok: true,
+        user: response.data,
+        token: jwtToken,
+      });
+    } else {
+      res.status(400).json({
+        ok: false,
+        message: response.data,
+      });
     }
+  };
 
-    public googleSignup = async (req: Request, res: Response): Promise<void> => {
+  public getAll = async (req: Request, res: Response): Promise<void> => {
+    const response = await usersRepository.getAll();
 
-        const { token } = req.body;
-
-        const response: IQueryResponse = await usersRepository.googleSignup(token);
-
-        if (response.ok) {
-
-            delete response.data.password;
-
-            const jwtToken: IToken = authController.generateToken(response.data);
-
-            res.send({
-                ok: true,
-                user: response.data,
-                token: jwtToken
-            });
-
-        } else {
-            res.status(400).json({
-                ok: false,
-                message: response.data
-            });
-        }
+    if (response.ok) {
+      response.data.forEach((user: any) => {
+        delete user.password;
+        return user;
+      });
+      res.send({
+        ok: true,
+        users: response.data,
+      });
+    } else {
+      res.status(400).json({
+        ok: false,
+        message: response.data,
+      });
     }
+  };
 
-    public getAll = async (req: Request, res: Response): Promise<void> => {
+  public me = async (req: Request, res: Response): Promise<void> => {
+    const user = req.body.user;
 
-        const response = await usersRepository.getAll();
+    const response: IQueryResponse = await usersRepository.getById(user.id);
 
-        if (response.ok) {
-            response.data.forEach((user: any) => {
-                delete user.password;
-                return user;
-            });
-            res.send({
-                ok: true,
-                users: response.data
-            });
-        } else {
-            res.status(400).json({
-                ok: false,
-                message: response.data
-            });
-        }
+    if (response.ok) {
+      delete response.data.password;
+      res.send({
+        ok: true,
+        user: response.data,
+      });
+    } else {
+      res.status(400).json({
+        ok: false,
+        message: response.data,
+      });
+    }
+  };
 
-    };
+  public getById = async (req: Request, res: Response): Promise<void> => {
+    const response = await usersRepository.getById(req.params.id);
 
-    public me = async (req: Request, res: Response): Promise<void> => {
+    if (response.ok) {
+      delete response.data.password;
+      res.send({
+        ok: true,
+        user: response.data,
+      });
+    } else {
+      res.status(400).json({
+        ok: false,
+        message: response.data,
+      });
+    }
+  };
 
-        const user = req.body.user;
+  public update = async (req: Request, res: Response): Promise<void> => {
+    const response: IQueryResponse = await usersRepository.update(
+      req.params.id,
+      req.body
+    );
 
-        const response: IQueryResponse = await usersRepository.getById(user.id);
+    if (response.ok) {
+      res.send({
+        ok: true,
+        user: response.data,
+      });
+    } else {
+      res.status(400).json({
+        ok: false,
+        message: response.data,
+      });
+    }
+  };
 
-        if (response.ok) {
-            delete response.data.password;
-            res.send({
-                ok: true,
-                user: response.data
-            });
-        } else {
-            res.status(400).json({
-                ok: false,
-                message: response.data
-            });
-        }
+  public updateStatus = async (req: Request, res: Response): Promise<void> => {
+    const response: IQueryResponse = await usersRepository.updateStatus(
+      req.params.id,
+      req.body
+    );
 
-    };
+    if (response.ok) {
+      res.send({
+        ok: true,
+        user: response.data,
+      });
+    } else {
+      res.status(400).json({
+        ok: false,
+        message: response.data,
+      });
+    }
+  };
 
-    public getById = async (req: Request, res: Response): Promise<void> => {
+  public delete = async (req: Request, res: Response): Promise<void> => {
+    const response: IQueryResponse = await usersRepository.delete(
+      req.params.id
+    );
 
-        const response = await usersRepository.getById(req.params.id);
-
-        if (response.ok) {
-            delete response.data.password;
-            res.send({
-                ok: true,
-                user: response.data
-            });
-        } else {
-            res.status(400).json({
-                ok: false,
-                message: response.data
-            });
-        }
-
-    };
-
-    public update = async (req: Request, res: Response): Promise<void> => {
-
-        const response: IQueryResponse = await usersRepository.update(req.params.id, req.body);
-
-        if (response.ok) {
-            res.send({
-                ok: true,
-                user: response.data
-            });
-        } else {
-            res.status(400).json({
-                ok: false,
-                message: response.data
-            });
-        }
-    };
-
-    public updateStatus = async (req: Request, res: Response): Promise<void> => {
-
-        const response: IQueryResponse = await usersRepository.updateStatus(req.params.id, req.body);
-
-        if (response.ok) {
-            res.send({
-                ok: true,
-                user: response.data
-            });
-        } else {
-            res.status(400).json({
-                ok: false,
-                message: response.data
-            });
-        }
-    };
-
-    public delete = async (req: Request, res: Response): Promise<void> => {
-
-        const response: IQueryResponse = await usersRepository.delete(req.params.id);
-
-        if (response.ok) {
-            res.send({
-                ok: true,
-                message: 'User deleted successfully'
-            });
-        } else {
-            res.status(400).json({
-                ok: false,
-                message: response.data
-            });
-        }
-
-    };
+    if (response.ok) {
+      res.send({
+        ok: true,
+        message: "User deleted successfully",
+      });
+    } else {
+      res.status(400).json({
+        ok: false,
+        message: response.data,
+      });
+    }
+  };
 }
 
-export const userController = new UserController;
+export const userController = new UserController();

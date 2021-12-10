@@ -1,11 +1,10 @@
-import { Router } from 'express';
-import { tokenController } from './controller';
-import { authController } from '../../utils/auth_controller';
+import { Router } from "express";
+import { tokenController } from "./controller";
 
 const router: Router = Router();
 
-router.post('/', tokenController.create);
-router.get('/refresh', tokenController.refreshToken);
+router.post("/", tokenController.create);
+router.post("/refresh", tokenController.refreshToken);
 
 // ADMIN
 

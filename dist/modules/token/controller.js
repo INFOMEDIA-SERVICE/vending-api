@@ -19,33 +19,40 @@ class TokenController {
             if (response.ok) {
                 res.send({
                     ok: true,
-                    tokens: response.data
+                    token: response.data,
                 });
             }
             else {
                 res.status(400).json({
                     ok: false,
-                    message: response.data
+                    message: response.data,
                 });
             }
         });
         this.refreshToken = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const token = req.body;
+            const token = req.body.refresh_token;
+            console.log(token);
+            if (!token) {
+                res.status(400).json({
+                    message: "refresh token is missed",
+                });
+                return;
+            }
             const response = yield repository_1.tokensRepository.getByToken(token);
             if (response.ok) {
                 res.send({
                     ok: true,
-                    tokens: response.data
+                    token: response.data,
                 });
             }
             else {
                 res.status(400).json({
                     ok: false,
-                    message: response.data
+                    message: response.data,
                 });
             }
         });
     }
 }
-exports.tokenController = new TokenController;
+exports.tokenController = new TokenController();
 //# sourceMappingURL=controller.js.map

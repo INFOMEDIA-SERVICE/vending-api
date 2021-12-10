@@ -13,42 +13,49 @@ exports.tokensRepository = void 0;
 const database_1 = require("../../database/database");
 class TokensRepository {
     constructor() {
-        this.table = 'tokens';
+        this.table = "tokens";
         this.create = (token, refreshToken) => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`insert into ${this.table}(token, refresh_token) values('${token}', '${refreshToken}') RETURNING *`).then((value) => {
+            return database_1.database
+                .query(`insert into ${this.table}(token, refresh_token) values('${token}', '${refreshToken}') RETURNING *`)
+                .then((value) => {
                 return {
                     ok: true,
-                    data: value.rows[0]
+                    data: value.rows[0],
                 };
-            }).catch((err) => {
+            })
+                .catch((err) => {
                 console.log(err);
                 return {
                     ok: false,
-                    data: err.message
+                    data: err.message,
                 };
             });
         });
         this.getByToken = (refreshToken) => __awaiter(this, void 0, void 0, function* () {
-            return database_1.database.query(`SELECT * FROM ${this.table} WHERE refresh_token = '${refreshToken}'`).then((value) => {
-                if (value.rowCount === 0) {
+            return database_1.database
+                .query(`SELECT * FROM ${this.table} WHERE refresh_token = '${refreshToken}'`)
+                .then((value) => {
+                console.log(value.rows.length);
+                if (value.rows.length == 0) {
                     return {
                         ok: false,
-                        message: 'token not found'
+                        data: "token not found",
                     };
                 }
                 return {
                     ok: true,
-                    data: value.rows[0]
+                    data: value.rows[0],
                 };
-            }).catch((err) => {
+            })
+                .catch((err) => {
                 console.log(err);
                 return {
                     ok: false,
-                    data: err.message
+                    data: err.message,
                 };
             });
         });
     }
 }
-exports.tokensRepository = new TokensRepository;
+exports.tokensRepository = new TokensRepository();
 //# sourceMappingURL=repository.js.map

@@ -20,40 +20,40 @@ class UserController {
     constructor() {
         this.signup = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { first_name, last_name, email, password } = req.body;
-            if (!first_name || first_name.match(' ')) {
+            if (!first_name || first_name.match(" ")) {
                 res.status(400).json({
                     ok: false,
-                    message: 'Invalid first_name'
+                    message: "Invalid first_name",
                 });
                 return;
             }
-            if (!last_name || last_name.match(' ')) {
+            if (!last_name || last_name.match(" ")) {
                 res.status(400).json({
                     ok: false,
-                    message: 'Invalid last_name'
+                    message: "Invalid last_name",
                 });
                 return;
             }
-            const newPass = bcryptjs_1.default.hashSync(password || '', 10);
+            const newPass = bcryptjs_1.default.hashSync(password || "", 10);
             const response = yield repository_1.usersRepository.signup({
                 first_name,
                 last_name,
                 email,
-                password: newPass
+                password: newPass,
             });
             if (response.ok) {
                 delete response.data.password;
-                const token = auth_controller_1.authController.generateToken(response.data);
+                const token = yield auth_controller_1.authController.generateToken(response.data);
                 res.send({
                     ok: true,
                     user: response.data,
-                    token
+                    token,
                 });
             }
             else {
                 res.status(400).json({
                     ok: false,
-                    message: response.data
+                    message: response.data,
                 });
             }
         });
@@ -65,22 +65,22 @@ class UserController {
                 if (!pass) {
                     res.status(400).json({
                         ok: false,
-                        message: 'Email or Password does\'not match'
+                        message: "Email or Password does'not match",
                     });
                     return;
                 }
                 delete response.data.password;
-                const token = auth_controller_1.authController.generateToken(response.data);
+                const token = yield auth_controller_1.authController.generateToken(response.data);
                 res.send({
                     ok: true,
                     user: response.data,
-                    token
+                    token,
                 });
             }
             else {
                 res.status(400).json({
                     ok: false,
-                    message: response.data
+                    message: response.data,
                 });
             }
         });
@@ -89,17 +89,17 @@ class UserController {
             const response = yield repository_1.usersRepository.googleLogin(token);
             if (response.ok) {
                 delete response.data.password;
-                const jwtToken = auth_controller_1.authController.generateToken(response.data);
+                const jwtToken = yield auth_controller_1.authController.generateToken(response.data);
                 res.send({
                     ok: true,
                     user: response.data,
-                    token: jwtToken
+                    token: jwtToken,
                 });
             }
             else {
                 res.status(400).json({
                     ok: false,
-                    message: response.data
+                    message: response.data,
                 });
             }
         });
@@ -108,17 +108,17 @@ class UserController {
             const response = yield repository_1.usersRepository.googleSignup(token);
             if (response.ok) {
                 delete response.data.password;
-                const jwtToken = auth_controller_1.authController.generateToken(response.data);
+                const jwtToken = yield auth_controller_1.authController.generateToken(response.data);
                 res.send({
                     ok: true,
                     user: response.data,
-                    token: jwtToken
+                    token: jwtToken,
                 });
             }
             else {
                 res.status(400).json({
                     ok: false,
-                    message: response.data
+                    message: response.data,
                 });
             }
         });
@@ -131,13 +131,13 @@ class UserController {
                 });
                 res.send({
                     ok: true,
-                    users: response.data
+                    users: response.data,
                 });
             }
             else {
                 res.status(400).json({
                     ok: false,
-                    message: response.data
+                    message: response.data,
                 });
             }
         });
@@ -148,13 +148,13 @@ class UserController {
                 delete response.data.password;
                 res.send({
                     ok: true,
-                    user: response.data
+                    user: response.data,
                 });
             }
             else {
                 res.status(400).json({
                     ok: false,
-                    message: response.data
+                    message: response.data,
                 });
             }
         });
@@ -164,13 +164,13 @@ class UserController {
                 delete response.data.password;
                 res.send({
                     ok: true,
-                    user: response.data
+                    user: response.data,
                 });
             }
             else {
                 res.status(400).json({
                     ok: false,
-                    message: response.data
+                    message: response.data,
                 });
             }
         });
@@ -179,13 +179,13 @@ class UserController {
             if (response.ok) {
                 res.send({
                     ok: true,
-                    user: response.data
+                    user: response.data,
                 });
             }
             else {
                 res.status(400).json({
                     ok: false,
-                    message: response.data
+                    message: response.data,
                 });
             }
         });
@@ -194,13 +194,13 @@ class UserController {
             if (response.ok) {
                 res.send({
                     ok: true,
-                    user: response.data
+                    user: response.data,
                 });
             }
             else {
                 res.status(400).json({
                     ok: false,
-                    message: response.data
+                    message: response.data,
                 });
             }
         });
@@ -209,17 +209,17 @@ class UserController {
             if (response.ok) {
                 res.send({
                     ok: true,
-                    message: 'User deleted successfully'
+                    message: "User deleted successfully",
                 });
             }
             else {
                 res.status(400).json({
                     ok: false,
-                    message: response.data
+                    message: response.data,
                 });
             }
         });
     }
 }
-exports.userController = new UserController;
+exports.userController = new UserController();
 //# sourceMappingURL=controller.js.map

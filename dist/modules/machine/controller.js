@@ -23,6 +23,7 @@ var MachineTypes;
     MachineTypes[MachineTypes["GetProducts"] = 1] = "GetProducts";
     MachineTypes[MachineTypes["GetMachine"] = 2] = "GetMachine";
     MachineTypes[MachineTypes["Dispense"] = 3] = "Dispense";
+    MachineTypes[MachineTypes["AddProduct"] = 4] = "AddProduct";
 })(MachineTypes || (MachineTypes = {}));
 var MachineActions;
 (function (MachineActions) {
@@ -30,12 +31,13 @@ var MachineActions;
     MachineActions["VendFinished"] = "vending.vend.finished";
     MachineActions["StartingVend"] = "vending.vend.startind";
     MachineActions["RequestingVend"] = "vend.request";
+    MachineActions["AddProduct"] = "vend.request";
 })(MachineActions || (MachineActions = {}));
 var LockersTypes;
 (function (LockersTypes) {
-    LockersTypes[LockersTypes["List"] = 4] = "List";
-    LockersTypes[LockersTypes["GetLocker"] = 5] = "GetLocker";
-    LockersTypes[LockersTypes["OpenLocker"] = 6] = "OpenLocker";
+    LockersTypes[LockersTypes["List"] = 5] = "List";
+    LockersTypes[LockersTypes["GetLocker"] = 6] = "GetLocker";
+    LockersTypes[LockersTypes["OpenLocker"] = 7] = "OpenLocker";
 })(LockersTypes || (LockersTypes = {}));
 var Types;
 (function (Types) {
@@ -52,9 +54,9 @@ class SocketController {
         this.host = process.env.MQTT_HOST;
         this.listener = new Emitter();
         this.onConnect = (socket) => __awaiter(this, void 0, void 0, function* () {
-            console.log('user connected');
-            socket.on('message', (data) => this.onMessage(socket, data));
-            socket.on('close', () => this.onDisconnectedUser(socket));
+            console.log("user connected");
+            socket.on("message", (data) => this.onMessage(socket, data));
+            socket.on("close", () => this.onDisconnectedUser(socket));
         });
         this.onMessage = (socket, data) => __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -93,8 +95,8 @@ class SocketController {
                     socket.send(JSON.stringify({
                         type: Types.Error,
                         data: {
-                            message: 'Type not found'
-                        }
+                            message: "Type not found",
+                        },
                     }));
                     break;
             }
@@ -102,35 +104,35 @@ class SocketController {
         this.machineList = (user, message) => __awaiter(this, void 0, void 0, function* () {
             user.mqtt.subscribe(this.machineResponseTopic);
             user.mqtt.publish(this.machineRequestTopic, JSON.stringify({
-                action: 'machine.list',
+                action: "machine.list",
             }));
-            user.mqtt.on('message', (_, message) => {
+            user.mqtt.on("message", (_, message) => {
                 const response = JSON.parse(message.toString());
                 console.log(response);
                 switch (response.action) {
-                    case 'machine.list':
+                    case "machine.list":
                         user.socket.send(JSON.stringify({
                             type: 0,
                             data: {
                                 machines: response.machines,
-                            }
+                            },
                         }));
                         break;
                 }
             });
         });
         this.getMachineProducts = (user, message, responseToUser = true) => __awaiter(this, void 0, void 0, function* () {
-            const machine_id = message.data.machine_id.replace('VM', '');
-            const topic = 'infomedia/vmachines/' + machine_id;
+            const machine_id = message.data.machine_id.replace("VM", "");
+            const topic = "infomedia/vmachines/" + machine_id;
             user.mqtt.subscribe(topic.toLocaleLowerCase());
             user.mqtt.publish(this.machineRequestTopic, JSON.stringify({
-                action: 'product.list.request',
+                action: "product.list.request",
                 device_id: message.data.machine_id,
             }));
-            user.mqtt.on('message', (_, message) => {
+            user.mqtt.on("message", (_, message) => {
                 const response = JSON.parse(message.toString());
                 switch (response.action) {
-                    case 'product.list.response':
+                    case "product.list.response":
                         if (responseToUser) {
                             user.socket.send(JSON.stringify({
                                 type: MachineTypes.GetProducts,
@@ -140,7 +142,7 @@ class SocketController {
                             }));
                         }
                         else {
-                            this.listener.emit('products_list', response.products);
+                            this.listener.emit("products_list", response.products);
                         }
                         break;
                 }
@@ -150,18 +152,18 @@ class SocketController {
             const machine_id = message.data.machine_id;
             user.mqtt.subscribe(this.machineResponseTopic);
             user.mqtt.publish(this.machineRequestTopic, JSON.stringify({
-                action: 'machine.status',
+                action: "machine.status",
                 device_id: machine_id,
             }));
-            user.mqtt.on('message', (_, message) => {
+            user.mqtt.on("message", (_, message) => {
                 const response = JSON.parse(message.toString());
                 switch (response.action) {
-                    case 'machine.status':
+                    case "machine.status":
                         if (response.status < 0) {
                             user.socket.send(JSON.stringify({
                                 type: -1,
                                 data: {
-                                    message: response.message
+                                    message: response.message,
                                 },
                             }));
                             return;
@@ -176,8 +178,8 @@ class SocketController {
         });
         this.dispense = (user, message) => __awaiter(this, void 0, void 0, function* () {
             this.getMachineProducts(user, message, false);
-            this.listener.on('products_list', (data) => {
-                this.listener.removeAllListeners('products_list');
+            this.listener.on("products_list", (data) => {
+                this.listener.removeAllListeners("products_list");
                 this.dispenseExecution(user, message, data);
             });
         });
@@ -192,7 +194,7 @@ class SocketController {
                     type: Types.Error,
                     data: {
                         message: `products are required`,
-                    }
+                    },
                 }));
             }
             for (const product of products) {
@@ -208,18 +210,18 @@ class SocketController {
                         type: Types.Error,
                         data: {
                             message: `product ${product.key} does'nt exists`,
-                        }
+                        },
                     }));
                 }
                 product.value = allProducts[index].value;
             }
             let value = 0;
             products.forEach((p) => {
-                return value += p.value * p.quantity;
+                return (value += p.value * p.quantity);
             });
             user.mqtt.subscribe(`${this.machineResponseTopic}`);
             const params = {
-                action: 'vend.request',
+                action: "vend.request",
                 device_id: machine_id,
                 credit: value,
                 tid: Math.random().toString(36).substring(2, 9),
@@ -231,32 +233,32 @@ class SocketController {
                 }),
             };
             user.mqtt.publish(`${this.machineRequestTopic}`, JSON.stringify(params));
-            user.mqtt.on('message', (_, message) => {
+            user.mqtt.on("message", (_, message) => {
                 const response = JSON.parse(message.toString());
                 switch (response.action) {
-                    case 'machine.vend.start':
+                    case "machine.vend.start":
                         user.socket.send(JSON.stringify({
                             type: MachineTypes.Dispense,
                             action: MachineActions.StartingVend,
                             data: {
-                                message: 'starting vend',
+                                message: "starting vend",
                             },
                         }));
                         break;
-                    case 'vend.request':
+                    case "vend.request":
                         user.socket.send(JSON.stringify({
                             type: MachineTypes.Dispense,
                             action: MachineActions.RequestingVend,
                             data: {
-                                message: 'requesting vend',
+                                message: "requesting vend",
                             },
                         }));
                         break;
-                    case 'vend.dispensing':
+                    case "vend.dispensing":
                         delete response.action;
                         serviceProducts.push({
                             key: response.item,
-                            dispensed: response.sucess === 'true',
+                            dispensed: response.sucess === "true",
                             quantity: response.pcount,
                             value: response.value,
                         });
@@ -264,13 +266,13 @@ class SocketController {
                             type: MachineTypes.Dispense,
                             action: MachineActions.Dispensing,
                             data: {
-                                success: response.sucess === 'true',
+                                success: response.sucess === "true",
                                 products_dispensed: response.pcount,
                                 key: response.item,
                             },
                         }));
                         break;
-                    case 'vend.closed':
+                    case "vend.closed":
                         console.log(JSON.stringify(serviceProducts));
                         const service = {
                             machine_id,
@@ -283,8 +285,8 @@ class SocketController {
                             type: MachineTypes.Dispense,
                             action: MachineActions.VendFinished,
                             data: {
-                                message: 'sale finished'
-                            }
+                                message: "sale finished",
+                            },
                         }));
                         controller_1.servicesController.createNoRequest(service);
                         break;
@@ -304,27 +306,26 @@ class SocketController {
             const options = {
                 clientId: user_id,
                 username: process.env.MQTT_USERNAME,
-                password: process.env.MQTT_PASSWORD,
-                port: parseInt(process.env.MQTT_PORT || '10110') || 10110,
+                //   password: process.env.MQTT_PASSWORD,
+                port: parseInt(process.env.MQTT_PORT || "10110") || 10110,
             };
             console.log(user_id);
             let client = mqtt_1.default.connect(this.host, options);
             client.subscribe(this.lockersResponseTopic);
             client.publish(this.lockersRequestTopic, JSON.stringify({
-                'action': 'get.lockers',
+                action: "get.lockers",
             }));
-            client.on('message', (_, message) => {
+            client.on("message", (_, message) => {
                 const response = JSON.parse(message.toString());
                 console.log(response);
                 switch (response.action) {
-                    case 'locker.list':
+                    case "locker.list":
                         socket.send(JSON.stringify({
                             type: LockersTypes.List,
                             data: {
                                 lockers: response.lockers,
-                            }
+                            },
                         }));
-                        client.end();
                         break;
                 }
             });
@@ -337,40 +338,38 @@ class SocketController {
             const options = {
                 clientId: user_id,
                 username: process.env.MQTT_USERNAME,
-                password: token,
+                //   password: token,
                 port: parseInt(process.env.MQTT_PORT),
             };
             let client = mqtt_1.default.connect(this.host, options);
             const action = {
-                'action': 'box.open',
-                'locker-name': locker_name.toLocaleLowerCase(),
-                'box-name': box_name.toLocaleLowerCase(),
-                'sender-id': user_id,
+                action: "box.open",
+                "locker-name": locker_name.toLocaleLowerCase(),
+                "box-name": box_name.toLocaleLowerCase(),
+                "sender-id": user_id,
             };
             client.subscribe(`${this.lockersResponseTopic}`);
             client.publish(this.lockersRequestTopic, JSON.stringify(action));
-            client.on('message', (_, message) => {
+            client.on("message", (_, message) => {
                 const response = JSON.parse(message.toString());
                 switch (response.action) {
-                    case 'locker-box-change':
+                    case "locker-box-change":
                         user.socket.send(JSON.stringify({
                             type: LockersTypes.OpenLocker,
                             data: {
-                                locker_name: response['locker-name'],
-                                box_name: response['box-name'],
+                                locker_name: response["locker-name"],
+                                box_name: response["box-name"],
                                 is_open: response.state !== 0,
-                            }
+                            },
                         }));
-                        client.end();
                         break;
-                    case 'box.open.error':
+                    case "box.open.error":
                         user.socket.send(JSON.stringify({
                             type: Types.Error,
                             data: {
                                 message: response.error,
-                            }
+                            },
                         }));
-                        client.end();
                         break;
                 }
             });
@@ -379,26 +378,26 @@ class SocketController {
             const locker_name = message.data.locker_name;
             user.mqtt.subscribe(this.lockersResponseTopic);
             user.mqtt.publish(this.lockersRequestTopic, JSON.stringify({
-                'action': 'get.status',
-                'locker-name': `${locker_name}`,
+                action: "get.status",
+                "locker-name": `${locker_name}`,
             }));
-            user.mqtt.on('message', (_, message) => {
+            user.mqtt.on("message", (_, message) => {
                 var _a;
                 const response = JSON.parse(message.toString());
                 console.log(response);
                 response.boxes = (_a = response.boxes) === null || _a === void 0 ? void 0 : _a.map((box) => {
-                    box.is_open = (box.state !== 0);
+                    box.is_open = box.state !== 0;
                     delete box.state;
                     return box;
                 });
                 switch (response.action) {
-                    case 'locker.status':
+                    case "locker.status":
                         user.socket.send(JSON.stringify({
                             type: LockersTypes.GetLocker,
                             data: {
-                                locker_name: response['locker-name'],
+                                locker_name: response["locker-name"],
                                 boxes: response.boxes,
-                            }
+                            },
                         }));
                         break;
                 }
@@ -409,7 +408,7 @@ class SocketController {
                 clientId: clientId,
                 username: process.env.MQTT_USERNAME,
                 password: process.env.MQTT_PASSWORD,
-                port: parseInt(process.env.MQTT_PORT || '') || 10110
+                port: parseInt(process.env.MQTT_PORT || "") || 10110,
             };
             return mqtt_1.default.connect(this.host, options);
         };
@@ -418,5 +417,5 @@ class SocketController {
         });
     }
 }
-exports.socketController = new SocketController;
+exports.socketController = new SocketController();
 //# sourceMappingURL=controller.js.map

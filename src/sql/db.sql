@@ -42,8 +42,8 @@ CREATE TABLE IF NOT EXISTS dispensed_products(
 
 CREATE TABLE IF NOT EXISTS tokens(
     id varchar(64) NOT NULL DEFAULT uuid_generate_v4(),
-    refresh_token text NOT NULL CHECK (key <> ''),
-    token text NOT NULL CHECK (key <> ''),
+    refresh_token text NOT NULL CHECK (refresh_token <> ''),
+    token text NOT NULL CHECK (token <> ''),
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
     CONSTRAINT pk_tokens PRIMARY KEY(id)

@@ -20,40 +20,40 @@ class AdminController {
     constructor() {
         this.signup = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { first_name, last_name, email, password } = req.body;
-            if (!first_name || first_name.match(' ')) {
+            if (!first_name || first_name.match(" ")) {
                 res.send({
                     ok: false,
-                    message: 'Invalid first_name'
+                    message: "Invalid first_name",
                 });
                 return;
             }
-            if (!last_name || last_name.match(' ')) {
+            if (!last_name || last_name.match(" ")) {
                 res.send({
                     ok: false,
-                    message: 'Invalid last_name'
+                    message: "Invalid last_name",
                 });
                 return;
             }
-            const newPass = bcryptjs_1.default.hashSync(password || '', 15);
+            const newPass = bcryptjs_1.default.hashSync(password || "", 15);
             const response = yield repository_1.adminsRepository.signup({
                 first_name,
                 last_name,
                 email,
-                password: newPass
+                password: newPass,
             });
             if (response.ok) {
                 delete response.data.password;
-                const token = auth_controller_1.authController.generateToken(response.data);
+                const token = yield auth_controller_1.authController.generateToken(response.data);
                 res.send({
                     ok: true,
                     user: response.data,
-                    token
+                    token,
                 });
             }
             else {
                 res.status(400).json({
                     ok: false,
-                    message: response.data
+                    message: response.data,
                 });
             }
         });
@@ -65,22 +65,22 @@ class AdminController {
                 if (!pass) {
                     res.send({
                         ok: false,
-                        message: 'Email or Password does\'not match'
+                        message: "Email or Password does'not match",
                     });
                     return;
                 }
                 delete response.data.password;
-                const token = auth_controller_1.authController.generateToken(response.data);
+                const token = yield auth_controller_1.authController.generateToken(response.data);
                 res.send({
                     ok: true,
                     user: response.data,
-                    token
+                    token,
                 });
             }
             else {
                 res.status(400).json({
                     ok: false,
-                    message: response.data
+                    message: response.data,
                 });
             }
         });
@@ -93,13 +93,13 @@ class AdminController {
                 });
                 res.send({
                     ok: true,
-                    admins: response.data
+                    admins: response.data,
                 });
             }
             else {
                 res.status(400).json({
                     ok: false,
-                    message: response.data
+                    message: response.data,
                 });
             }
         });
@@ -109,13 +109,13 @@ class AdminController {
                 delete response.data.password;
                 res.send({
                     ok: true,
-                    user: response.data
+                    user: response.data,
                 });
             }
             else {
                 res.status(400).json({
                     ok: false,
-                    message: response.data
+                    message: response.data,
                 });
             }
         });
@@ -126,13 +126,13 @@ class AdminController {
                 delete response.data.password;
                 res.send({
                     ok: true,
-                    user: response.data
+                    user: response.data,
                 });
             }
             else {
                 res.status(400).json({
                     ok: false,
-                    message: response.data
+                    message: response.data,
                 });
             }
         });
@@ -141,13 +141,13 @@ class AdminController {
             if (response.ok) {
                 res.send({
                     ok: true,
-                    user: response.data
+                    user: response.data,
                 });
             }
             else {
                 res.status(400).json({
                     ok: false,
-                    message: response.data
+                    message: response.data,
                 });
             }
         });
@@ -156,17 +156,17 @@ class AdminController {
             if (response.ok) {
                 res.send({
                     ok: true,
-                    message: 'Admin deleted successfully'
+                    message: "Admin deleted successfully",
                 });
             }
             else {
                 res.status(400).json({
                     ok: false,
-                    message: response.data
+                    message: response.data,
                 });
             }
         });
     }
 }
-exports.adminController = new AdminController;
+exports.adminController = new AdminController();
 //# sourceMappingURL=controller.js.map

@@ -564,7 +564,8 @@ paths:
                     type: string
                     format: uuid
                   token:
-                    $ref: '#/definitions/Token'
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFuZHJlc0B0ZXN0LmNvbSIsInJvbGUiOjAsImlkIjoiNWNhOTI2YzgtNDRlZi00ZWU3LWFkOTItYTZmNGNmNTFmYzk1IiwiaWF0IjoxNjM3NjI4ODM1LCJleHAiOjE2Mzc2NzIwMzV9.FyOrfI50rM7bGFeMo5zO8xX9OM42iTs5Lw-KRKeAo8A"
+                    # $ref: '#/definitions/Token'
 
       responses:
         200:
@@ -643,7 +644,8 @@ paths:
                     type: string
                     format: uuid
                   token:
-                    $ref: '#/definitions/Token'
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFuZHJlc0B0ZXN0LmNvbSIsInJvbGUiOjAsImlkIjoiNWNhOTI2YzgtNDRlZi00ZWU3LWFkOTItYTZmNGNmNTFmYzk1IiwiaWF0IjoxNjM3NjI4ODM1LCJleHAiOjE2Mzc2NzIwMzV9.FyOrfI50rM7bGFeMo5zO8xX9OM42iTs5Lw-KRKeAo8A"
+                    # $ref: '#/definitions/Token'
 
       responses:
         200:
@@ -739,7 +741,8 @@ paths:
                     type: string
                     example: "Box1_name"
                   token:
-                    $ref: '#/definitions/Token'
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFuZHJlc0B0ZXN0LmNvbSIsInJvbGUiOjAsImlkIjoiNWNhOTI2YzgtNDRlZi00ZWU3LWFkOTItYTZmNGNmNTFmYzk1IiwiaWF0IjoxNjM3NjI4ODM1LCJleHAiOjE2Mzc2NzIwMzV9.FyOrfI50rM7bGFeMo5zO8xX9OM42iTs5Lw-KRKeAo8A"
+                    # $ref: '#/definitions/Token'
 
       responses:
         200:
@@ -830,7 +833,8 @@ paths:
                     type: string
                     example: "Box1_name"
                   token:
-                    $ref: '#/definitions/Token'
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFuZHJlc0B0ZXN0LmNvbSIsInJvbGUiOjAsImlkIjoiNWNhOTI2YzgtNDRlZi00ZWU3LWFkOTItYTZmNGNmNTFmYzk1IiwiaWF0IjoxNjM3NjI4ODM1LCJleHAiOjE2Mzc2NzIwMzV9.FyOrfI50rM7bGFeMo5zO8xX9OM42iTs5Lw-KRKeAo8A"
+                    # $ref: '#/definitions/Token'
 
       responses:
         200:
@@ -946,7 +950,7 @@ paths:
                     type: string
                     example: "jwt must be provided"
   
-  /lockers/type/4:
+  /lockers/type/5:
     get:
       tags:
       - lockers
@@ -977,7 +981,7 @@ paths:
             properties:
               type: 
                 type: number
-                example: 3
+                example: 5
               data:
                 properties:
                   user_id: 
@@ -987,7 +991,8 @@ paths:
                     type: string
                     example: "locker-10001/"
                   token:
-                    $ref: '#/definitions/Token'
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFuZHJlc0B0ZXN0LmNvbSIsInJvbGUiOjAsImlkIjoiNWNhOTI2YzgtNDRlZi00ZWU3LWFkOTItYTZmNGNmNTFmYzk1IiwiaWF0IjoxNjM3NjI4ODM1LCJleHAiOjE2Mzc2NzIwMzV9.FyOrfI50rM7bGFeMo5zO8xX9OM42iTs5Lw-KRKeAo8A"
+                    # $ref: '#/definitions/Token'
 
       responses:
         200:
@@ -996,7 +1001,7 @@ paths:
             properties:
               type: 
                 type: number
-                example: 3
+                example: 5
               data:
                 properties:
                   locker_name:
@@ -1038,7 +1043,7 @@ paths:
                     example: "jwt must be provided"
   
   
-  /lockers/type/5:
+  /lockers/type/6:
     get:
       tags:
       - lockers
@@ -1068,14 +1073,15 @@ paths:
             properties:
               type: 
                 type: number
-                example: 4
+                example: 6
               data:
                 properties:
                   user_id: 
                     type: string
                     format: uuid
                   token:
-                    $ref: '#/definitions/Token'
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFuZHJlc0B0ZXN0LmNvbSIsInJvbGUiOjAsImlkIjoiNWNhOTI2YzgtNDRlZi00ZWU3LWFkOTItYTZmNGNmNTFmYzk1IiwiaWF0IjoxNjM3NjI4ODM1LCJleHAiOjE2Mzc2NzIwMzV9.FyOrfI50rM7bGFeMo5zO8xX9OM42iTs5Lw-KRKeAo8A"
+                    # $ref: '#/definitions/Token'
 
       responses:
         200:
@@ -1084,7 +1090,7 @@ paths:
             properties:
               type: 
                 type: number
-                example: 4
+                example: 6
               data:
                 properties:
                   locker_name:
@@ -1126,7 +1132,7 @@ paths:
                     example: "jwt must be provided"
   
   
-  /lockers/type/6:
+  /lockers/type/7:
     get:
       tags:
       - lockers
@@ -1158,7 +1164,7 @@ paths:
             properties:
               type: 
                 type: number
-                example: 5
+                example: 7
               data:
                 properties:
                   user_id: 
@@ -1171,7 +1177,9 @@ paths:
                     type: string
                     example: "Box1_name"
                   token:
-                    $ref: '#/definitions/Token'
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFuZHJlc0B0ZXN0LmNvbSIsInJvbGUiOjAsImlkIjoiNWNhOTI2YzgtNDRlZi00ZWU3LWFkOTItYTZmNGNmNTFmYzk1IiwiaWF0IjoxNjM3NjI4ODM1LCJleHAiOjE2Mzc2NzIwMzV9.FyOrfI50rM7bGFeMo5zO8xX9OM42iTs5Lw-KRKeAo8A"
+                    # $ref: '#/definitions/Token'
 
       responses:
         200:
@@ -1180,7 +1188,7 @@ paths:
             properties:
               type: 
                 type: number
-                example: 5
+                example: 7
               data:
                 properties:
                   locker_name:
