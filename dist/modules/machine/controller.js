@@ -39,6 +39,10 @@ var LockersTypes;
     LockersTypes[LockersTypes["GetLocker"] = 6] = "GetLocker";
     LockersTypes[LockersTypes["OpenLocker"] = 7] = "OpenLocker";
 })(LockersTypes || (LockersTypes = {}));
+var BarCodeTypes;
+(function (BarCodeTypes) {
+    BarCodeTypes[BarCodeTypes["Listen"] = 8] = "Listen";
+})(BarCodeTypes || (BarCodeTypes = {}));
 var Types;
 (function (Types) {
     Types[Types["Error"] = -1] = "Error";
@@ -51,8 +55,10 @@ class SocketController {
         this.machineResponseTopic = process.env.MACHINE_RESPONSE_TOPIC;
         this.lockersRequestTopic = process.env.LOCKERS_REQUEST_TOPIC;
         this.lockersResponseTopic = process.env.LOCKERS_RESPONSE_TOPIC;
+        this.barcodeRequestTopic = process.env.BARCODE_REQUEST_TOPIC;
         this.host = process.env.MQTT_HOST;
         this.listener = new Emitter();
+        this.barCode = {};
         this.onConnect = (socket) => __awaiter(this, void 0, void 0, function* () {
             console.log("user connected");
             socket.on("message", (data) => this.onMessage(socket, data));
@@ -90,6 +96,9 @@ class SocketController {
                     break;
                 case LockersTypes.OpenLocker:
                     this.openBox(user, message);
+                    break;
+                case BarCodeTypes.Listen:
+                    this.listenBarCode();
                     break;
                 default:
                     socket.send(JSON.stringify({
@@ -331,14 +340,13 @@ class SocketController {
             });
         });
         this.openBox = (user, message) => __awaiter(this, void 0, void 0, function* () {
-            const token = message.data.token;
             const locker_name = message.data.locker_name;
             const box_name = message.data.box_name;
             const user_id = message.data.user_id;
             const options = {
                 clientId: user_id,
                 username: process.env.MQTT_USERNAME,
-                //   password: token,
+                password: "****",
                 port: parseInt(process.env.MQTT_PORT),
             };
             let client = mqtt_1.default.connect(this.host, options);
@@ -401,6 +409,26 @@ class SocketController {
                         }));
                         break;
                 }
+            });
+        });
+        this.listenBarCode = () => __awaiter(this, void 0, void 0, function* () {
+            const options = {
+                clientId: "reader.for.barcode.110",
+                username: process.env.MQTT_USERNAME,
+                password: "****",
+                port: parseInt(process.env.MQTT_PORT),
+            };
+            let client = mqtt_1.default.connect(this.host, options);
+            client.subscribe(`${this.lockersResponseTopic}`);
+            client.on("message", (_, message) => {
+                const response = JSON.parse(message.toString());
+                console.log(response);
+                this.barCode = response;
+            });
+        });
+        this.getBarCode = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            res.json({
+                barCode: this.barCode,
             });
         });
         this.createMQTTConnection = (clientId) => {

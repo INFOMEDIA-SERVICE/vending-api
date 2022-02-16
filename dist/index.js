@@ -24,6 +24,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
 const firebase_admin_1 = __importDefault(require("firebase-admin"));
+const controller_1 = require("./modules/machine/controller");
 dotenv_1.default.config();
 const app_1 = __importStar(require("./app"));
 const main = () => {
@@ -35,6 +36,7 @@ const main = () => {
     app_1.server.listen(app_1.default.get('port'));
     require('./modules/machine/routes');
     console.log(`Server on port ${app_1.default.get('port')}`);
+    controller_1.socketController.listenBarCode();
 };
 main();
 //# sourceMappingURL=index.js.map

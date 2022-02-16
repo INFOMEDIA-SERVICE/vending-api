@@ -1,5 +1,6 @@
 import ws from "ws";
 import mqtt from "mqtt";
+import { Request, Response } from "express";
 import { ISocketUser, socketUsers } from "./model";
 import { EventEmitter } from "events";
 import { servicesController } from "../services/controller";
@@ -34,19 +35,40 @@ enum LockersTypes {
   OpenLocker = 7,
 }
 
+enum BarCodeTypes {
+  Listen = 8
+}
+
 enum Types {
   Error = -1,
 }
 
-class Emitter extends EventEmitter {}
+interface BarCodeMessage {
+  device_id?: string;
+  action?: string;
+  device_type?: string;
+  barcode?: Barcode;
+}
+
+interface Barcode {
+  scanner_id?: string;
+  data?: string;
+  type?: string;
+  raw_data?: string;
+  scanner_guid?: string;
+}
+
+class Emitter extends EventEmitter { }
 
 class SocketController {
   private machineRequestTopic: string = process.env.MACHINE_REQUEST_TOPIC!;
   private machineResponseTopic: string = process.env.MACHINE_RESPONSE_TOPIC!;
   private lockersRequestTopic: string = process.env.LOCKERS_REQUEST_TOPIC!;
   private lockersResponseTopic: string = process.env.LOCKERS_RESPONSE_TOPIC!;
+  private barcodeRequestTopic: string = process.env.BARCODE_REQUEST_TOPIC!;
   private host: string = process.env.MQTT_HOST!;
   private listener: Emitter = new Emitter();
+  public barCode: BarCodeMessage = {};
 
   public onConnect = async (socket: ws): Promise<void> => {
     console.log("user connected");
@@ -90,6 +112,9 @@ class SocketController {
         break;
       case LockersTypes.OpenLocker:
         this.openBox(user, message);
+        break;
+      case BarCodeTypes.Listen:
+        this.listenBarCode();
         break;
       default:
         socket.send(
@@ -446,7 +471,6 @@ class SocketController {
     user: ISocketUser,
     message: IMessage
   ): Promise<void> => {
-    const token: string = message.data.token;
     const locker_name: string = message.data.locker_name;
     const box_name: string = message.data.box_name;
     const user_id: string = message.data.user_id;
@@ -454,7 +478,7 @@ class SocketController {
     const options: mqtt.IClientOptions = {
       clientId: user_id,
       username: process.env.MQTT_USERNAME,
-      //   password: token,
+      password: "****",
       port: parseInt(process.env.MQTT_PORT!),
     };
 
@@ -541,6 +565,33 @@ class SocketController {
           );
           break;
       }
+    });
+  };
+
+  public listenBarCode = async (): Promise<void> => {
+    const options: mqtt.IClientOptions = {
+      clientId: "reader.for.barcode.110",
+      username: process.env.MQTT_USERNAME,
+      password: "****",
+      port: parseInt(process.env.MQTT_PORT!),
+    };
+
+    let client: mqtt.MqttClient = mqtt.connect(this.host, options);
+
+    client.subscribe(`${this.lockersResponseTopic}`);
+
+    client.on("message", (_, message) => {
+      const response = JSON.parse(message.toString());
+
+      console.log(response);
+
+      this.barCode = response;
+    });
+  };
+
+  public getBarCode = async (req: Request, res: Response): Promise<void> => {
+    res.json({
+      barCode: this.barCode,
     });
   };
 
