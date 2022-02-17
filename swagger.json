@@ -674,6 +674,56 @@
         }
       }
     },
+    "/machine/barcode": {
+      "get": {
+        "tags": [
+          "machine"
+        ],
+        "summary": "Obtener el QR escanneado",
+        "operationId": "getBarCode",
+        "description": "Retorna la data del QR\n",
+        "produces": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "QR Escanneado",
+            "schema": {
+              "properties": {
+                "barCode": {
+                  "$ref": "#/definitions/BarCode"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error message",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
     "/vendings/": {
       "get": {
         "tags": [
@@ -2847,6 +2897,38 @@
           "type": "string",
           "format": "datetime",
           "example": "2019-12-11T19:22:49.503Z"
+        }
+      }
+    },
+    "BarCode": {
+      "properties": {
+        "device_id": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
+        },
+        "device_type": {
+          "type": "string"
+        },
+        "barcode": {
+          "properties": {
+            "scanner_id": {
+              "type": "string"
+            },
+            "data": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "raw_data": {
+              "type": "string"
+            },
+            "scanner_guid": {
+              "type": "string"
+            }
+          }
         }
       }
     }
