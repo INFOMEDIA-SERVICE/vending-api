@@ -26,6 +26,10 @@
       "description": "Rutas de lockers"
     },
     {
+      "name": "barcode",
+      "description": "Rutas de barcode"
+    },
+    {
       "name": "Service",
       "description": "Rutas de servicios"
     },
@@ -674,12 +678,12 @@
         }
       }
     },
-    "/machine/barcode": {
+    "/barcode/type/8": {
       "get": {
         "tags": [
-          "machine"
+          "barcode"
         ],
-        "summary": "Obtener el QR escanneado",
+        "summary": "Escuchar el QR por device_id",
         "operationId": "getBarCode",
         "description": "Retorna la data del QR\n",
         "produces": [
@@ -696,6 +700,26 @@
             "name": "Authorization",
             "type": "string",
             "required": true
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "properties": {
+                "type": {
+                  "type": "number",
+                  "example": 8
+                },
+                "data": {
+                  "properties": {
+                    "device_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                }
+              }
+            }
           }
         ],
         "responses": {
