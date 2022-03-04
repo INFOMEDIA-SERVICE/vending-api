@@ -98,7 +98,7 @@ class SocketController {
                     this.openBox(user, message);
                     break;
                 case BarCodeTypes.Listen:
-                    this.listenBarCode();
+                    this.listenBarCodeEvent(message);
                     break;
                 default:
                     socket.send(JSON.stringify({
@@ -306,6 +306,7 @@ class SocketController {
             const user = {
                 socket,
                 user_id: message.data.user_id,
+                device_id: message.data.device_id,
             };
             socket.id = message.data.user_id;
             model_1.socketUsers.addUser(user);
@@ -421,16 +422,23 @@ class SocketController {
             let client = mqtt_1.default.connect(this.host, options);
             client.subscribe(`${this.lockersResponseTopic}`);
             client.on("message", (_, message) => {
+                var _a;
                 const response = JSON.parse(message.toString());
                 console.log(response);
-                this.barCode = response;
+                const device_id = response.device_id;
+                const user = model_1.socketUsers.getUserByDeviceId(device_id);
+                (_a = user === null || user === void 0 ? void 0 : user.socket) === null || _a === void 0 ? void 0 : _a.send({
+                    barCode: response,
+                });
             });
         });
-        this.getBarCode = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            res.json({
-                barCode: this.barCode,
+        this.listenBarCodeEvent = (message) => {
+            var _a;
+            const user = model_1.socketUsers.getUserByDeviceId(message.data.device_id);
+            (_a = user === null || user === void 0 ? void 0 : user.socket) === null || _a === void 0 ? void 0 : _a.send({
+                status: 'connected',
             });
-        });
+        };
         this.createMQTTConnection = (clientId) => {
             const options = {
                 clientId: clientId,

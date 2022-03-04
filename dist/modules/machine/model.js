@@ -24,6 +24,14 @@ class SocketUsers {
                 return;
             return this.users[index];
         };
+        this.getUserByDeviceId = (deviceId) => {
+            let index = this.users.findIndex((u) => {
+                return u.device_id === deviceId;
+            });
+            if (index === -1)
+                return;
+            return this.users[index];
+        };
         this.getActiveUsers = () => {
             return this.users.filter((u) => u.active);
         };
@@ -47,11 +55,11 @@ class SocketUsers {
             this.users[index] = this.users[index];
             return true;
         };
-        this.disconnectUser = (socket) => {
+        this.disconnectUser = (client) => {
             let index = this.users.findIndex((u) => {
                 if (!(u === null || u === void 0 ? void 0 : u.socket))
                     return false;
-                return u.socket.id === socket.id;
+                return u.socket.id === client.id;
             });
             if (index === -1)
                 return;

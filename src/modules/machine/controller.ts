@@ -114,7 +114,7 @@ class SocketController {
         this.openBox(user, message);
         break;
       case BarCodeTypes.Listen:
-        this.listenBarCode();
+        this.listenBarCodeEvent(message);
         break;
       default:
         socket.send(
@@ -414,6 +414,7 @@ class SocketController {
     const user: ISocketUser = {
       socket,
       user_id: message.data.user_id,
+      device_id: message.data.device_id,
     };
 
     (socket as any).id = message.data.user_id;
@@ -585,13 +586,21 @@ class SocketController {
 
       console.log(response);
 
-      this.barCode = response;
+      const device_id = response.device_id;
+
+      const user = socketUsers.getUserByDeviceId(device_id);
+
+      user?.socket?.send({
+        barCode: response,
+      });
     });
   };
 
-  public getBarCode = async (req: Request, res: Response): Promise<void> => {
-    res.json({
-      barCode: this.barCode,
+  public listenBarCodeEvent = (message: IMessage) => {
+    const user = socketUsers.getUserByDeviceId(message.data.device_id);
+
+    user?.socket?.send({
+      status: 'connected',
     });
   };
 

@@ -3,10 +3,8 @@ import usersRoutes from "./modules/user/routes";
 import adminRoutes from "./modules/admin/routes";
 import tokenRoutes from "./modules/token/routes";
 import servicesRoutes from "./modules/services/routes";
-import { Router } from 'express';
 import path from "path";
 import swaggerUi from "swagger-ui-express";
-import { socketController } from './modules/machine/controller';
 import http from "http";
 import cors from "cors";
 
@@ -34,10 +32,5 @@ app.use("/api/users", usersRoutes);
 app.use("/api/services", servicesRoutes);
 app.use("/api/admins", adminRoutes);
 app.use("/api/token", tokenRoutes);
-
-const machineRoutes: Router = Router();
-machineRoutes.get('/barcode', socketController.getBarCode);
-
-app.use("/api/machine", machineRoutes);
 
 export default app;

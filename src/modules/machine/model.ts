@@ -3,6 +3,7 @@ import mqtt from 'mqtt';
 
 export interface ISocketUser {
     user_id: string
+    device_id?: string
     socket?: ws
     mqtt?: mqtt.MqttClient
     active?: boolean
@@ -43,6 +44,17 @@ class SocketUsers {
         return this.users[index];
     };
 
+    public getUserByDeviceId = (deviceId: String): ISocketUser | undefined => {
+
+        let index: number = this.users.findIndex((u: ISocketUser): boolean => {
+            return u.device_id === deviceId;
+        });
+
+        if (index === -1) return;
+
+        return this.users[index];
+    };
+
     public getActiveUsers = (): ISocketUser[] => {
         return this.users.filter((u: ISocketUser) => u.active);
     };
@@ -76,12 +88,12 @@ class SocketUsers {
         return true;
     };
 
-    public disconnectUser = (socket: ws): void => {
+    public disconnectUser = (client: ws): void => {
 
         let index: number = this.users.findIndex(
             (u: ISocketUser): boolean => {
                 if (!u?.socket) return false;
-                return (u.socket as any).id === (socket as any).id;
+                return (u.socket as any).id === (client as any).id;
             },
         );
 
@@ -93,6 +105,7 @@ class SocketUsers {
 
         this.users = this.users;
     };
+
 
 }
 
