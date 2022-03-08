@@ -68,7 +68,6 @@ class SocketController {
   private barcodeRequestTopic: string = process.env.BARCODE_REQUEST_TOPIC!;
   private host: string = process.env.MQTT_HOST!;
   private listener: Emitter = new Emitter();
-  public barCode: BarCodeMessage = {};
 
   public onConnect = async (socket: ws): Promise<void> => {
     console.log("user connected");
@@ -594,7 +593,7 @@ class SocketController {
         JSON.stringify({
           type: BarCodeTypes.Listen,
           data: {
-            barCode: response,
+            barcode: response,
           }
         })
       );

@@ -727,8 +727,16 @@
             "description": "QR Escanneado",
             "schema": {
               "properties": {
-                "barCode": {
-                  "$ref": "#/definitions/BarCode"
+                "type": {
+                  "type": "number",
+                  "example": 8
+                },
+                "data": {
+                  "properties": {
+                    "barcode": {
+                      "$ref": "#/definitions/BarCode"
+                    }
+                  }
                 }
               }
             }
@@ -2671,40 +2679,6 @@
     }
   },
   "definitions": {
-    "Product": {
-      "type": "object",
-      "required": [
-        "name",
-        "value",
-        "item",
-        "description",
-        "stock"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "example": "De toditos de limón"
-        },
-        "value": {
-          "type": "number",
-          "format": "integer",
-          "example": 15000
-        },
-        "key": {
-          "type": "string",
-          "example": "15"
-        },
-        "description": {
-          "type": "string",
-          "example": "product description product description product description"
-        },
-        "stock": {
-          "type": "number",
-          "format": "integer",
-          "example": 10
-        }
-      }
-    },
     "SocketProduct": {
       "type": "object",
       "required": [
@@ -2769,43 +2743,6 @@
         "password": {
           "type": "string",
           "example": "password"
-        },
-        "created_at": {
-          "type": "string",
-          "format": "datetime",
-          "example": "2019-12-11T19:22:49.503Z"
-        },
-        "updated_at": {
-          "type": "string",
-          "format": "datetime",
-          "example": "2019-12-11T19:22:49.503Z"
-        }
-      }
-    },
-    "Vending": {
-      "type": "object",
-      "required": [
-        "name",
-        "machine_id",
-        "image"
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid",
-          "example": "d290f1ee-6c54-4b01-90e6-d701748f0851"
-        },
-        "name": {
-          "type": "string",
-          "example": "Vending #1"
-        },
-        "image": {
-          "type": "string",
-          "example": "https://example.com/mypicture.jpg"
-        },
-        "machine_id": {
-          "type": "string",
-          "example": "STM32-1234567891"
         },
         "created_at": {
           "type": "string",
