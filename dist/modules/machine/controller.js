@@ -427,17 +427,20 @@ class SocketController {
                 console.log(response);
                 const device_id = response.device_id;
                 const user = model_1.socketUsers.getUserByDeviceId(device_id);
-                (_a = user === null || user === void 0 ? void 0 : user.socket) === null || _a === void 0 ? void 0 : _a.send({
-                    barCode: response,
-                });
+                (_a = user === null || user === void 0 ? void 0 : user.socket) === null || _a === void 0 ? void 0 : _a.send(JSON.stringify({
+                    type: BarCodeTypes.Listen,
+                    data: {
+                        barCode: response,
+                    }
+                }));
             });
         });
         this.listenBarCodeEvent = (message) => {
             var _a;
             const user = model_1.socketUsers.getUserByDeviceId(message.data.device_id);
-            (_a = user === null || user === void 0 ? void 0 : user.socket) === null || _a === void 0 ? void 0 : _a.send({
+            (_a = user === null || user === void 0 ? void 0 : user.socket) === null || _a === void 0 ? void 0 : _a.send(JSON.stringify({
                 status: 'connected',
-            });
+            }));
         };
         this.createMQTTConnection = (clientId) => {
             const options = {

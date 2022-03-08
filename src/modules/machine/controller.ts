@@ -590,18 +590,25 @@ class SocketController {
 
       const user = socketUsers.getUserByDeviceId(device_id);
 
-      user?.socket?.send({
-        barCode: response,
-      });
+      user?.socket?.send(
+        JSON.stringify({
+          type: BarCodeTypes.Listen,
+          data: {
+            barCode: response,
+          }
+        })
+      );
     });
   };
 
   public listenBarCodeEvent = (message: IMessage) => {
     const user = socketUsers.getUserByDeviceId(message.data.device_id);
 
-    user?.socket?.send({
-      status: 'connected',
-    });
+    user?.socket?.send(
+      JSON.stringify({
+        status: 'connected',
+      })
+    );
   };
 
   private createMQTTConnection = (clientId: string): mqtt.MqttClient => {
