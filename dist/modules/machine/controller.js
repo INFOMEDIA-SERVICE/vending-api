@@ -58,7 +58,6 @@ class SocketController {
         this.barcodeRequestTopic = process.env.BARCODE_REQUEST_TOPIC;
         this.host = process.env.MQTT_HOST;
         this.listener = new Emitter();
-        this.barCode = {};
         this.onConnect = (socket) => __awaiter(this, void 0, void 0, function* () {
             console.log("user connected");
             socket.on("message", (data) => this.onMessage(socket, data));
@@ -430,7 +429,7 @@ class SocketController {
                 (_a = user === null || user === void 0 ? void 0 : user.socket) === null || _a === void 0 ? void 0 : _a.send(JSON.stringify({
                     type: BarCodeTypes.Listen,
                     data: {
-                        barCode: response,
+                        barcode: response,
                     }
                 }));
             });
