@@ -65,7 +65,6 @@ class SocketController {
   private machineResponseTopic: string = process.env.MACHINE_RESPONSE_TOPIC!;
   private lockersRequestTopic: string = process.env.LOCKERS_REQUEST_TOPIC!;
   private lockersResponseTopic: string = process.env.LOCKERS_RESPONSE_TOPIC!;
-  private barcodeRequestTopic: string = process.env.BARCODE_REQUEST_TOPIC!;
   private host: string = process.env.MQTT_HOST!;
   private listener: Emitter = new Emitter();
 
@@ -569,16 +568,17 @@ class SocketController {
   };
 
   public listenBarCode = async (): Promise<void> => {
-    const options: mqtt.IClientOptions = {
-      clientId: "reader.for.barcode.110",
-      username: process.env.MQTT_USERNAME,
-      password: "****",
-      port: parseInt(process.env.MQTT_PORT!),
-    };
+    let client: mqtt.MqttClient = this.createMQTTConnection('jwhvbkajwbvabwfrllf');
 
-    let client: mqtt.MqttClient = mqtt.connect(this.host, options);
+    client.on("connect", () => {
+      console.log('MQTT CONNECTED')
+    })
 
-    client.subscribe(`${this.barcodeRequestTopic}`);
+    client.on("error", (e) => {
+      console.log('ERROR:' + e.message)
+    })
+
+    client.subscribe(process.env.BARCODE_RESPONSE_TOPIC!);
 
     client.on("message", (_, message) => {
       const response = JSON.parse(message.toString());
@@ -618,7 +618,7 @@ class SocketController {
       port: parseInt(process.env.MQTT_PORT || "") || 10110,
     };
 
-    return mqtt.connect(this.host, options);
+    return mqtt.connect(process.env.MQTT_HOST, options);
   };
 
   private onDisconnectedUser = async (socket: ws): Promise<void> => {
