@@ -578,7 +578,7 @@ class SocketController {
 
     let client: mqtt.MqttClient = mqtt.connect(this.host, options);
 
-    client.subscribe(`${this.lockersResponseTopic}`);
+    client.subscribe(`${this.barcodeRequestTopic}`);
 
     client.on("message", (_, message) => {
       const response = JSON.parse(message.toString());

@@ -419,7 +419,7 @@ class SocketController {
                 port: parseInt(process.env.MQTT_PORT),
             };
             let client = mqtt_1.default.connect(this.host, options);
-            client.subscribe(`${this.lockersResponseTopic}`);
+            client.subscribe(`${this.barcodeRequestTopic}`);
             client.on("message", (_, message) => {
                 var _a;
                 const response = JSON.parse(message.toString());
