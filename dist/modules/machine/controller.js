@@ -425,6 +425,9 @@ class SocketController {
                 console.log(response);
                 const device_id = response.device_id;
                 const user = model_1.socketUsers.getUserByDeviceId(device_id);
+                if (!user) {
+                    console.log(`USER WITH DEVICE ID: ${device_id} NOT FOUND`);
+                }
                 (_a = user === null || user === void 0 ? void 0 : user.socket) === null || _a === void 0 ? void 0 : _a.send(JSON.stringify({
                     type: BarCodeTypes.Listen,
                     data: {
