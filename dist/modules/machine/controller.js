@@ -96,7 +96,7 @@ class SocketController {
                     this.openBox(user, message);
                     break;
                 case BarCodeTypes.Listen:
-                    this.listenBarCodeEvent(message);
+                    this.listenBarCodeEvent(socket, message);
                     break;
                 default:
                     socket.send(JSON.stringify({
@@ -436,8 +436,9 @@ class SocketController {
                 }));
             });
         });
-        this.listenBarCodeEvent = (message) => {
+        this.listenBarCodeEvent = (socket, message) => {
             var _a;
+            this.saveUser(socket, message);
             const user = model_1.socketUsers.getUserByDeviceId(message.data.device_id);
             (_a = user === null || user === void 0 ? void 0 : user.socket) === null || _a === void 0 ? void 0 : _a.send(JSON.stringify({
                 status: 'connected',

@@ -112,7 +112,7 @@ class SocketController {
         this.openBox(user, message);
         break;
       case BarCodeTypes.Listen:
-        this.listenBarCodeEvent(message);
+        this.listenBarCodeEvent(socket, message);
         break;
       default:
         socket.send(
@@ -589,7 +589,7 @@ class SocketController {
 
       const user = socketUsers.getUserByDeviceId(device_id);
 
-      if(!user) {
+      if (!user) {
         console.log(`USER WITH DEVICE ID: ${device_id} NOT FOUND`);
       }
 
@@ -604,7 +604,8 @@ class SocketController {
     });
   };
 
-  public listenBarCodeEvent = (message: IMessage) => {
+  public listenBarCodeEvent = (socket: ws, message: IMessage) => {
+    this.saveUser(socket, message);
     const user = socketUsers.getUserByDeviceId(message.data.device_id);
 
     user?.socket?.send(
