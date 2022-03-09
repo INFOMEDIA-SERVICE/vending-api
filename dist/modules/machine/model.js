@@ -8,12 +8,16 @@ class SocketUsers {
             let index = this.users.findIndex((u) => {
                 return u.user_id === user.user_id;
             });
-            if (index === -1) {
+            let index2 = this.users.findIndex((u) => {
+                return u.device_id === user.device_id;
+            });
+            let finalIndex = index === -1 ? index2 : index;
+            if (finalIndex === -1) {
                 this.users.push(user);
             }
             else {
-                this.users[index].socket = user.socket;
-                this.users[index].active = true;
+                this.users[finalIndex].socket = user.socket;
+                this.users[finalIndex].active = true;
             }
         };
         this.getUserById = (userId) => {

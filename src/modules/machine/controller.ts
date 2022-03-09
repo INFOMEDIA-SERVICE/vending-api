@@ -415,7 +415,7 @@ class SocketController {
       device_id: message.data.device_id,
     };
 
-    (socket as any).id = message.data.user_id;
+    (socket as any).id = message.data.user_id || message.data.device_id;
 
     socketUsers.addUser(user);
   };

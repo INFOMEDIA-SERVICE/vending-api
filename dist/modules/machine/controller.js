@@ -306,7 +306,7 @@ class SocketController {
                 user_id: message.data.user_id,
                 device_id: message.data.device_id,
             };
-            socket.id = message.data.user_id;
+            socket.id = message.data.user_id || message.data.device_id;
             model_1.socketUsers.addUser(user);
         });
         this.consultAllLockers = (socket, message) => __awaiter(this, void 0, void 0, function* () {
