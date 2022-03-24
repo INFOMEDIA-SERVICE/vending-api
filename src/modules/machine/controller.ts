@@ -6,7 +6,7 @@ import { EventEmitter } from "events";
 import { servicesController } from "../services/controller";
 import { IProduct } from "../../interfaces/postgres_responses";
 import { IService } from "../../modules/services/model";
-import uuid from "uuid";
+import { v1 } from 'uuid';
 
 interface IMessage {
   type?: number;
@@ -569,7 +569,7 @@ class SocketController {
   };
 
   public listenBarCode = async (): Promise<void> => {
-    let client: mqtt.MqttClient = this.createMQTTConnection(uuid.v1());
+    let client: mqtt.MqttClient = this.createMQTTConnection(v1());
 
     client.on("connect", () => {
       console.log('MQTT CONNECTED')
