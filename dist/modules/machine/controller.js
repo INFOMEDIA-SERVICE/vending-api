@@ -52,10 +52,6 @@ class Emitter extends events_1.EventEmitter {
 }
 class SocketController {
     constructor() {
-        this.machineRequestTopic = process.env.MACHINE_REQUEST_TOPIC;
-        this.machineResponseTopic = process.env.MACHINE_RESPONSE_TOPIC;
-        this.lockersRequestTopic = process.env.LOCKERS_REQUEST_TOPIC;
-        this.lockersResponseTopic = process.env.LOCKERS_RESPONSE_TOPIC;
         this.host = process.env.MQTT_HOST;
         this.listener = new Emitter();
         this.onConnect = (socket) => __awaiter(this, void 0, void 0, function* () {
@@ -110,8 +106,8 @@ class SocketController {
             }
         });
         this.machineList = (user, message) => __awaiter(this, void 0, void 0, function* () {
-            user.mqtt.subscribe(this.machineResponseTopic);
-            user.mqtt.publish(this.machineRequestTopic, JSON.stringify({
+            user.mqtt.subscribe(process.env.MACHINE_RESPONSE_TOPIC);
+            user.mqtt.publish(process.env.MACHINE_REQUEST_TOPIC, JSON.stringify({
                 action: "machine.list",
             }));
             user.mqtt.on("message", (_, message) => {
@@ -133,7 +129,7 @@ class SocketController {
             const machine_id = message.data.machine_id.replace("VM", "");
             const topic = "infomedia/vmachines/" + machine_id;
             user.mqtt.subscribe(topic.toLocaleLowerCase());
-            user.mqtt.publish(this.machineRequestTopic, JSON.stringify({
+            user.mqtt.publish(process.env.MACHINE_REQUEST_TOPIC, JSON.stringify({
                 action: "product.list.request",
                 device_id: message.data.machine_id,
             }));
@@ -158,8 +154,8 @@ class SocketController {
         });
         this.consultMachine = (user, message) => __awaiter(this, void 0, void 0, function* () {
             const machine_id = message.data.machine_id;
-            user.mqtt.subscribe(this.machineResponseTopic);
-            user.mqtt.publish(this.machineRequestTopic, JSON.stringify({
+            user.mqtt.subscribe(process.env.MACHINE_RESPONSE_TOPIC);
+            user.mqtt.publish(process.env.MACHINE_REQUEST_TOPIC, JSON.stringify({
                 action: "machine.status",
                 device_id: machine_id,
             }));
@@ -227,7 +223,7 @@ class SocketController {
             products.forEach((p) => {
                 return (value += p.value * p.quantity);
             });
-            user.mqtt.subscribe(`${this.machineResponseTopic}`);
+            user.mqtt.subscribe(process.env.MACHINE_RESPONSE_TOPIC);
             const params = {
                 action: "vend.request",
                 device_id: machine_id,
@@ -240,7 +236,7 @@ class SocketController {
                     };
                 }),
             };
-            user.mqtt.publish(`${this.machineRequestTopic}`, JSON.stringify(params));
+            user.mqtt.publish(process.env.MACHINE_REQUEST_TOPIC, JSON.stringify(params));
             user.mqtt.on("message", (_, message) => {
                 const response = JSON.parse(message.toString());
                 switch (response.action) {
@@ -320,8 +316,8 @@ class SocketController {
             };
             console.log(user_id);
             let client = mqtt_1.default.connect(this.host, options);
-            client.subscribe(this.lockersResponseTopic);
-            client.publish(this.lockersRequestTopic, JSON.stringify({
+            client.subscribe(process.env.LOCKERS_RESPONSE_TOPIC);
+            client.publish(process.env.LOCKERS_REQUEST_TOPIC, JSON.stringify({
                 action: "get.lockers",
             }));
             client.on("message", (_, message) => {
@@ -356,8 +352,8 @@ class SocketController {
                 "box-name": box_name.toLocaleLowerCase(),
                 "sender-id": user_id,
             };
-            client.subscribe(`${this.lockersResponseTopic}`);
-            client.publish(this.lockersRequestTopic, JSON.stringify(action));
+            client.subscribe(process.env.LOCKERS_RESPONSE_TOPIC);
+            client.publish(process.env.LOCKERS_REQUEST_TOPIC, JSON.stringify(action));
             client.on("message", (_, message) => {
                 const response = JSON.parse(message.toString());
                 switch (response.action) {
@@ -384,8 +380,8 @@ class SocketController {
         });
         this.consultLocker = (user, message) => __awaiter(this, void 0, void 0, function* () {
             const locker_name = message.data.locker_name;
-            user.mqtt.subscribe(this.lockersResponseTopic);
-            user.mqtt.publish(this.lockersRequestTopic, JSON.stringify({
+            user.mqtt.subscribe(process.env.LOCKERS_RESPONSE_TOPIC);
+            user.mqtt.publish(process.env.LOCKERS_REQUEST_TOPIC, JSON.stringify({
                 action: "get.status",
                 "locker-name": `${locker_name}`,
             }));
@@ -412,7 +408,13 @@ class SocketController {
             });
         });
         this.listenBarCode = () => __awaiter(this, void 0, void 0, function* () {
-            let client = this.createMQTTConnection(uuid_1.v1());
+            const options = {
+                clientId: (0, uuid_1.v1)(),
+                username: process.env.MQTT_USERNAME,
+                password: process.env.MQTT_PASSWORD,
+                port: parseInt(process.env.MQTT_PORT || "") || 10110,
+            };
+            let client = mqtt_1.default.connect(process.env.MQTT_HOST, options);
             client.on("connect", () => {
                 console.log('MQTT CONNECTED');
             });
@@ -452,7 +454,14 @@ class SocketController {
                 password: process.env.MQTT_PASSWORD,
                 port: parseInt(process.env.MQTT_PORT || "") || 10110,
             };
-            return mqtt_1.default.connect(process.env.MQTT_HOST, options);
+            const client = mqtt_1.default.connect(process.env.MQTT_HOST, options);
+            client.on("connect", () => {
+                console.log('USER MQTT CONNECTED');
+            });
+            client.on("error", (e) => {
+                console.log('ERROR:' + e.message);
+            });
+            return client;
         };
         this.onDisconnectedUser = (socket) => __awaiter(this, void 0, void 0, function* () {
             model_1.socketUsers.disconnectUser(socket);

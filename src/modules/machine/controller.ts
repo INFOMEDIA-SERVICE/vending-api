@@ -1,6 +1,5 @@
 import ws from "ws";
 import mqtt from "mqtt";
-import { Request, Response } from "express";
 import { ISocketUser, socketUsers } from "./model";
 import { EventEmitter } from "events";
 import { servicesController } from "../services/controller";
@@ -62,10 +61,6 @@ interface Barcode {
 class Emitter extends EventEmitter { }
 
 class SocketController {
-  private machineRequestTopic: string = process.env.MACHINE_REQUEST_TOPIC!;
-  private machineResponseTopic: string = process.env.MACHINE_RESPONSE_TOPIC!;
-  private lockersRequestTopic: string = process.env.LOCKERS_REQUEST_TOPIC!;
-  private lockersResponseTopic: string = process.env.LOCKERS_RESPONSE_TOPIC!;
   private host: string = process.env.MQTT_HOST!;
   private listener: Emitter = new Emitter();
 
@@ -128,16 +123,13 @@ class SocketController {
     }
   };
 
-  public machineList = async (
-    user: ISocketUser,
-    message: IMessage
-  ): Promise<void> => {
-    user.mqtt!.subscribe(this.machineResponseTopic);
+  public machineList = async (user: ISocketUser, message: IMessage): Promise<void> => {
+    user.mqtt!.subscribe(process.env.MACHINE_RESPONSE_TOPIC!);
     user.mqtt!.publish(
-      this.machineRequestTopic,
+      process.env.MACHINE_REQUEST_TOPIC!,
       JSON.stringify({
         action: "machine.list",
-      })
+      }),
     );
 
     user.mqtt!.on("message", (_, message) => {
@@ -173,7 +165,7 @@ class SocketController {
 
     user.mqtt!.subscribe(topic.toLocaleLowerCase());
     user.mqtt!.publish(
-      this.machineRequestTopic,
+      process.env.MACHINE_REQUEST_TOPIC!,
       JSON.stringify({
         action: "product.list.request",
         device_id: message.data.machine_id,
@@ -207,10 +199,9 @@ class SocketController {
     message: IMessage
   ): Promise<void> => {
     const machine_id: string = message.data.machine_id;
-
-    user.mqtt!.subscribe(this.machineResponseTopic);
+    user.mqtt!.subscribe(process.env.MACHINE_RESPONSE_TOPIC!);
     user.mqtt!.publish(
-      this.machineRequestTopic,
+      process.env.MACHINE_REQUEST_TOPIC!,
       JSON.stringify({
         action: "machine.status",
         device_id: machine_id,
@@ -312,7 +303,7 @@ class SocketController {
       return (value += p.value! * p.quantity!);
     });
 
-    user.mqtt!.subscribe(`${this.machineResponseTopic}`);
+    user.mqtt!.subscribe(process.env.MACHINE_RESPONSE_TOPIC!);
 
     const params = {
       action: "vend.request",
@@ -327,7 +318,7 @@ class SocketController {
       }),
     };
 
-    user.mqtt!.publish(`${this.machineRequestTopic}`, JSON.stringify(params));
+    user.mqtt!.publish(process.env.MACHINE_REQUEST_TOPIC!, JSON.stringify(params));
 
     user.mqtt!.on("message", (_, message) => {
       const response = JSON.parse(message.toString());
@@ -438,10 +429,10 @@ class SocketController {
 
     let client: mqtt.MqttClient = mqtt.connect(this.host, options);
 
-    client.subscribe(this.lockersResponseTopic);
+    client.subscribe(process.env.LOCKERS_RESPONSE_TOPIC!);
 
     client.publish(
-      this.lockersRequestTopic,
+      process.env.LOCKERS_REQUEST_TOPIC!,
       JSON.stringify({
         action: "get.lockers",
       })
@@ -491,9 +482,9 @@ class SocketController {
       "sender-id": user_id,
     };
 
-    client.subscribe(`${this.lockersResponseTopic}`);
+    client.subscribe(process.env.LOCKERS_RESPONSE_TOPIC!);
 
-    client.publish(this.lockersRequestTopic, JSON.stringify(action));
+    client.publish(process.env.LOCKERS_REQUEST_TOPIC!, JSON.stringify(action));
 
     client.on("message", (_, message) => {
       const response = JSON.parse(message.toString());
@@ -531,10 +522,10 @@ class SocketController {
   ): Promise<void> => {
     const locker_name: string = message.data.locker_name;
 
-    user.mqtt!.subscribe(this.lockersResponseTopic);
+    user.mqtt!.subscribe(process.env.LOCKERS_RESPONSE_TOPIC!);
 
     user.mqtt!.publish(
-      this.lockersRequestTopic,
+      process.env.LOCKERS_REQUEST_TOPIC!,
       JSON.stringify({
         action: "get.status",
         "locker-name": `${locker_name}`,
@@ -569,7 +560,14 @@ class SocketController {
   };
 
   public listenBarCode = async (): Promise<void> => {
-    let client: mqtt.MqttClient = this.createMQTTConnection(v1());
+    const options: mqtt.IClientOptions = {
+      clientId: v1(),
+      username: process.env.MQTT_USERNAME,
+      password: process.env.MQTT_PASSWORD,
+      port: parseInt(process.env.MQTT_PORT || "") || 10110,
+    };
+
+    let client: mqtt.MqttClient = mqtt.connect(process.env.MQTT_HOST, options);
 
     client.on("connect", () => {
       console.log('MQTT CONNECTED')
@@ -624,7 +622,17 @@ class SocketController {
       port: parseInt(process.env.MQTT_PORT || "") || 10110,
     };
 
-    return mqtt.connect(process.env.MQTT_HOST, options);
+    const client = mqtt.connect(process.env.MQTT_HOST, options);
+
+    client.on("connect", () => {
+      console.log('USER MQTT CONNECTED')
+    })
+
+    client.on("error", (e) => {
+      console.log('ERROR:' + e.message)
+    })
+
+    return client;
   };
 
   private onDisconnectedUser = async (socket: ws): Promise<void> => {
