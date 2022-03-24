@@ -17,6 +17,7 @@ const mqtt_1 = __importDefault(require("mqtt"));
 const model_1 = require("./model");
 const events_1 = require("events");
 const controller_1 = require("../services/controller");
+const uuid_1 = __importDefault(require("uuid"));
 var MachineTypes;
 (function (MachineTypes) {
     MachineTypes[MachineTypes["List"] = 0] = "List";
@@ -411,7 +412,7 @@ class SocketController {
             });
         });
         this.listenBarCode = () => __awaiter(this, void 0, void 0, function* () {
-            let client = this.createMQTTConnection('jwhvbkajwbvabwfrllf');
+            let client = this.createMQTTConnection(uuid_1.default.v1());
             client.on("connect", () => {
                 console.log('MQTT CONNECTED');
             });
