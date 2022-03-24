@@ -870,7 +870,7 @@
               "properties": {
                 "type": {
                   "type": "number",
-                  "example": 3
+                  "example": 0
                 },
                 "data": {
                   "properties": {
@@ -894,7 +894,7 @@
               "properties": {
                 "type": {
                   "type": "number",
-                  "example": 3
+                  "example": 0
                 },
                 "data": {
                   "properties": {
@@ -972,13 +972,17 @@
               "properties": {
                 "type": {
                   "type": "number",
-                  "example": 4
+                  "example": 1
                 },
                 "data": {
                   "properties": {
                     "user_id": {
                       "type": "string",
                       "format": "uuid"
+                    },
+                    "machine_id": {
+                      "type": "string",
+                      "example": "VM12345"
                     },
                     "token": {
                       "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFuZHJlc0B0ZXN0LmNvbSIsInJvbGUiOjAsImlkIjoiNWNhOTI2YzgtNDRlZi00ZWU3LWFkOTItYTZmNGNmNTFmYzk1IiwiaWF0IjoxNjM3NjI4ODM1LCJleHAiOjE2Mzc2NzIwMzV9.FyOrfI50rM7bGFeMo5zO8xX9OM42iTs5Lw-KRKeAo8A"
@@ -996,27 +1000,14 @@
               "properties": {
                 "type": {
                   "type": "number",
-                  "example": 4
+                  "example": 1
                 },
                 "data": {
                   "properties": {
-                    "locker_name": {
-                      "type": "string",
-                      "example": "the locker name"
-                    },
-                    "boxes": {
+                    "products": {
                       "type": "array",
                       "items": {
-                        "properties": {
-                          "name": {
-                            "type": "string",
-                            "example": "Box1_name"
-                          },
-                          "is_open": {
-                            "type": "boolean",
-                            "example": false
-                          }
-                        }
+                        "$ref": "#/definitions/SocketProduct"
                       }
                     }
                   }
@@ -1036,7 +1027,7 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "lockers not found"
+                      "example": "vending not found"
                     }
                   }
                 }
@@ -1072,7 +1063,7 @@
         ],
         "summary": "Obtener detalles de una vending",
         "operationId": "getMachineDetails",
-        "description": "\ntype: Es la orden a ejecutar\ndata: Es el objeto que lleva todo el mensaje de la orden\n\nSi todo está marchando bien, el socket le devolverá el mismo \"type\" que mandaste\nDe lo contrario, la respuesta será un \"type\": -1\n\nSe debe mandar los siguientes parametros en el objeto \"data\"\n\nuser_id: Identificador único del usuario\nlocker_name: Nombre del locker a consultar\nbox_name: Nombre de la caja que se quiere abrir\ntoken: JWT de autenticacion\n",
+        "description": "\ntype: Es la orden a ejecutar\ndata: Es el objeto que lleva todo el mensaje de la orden\n\nSi todo está marchando bien, el socket le devolverá el mismo \"type\" que mandaste\nDe lo contrario, la respuesta será un \"type\": -1\n\nSe debe mandar los siguientes parametros en el objeto \"data\"\n\nuser_id: Identificador único del usuario\nmachine_id: Identificador de la vending\ntoken: JWT de autenticacion\n",
         "produces": [
           "application/json"
         ],
@@ -1089,7 +1080,7 @@
               "properties": {
                 "type": {
                   "type": "number",
-                  "example": 5
+                  "example": 2
                 },
                 "data": {
                   "properties": {
@@ -1097,13 +1088,9 @@
                       "type": "string",
                       "format": "uuid"
                     },
-                    "locker_name": {
+                    "machine_id": {
                       "type": "string",
-                      "example": "locker-10001/"
-                    },
-                    "box_name": {
-                      "type": "string",
-                      "example": "Box1_name"
+                      "example": "VM123456"
                     },
                     "token": {
                       "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFuZHJlc0B0ZXN0LmNvbSIsInJvbGUiOjAsImlkIjoiNWNhOTI2YzgtNDRlZi00ZWU3LWFkOTItYTZmNGNmNTFmYzk1IiwiaWF0IjoxNjM3NjI4ODM1LCJleHAiOjE2Mzc2NzIwMzV9.FyOrfI50rM7bGFeMo5zO8xX9OM42iTs5Lw-KRKeAo8A"
@@ -1121,21 +1108,25 @@
               "properties": {
                 "type": {
                   "type": "number",
-                  "example": 5
+                  "example": 2
                 },
                 "data": {
                   "properties": {
-                    "locker_name": {
+                    "machine_id": {
                       "type": "string",
-                      "example": "the locker name"
+                      "example": "VM123456"
                     },
-                    "box_name": {
+                    "machine_type": {
                       "type": "string",
-                      "example": "Box1_name"
+                      "example": "Inssa model 3456"
                     },
-                    "is_open": {
-                      "type": "boolean",
-                      "example": false
+                    "device_type": {
+                      "type": "string",
+                      "example": "vending.machine"
+                    },
+                    "status": {
+                      "type": "string",
+                      "example": 0
                     }
                   }
                 }
@@ -1154,7 +1145,7 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "locker not found"
+                      "example": "vending not found"
                     }
                   }
                 }
@@ -1190,7 +1181,7 @@
         ],
         "summary": "Dispensar productos",
         "operationId": "dispenseProducts",
-        "description": "\ntype: Es la orden a ejecutar\ndata: Es el objeto que lleva todo el mensaje de la orden\n\nSi todo está marchando bien, el socket le devolverá el mismo \"type\" que mandaste\nDe lo contrario, la respuesta será un \"type\": -1\n\nSe debe mandar los siguientes parametros en el objeto \"data\"\n\nuser_id: Identificador único del usuario\nlocker_name: Nombre del locker a consultar\nbox_name: Nombre de la caja que se quiere abrir\ntoken: JWT de autenticacion\n",
+        "description": "\ntype: Es la orden a ejecutar\ndata: Es el objeto que lleva todo el mensaje de la orden\n\nSi todo está marchando bien, el socket le devolverá el mismo \"type\" que mandaste\nDe lo contrario, la respuesta será un \"type\": -1\n\nSe debe mandar los siguientes parametros en el objeto \"data\"\n\nuser_id: Identificador único del usuario\nmachine_id: Identificador de la vending\nproducts: Productos a dispensar\ntoken: JWT de autenticacion\n",
         "produces": [
           "application/json"
         ],
@@ -1207,7 +1198,7 @@
               "properties": {
                 "type": {
                   "type": "number",
-                  "example": 5
+                  "example": 3
                 },
                 "data": {
                   "properties": {
@@ -1215,13 +1206,15 @@
                       "type": "string",
                       "format": "uuid"
                     },
-                    "locker_name": {
+                    "machine_id": {
                       "type": "string",
-                      "example": "locker-10001/"
+                      "example": "VM123456"
                     },
-                    "box_name": {
-                      "type": "string",
-                      "example": "Box1_name"
+                    "products": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/definitions/SocketProduct"
+                      }
                     },
                     "token": {
                       "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFuZHJlc0B0ZXN0LmNvbSIsInJvbGUiOjAsImlkIjoiNWNhOTI2YzgtNDRlZi00ZWU3LWFkOTItYTZmNGNmNTFmYzk1IiwiaWF0IjoxNjM3NjI4ODM1LCJleHAiOjE2Mzc2NzIwMzV9.FyOrfI50rM7bGFeMo5zO8xX9OM42iTs5Lw-KRKeAo8A"
@@ -1239,21 +1232,17 @@
               "properties": {
                 "type": {
                   "type": "number",
-                  "example": 5
+                  "example": 3
+                },
+                "action": {
+                  "type": "string",
+                  "example": "vending.vend.finished"
                 },
                 "data": {
                   "properties": {
-                    "locker_name": {
+                    "message": {
                       "type": "string",
-                      "example": "the locker name"
-                    },
-                    "box_name": {
-                      "type": "string",
-                      "example": "Box1_name"
-                    },
-                    "is_open": {
-                      "type": "boolean",
-                      "example": false
+                      "example": "sale finished"
                     }
                   }
                 }
@@ -1272,7 +1261,7 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "locker not found"
+                      "example": "products are required"
                     }
                   }
                 }
@@ -2695,9 +2684,17 @@
           "type": "string",
           "example": "De toditos natural"
         },
-        "item": {
+        "key": {
           "type": "string",
           "example": "27"
+        },
+        "description": {
+          "type": "string",
+          "example": "Superheroe Barra"
+        },
+        "imagen": {
+          "type": "string",
+          "example": "https://drive.google.com/uc?export=download&id=1S-kbA1PmyaPGSemskTJh71T7tha0hbLw"
         }
       }
     },

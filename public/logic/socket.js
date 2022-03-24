@@ -4,7 +4,7 @@ var currentLocation = window.location;
 ws.onopen = (e) => {
     console.log('connected');
     ws.send(JSON.stringify({
-        type: 0,
+        type: 2,
         data: {
             user_id: 'andresrgaergaergaewrgerg.carrillo.1001sgasfgsdfsdfasdfgasdfgasdf' + currentLocation.href.split('?')[1] || '',
             machine_id: 'VM10003',

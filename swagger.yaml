@@ -608,7 +608,7 @@ paths:
             properties:
               type: 
                 type: number
-                example: 3
+                example: 0
               data:
                 properties:
                   user_id: 
@@ -625,7 +625,7 @@ paths:
             properties:
               type: 
                 type: number
-                example: 3
+                example: 0
               data:
                 properties:
                   locker_name:
@@ -688,12 +688,15 @@ paths:
             properties:
               type: 
                 type: number
-                example: 4
+                example: 1
               data:
                 properties:
                   user_id: 
                     type: string
                     format: uuid
+                  machine_id: 
+                    type: string
+                    example: VM12345
                   token:
                     example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFuZHJlc0B0ZXN0LmNvbSIsInJvbGUiOjAsImlkIjoiNWNhOTI2YzgtNDRlZi00ZWU3LWFkOTItYTZmNGNmNTFmYzk1IiwiaWF0IjoxNjM3NjI4ODM1LCJleHAiOjE2Mzc2NzIwMzV9.FyOrfI50rM7bGFeMo5zO8xX9OM42iTs5Lw-KRKeAo8A"
                     # $ref: '#/definitions/Token'
@@ -705,22 +708,13 @@ paths:
             properties:
               type: 
                 type: number
-                example: 4
+                example: 1
               data:
                 properties:
-                  locker_name:
-                    type: string
-                    example: "the locker name"
-                  boxes:
+                  products:
                     type: array
                     items:
-                      properties:
-                        name:
-                          type: string
-                          example: "Box1_name"
-                        is_open:
-                          type: boolean
-                          example: false
+                      $ref: '#/definitions/SocketProduct'
         400:
           description: Error message
           schema:
@@ -732,7 +726,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "lockers not found"
+                    example: "vending not found"
         401:
           description: Error message
           schema:
@@ -764,8 +758,7 @@ paths:
         Se debe mandar los siguientes parametros en el objeto "data"
         
         user_id: Identificador único del usuario
-        locker_name: Nombre del locker a consultar
-        box_name: Nombre de la caja que se quiere abrir
+        machine_id: Identificador de la vending
         token: JWT de autenticacion
 
       produces:
@@ -779,18 +772,15 @@ paths:
             properties:
               type: 
                 type: number
-                example: 5
+                example: 2
               data:
                 properties:
                   user_id: 
                     type: string
                     format: uuid
-                  locker_name:
+                  machine_id:
                     type: string
-                    example: "locker-10001/"
-                  box_name:
-                    type: string
-                    example: "Box1_name"
+                    example: "VM123456"
                   token:
                     example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFuZHJlc0B0ZXN0LmNvbSIsInJvbGUiOjAsImlkIjoiNWNhOTI2YzgtNDRlZi00ZWU3LWFkOTItYTZmNGNmNTFmYzk1IiwiaWF0IjoxNjM3NjI4ODM1LCJleHAiOjE2Mzc2NzIwMzV9.FyOrfI50rM7bGFeMo5zO8xX9OM42iTs5Lw-KRKeAo8A"
                     # $ref: '#/definitions/Token'
@@ -802,18 +792,21 @@ paths:
             properties:
               type: 
                 type: number
-                example: 5
+                example: 2
               data:
                 properties:
-                  locker_name:
+                  machine_id:
                     type: string
-                    example: "the locker name"
-                  box_name:
+                    example: "VM123456"
+                  machine_type:
                     type: string
-                    example: "Box1_name"
-                  is_open:
-                    type: boolean
-                    example: false
+                    example: "Inssa model 3456"
+                  device_type:
+                    type: string
+                    example: "vending.machine"
+                  status:
+                    type: string
+                    example: 0
         400:
           description: Error message
           schema:
@@ -825,7 +818,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "locker not found"
+                    example: "vending not found"
         401:
           description: Error message
           schema:
@@ -856,8 +849,8 @@ paths:
         Se debe mandar los siguientes parametros en el objeto "data"
         
         user_id: Identificador único del usuario
-        locker_name: Nombre del locker a consultar
-        box_name: Nombre de la caja que se quiere abrir
+        machine_id: Identificador de la vending
+        products: Productos a dispensar
         token: JWT de autenticacion
 
       produces:
@@ -871,18 +864,19 @@ paths:
             properties:
               type: 
                 type: number
-                example: 5
+                example: 3
               data:
                 properties:
                   user_id: 
                     type: string
                     format: uuid
-                  locker_name:
+                  machine_id:
                     type: string
-                    example: "locker-10001/"
-                  box_name:
-                    type: string
-                    example: "Box1_name"
+                    example: "VM123456"
+                  products:
+                    type: array
+                    items:
+                      $ref: '#/definitions/SocketProduct'
                   token:
                     example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFuZHJlc0B0ZXN0LmNvbSIsInJvbGUiOjAsImlkIjoiNWNhOTI2YzgtNDRlZi00ZWU3LWFkOTItYTZmNGNmNTFmYzk1IiwiaWF0IjoxNjM3NjI4ODM1LCJleHAiOjE2Mzc2NzIwMzV9.FyOrfI50rM7bGFeMo5zO8xX9OM42iTs5Lw-KRKeAo8A"
                     # $ref: '#/definitions/Token'
@@ -894,18 +888,16 @@ paths:
             properties:
               type: 
                 type: number
-                example: 5
+                example: 3
+              action:
+                type: string
+                example: "vending.vend.finished"
               data:
                 properties:
-                  locker_name:
+                  message:
                     type: string
-                    example: "the locker name"
-                  box_name:
-                    type: string
-                    example: "Box1_name"
-                  is_open:
-                    type: boolean
-                    example: false
+                    example: "sale finished"
+
         400:
           description: Error message
           schema:
@@ -917,7 +909,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "locker not found"
+                    example: "products are required"
         401:
           description: Error message
           schema:
@@ -1907,9 +1899,15 @@ definitions:
       name:
         type: string
         example: "De toditos natural"
-      item:
+      key:
         type: string
         example: "27"
+      description:
+        type: string
+        example: "Superheroe Barra"
+      imagen:
+        type: string
+        example: "https://drive.google.com/uc?export=download&id=1S-kbA1PmyaPGSemskTJh71T7tha0hbLw"
   User:
     required:
       - first_name
