@@ -61,7 +61,6 @@ interface Barcode {
 class Emitter extends EventEmitter { }
 
 class SocketController {
-  private host: string = process.env.MQTT_HOST!;
   private listener: Emitter = new Emitter();
 
   public onConnect = async (socket: ws): Promise<void> => {
@@ -427,7 +426,7 @@ class SocketController {
 
     console.log(user_id);
 
-    let client: mqtt.MqttClient = mqtt.connect(this.host, options);
+    let client: mqtt.MqttClient = mqtt.connect(process.env.MQTT_HOST!, options);
 
     client.subscribe(process.env.LOCKERS_RESPONSE_TOPIC!);
 
@@ -473,7 +472,7 @@ class SocketController {
       port: parseInt(process.env.MQTT_PORT!),
     };
 
-    let client: mqtt.MqttClient = mqtt.connect(this.host, options);
+    let client: mqtt.MqttClient = mqtt.connect(process.env.MQTT_HOST!, options);
 
     const action = {
       action: "box.open",

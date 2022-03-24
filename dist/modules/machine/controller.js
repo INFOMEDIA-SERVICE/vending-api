@@ -52,7 +52,6 @@ class Emitter extends events_1.EventEmitter {
 }
 class SocketController {
     constructor() {
-        this.host = process.env.MQTT_HOST;
         this.listener = new Emitter();
         this.onConnect = (socket) => __awaiter(this, void 0, void 0, function* () {
             console.log("user connected");
@@ -315,7 +314,7 @@ class SocketController {
                 port: parseInt(process.env.MQTT_PORT || "10110") || 10110,
             };
             console.log(user_id);
-            let client = mqtt_1.default.connect(this.host, options);
+            let client = mqtt_1.default.connect(process.env.MQTT_HOST, options);
             client.subscribe(process.env.LOCKERS_RESPONSE_TOPIC);
             client.publish(process.env.LOCKERS_REQUEST_TOPIC, JSON.stringify({
                 action: "get.lockers",
@@ -345,7 +344,7 @@ class SocketController {
                 password: "****",
                 port: parseInt(process.env.MQTT_PORT),
             };
-            let client = mqtt_1.default.connect(this.host, options);
+            let client = mqtt_1.default.connect(process.env.MQTT_HOST, options);
             const action = {
                 action: "box.open",
                 "locker-name": locker_name.toLocaleLowerCase(),

@@ -4,20 +4,19 @@ var currentLocation = window.location;
 ws.onopen = (e) => {
     console.log('connected');
     ws.send(JSON.stringify({
-        type: 2,
+        type: 5,
         data: {
-            user_id: 'andresrgaergaergaewrgerg.carrillo.1001sgasfgsdfsdfasdfgasdfgasdf' + currentLocation.href.split('?')[1] || '',
+            user_id: '3fa85f64-5717-4562-b3fc-2c963f66afa6fsdfwsdf',
             machine_id: 'VM10003',
             products: [
                 {
-                    "key": 10,
-                    "quantity": 2,
-                },
-                {
-                    "key": 11,
-                    "quantity": 1,
-                },
+                    name: 'De toditos natural',
+                    key: 10,
+                    description: 'Superheroe Barra',
+                    imagen: "https://drive.google.com/uc?export=download&id=1S-kbA1PmyaPGSemskTJh71T7tha0hbLw"
+                }
             ],
+            token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFuZHJlc0B0ZXN0LmNvbSIsInJvbGUiOjAsImlkIjoiNWNhOTI2YzgtNDRlZi00ZWU3LWFkOTItYTZmNGNmNTFmYzk1IiwiaWF0IjoxNjM3NjI4ODM1LCJleHAiOjE2Mzc2NzIwMzV9.FyOrfI50rM7bGFeMo5zO8xX9OM42iTs5Lw-KRKeAo8A"
         }
     }));
 };
