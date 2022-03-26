@@ -242,6 +242,7 @@ class SocketController {
             user.mqtt.publish(process.env.MACHINE_REQUEST_TOPIC, JSON.stringify(params));
             user.mqtt.on("message", (_, message) => {
                 const response = JSON.parse(message.toString());
+                console.log(response);
                 switch (response.action) {
                     case "machine.vend.start":
                         user.socket.send(JSON.stringify({
@@ -424,7 +425,7 @@ class SocketController {
         });
         this.listenBarCode = () => __awaiter(this, void 0, void 0, function* () {
             const options = {
-                clientId: uuid_1.v1(),
+                clientId: (0, uuid_1.v1)(),
                 username: process.env.MQTT_USERNAME,
                 password: process.env.MQTT_PASSWORD,
                 port: parseInt(process.env.MQTT_PORT || "") || 10110,
