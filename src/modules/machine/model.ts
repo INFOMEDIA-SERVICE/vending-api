@@ -26,7 +26,7 @@ class SocketUsers {
         });
 
         let index2: number = this.users.findIndex((u: ISocketUser): boolean => {
-            return u.device_id === user.device_id;
+            return u.device_id === user.device_id && user.device_id !== undefined;
         });
 
         let finalIndex = index === -1 ? index2 : index;
@@ -40,20 +40,25 @@ class SocketUsers {
     };
 
     public getUserById = (userId: String): ISocketUser | undefined => {
-
         let index: number = this.users.findIndex((u: ISocketUser): boolean => {
             return u.user_id === userId;
         });
 
-        if (index === -1) return;
+        let index2: number = this.users.findIndex((u: ISocketUser): boolean => {
+            return u.device_id === userId;
+        });
 
-        return this.users[index];
+        let finalIndex = index === -1 ? index2 : index;
+
+        if (finalIndex === -1) return;
+
+        return this.users[finalIndex];
     };
 
     public getUserByDeviceId = (deviceId: String): ISocketUser | undefined => {
 
         let index: number = this.users.findIndex((u: ISocketUser): boolean => {
-            return u.device_id === deviceId;
+            return u.device_id === deviceId && u.device_id !== undefined;
         });
 
         if (index === -1) return;
@@ -69,16 +74,26 @@ class SocketUsers {
         return this.users;
     };
 
-    public editUserStatus = (user: ISocketUser): boolean => {
+    public editUserStatus = (user: ISocketUser): ISocketUser[] | undefined => {
 
-        let index: number = this.users.findIndex((u: ISocketUser): boolean => u.user_id === user.user_id);
+        let index: number = this.users.findIndex((u: ISocketUser): boolean => {
+            return u.user_id === user.user_id;
+        });
 
-        if (index === -1) return false;
+        let index2: number = this.users.findIndex((u: ISocketUser): boolean => {
+            return u.device_id === user.device_id && user.device_id !== undefined;
+        });
 
-        this.users[index].active = !this.users[index].active;
-        this.users[index].mqtt = undefined;
+        let finalIndex = index === -1 ? index2 : index;
 
-        return true;
+        if (finalIndex === -1) return;
+
+        const newUsers = [...this.users];
+
+        newUsers[finalIndex].active = newUsers[finalIndex].active;
+        newUsers[finalIndex].mqtt = undefined;
+
+        return newUsers;
     };
 
     public update = (user: ISocketUser): boolean => {
@@ -105,11 +120,13 @@ class SocketUsers {
 
         if (index === -1) return;
 
-        this.editUserStatus(this.users[index]);
+        const newUsers = this.editUserStatus(this.users[index]);
+
+        if (!newUsers) return;
 
         console.log(`User disconnect ${this.users[index].user_id}`);
 
-        this.users = this.users;
+        this.users = newUsers;
     };
 
 

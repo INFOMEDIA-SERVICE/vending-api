@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const controller_1 = require("./controller");
 const auth_controller_1 = require("../../utils/auth_controller");
-const router = (0, express_1.Router)();
+const router = express_1.Router();
 router.get('/me', [auth_controller_1.authController.validateAccess], controller_1.servicesController.me);
 router.get('/:id', [auth_controller_1.authController.validateAccess], controller_1.servicesController.getById);
 // ADMIN

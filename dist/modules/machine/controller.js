@@ -36,9 +36,10 @@ var MachineActions;
 })(MachineActions || (MachineActions = {}));
 var LockersTypes;
 (function (LockersTypes) {
-    LockersTypes[LockersTypes["List"] = 5] = "List";
-    LockersTypes[LockersTypes["GetLocker"] = 6] = "GetLocker";
+    LockersTypes[LockersTypes["GetLocker"] = 5] = "GetLocker";
+    LockersTypes[LockersTypes["List"] = 6] = "List";
     LockersTypes[LockersTypes["OpenLocker"] = 7] = "OpenLocker";
+    LockersTypes[LockersTypes["CloseLocker"] = 9897] = "CloseLocker";
 })(LockersTypes || (LockersTypes = {}));
 var BarCodeTypes;
 (function (BarCodeTypes) {
@@ -64,8 +65,8 @@ class SocketController {
             this.saveUser(socket, message);
             const user = model_1.socketUsers.getUserById(message.data.user_id);
             if (!((_a = user.mqtt) === null || _a === void 0 ? void 0 : _a.connected)) {
-                user.mqtt = this.createMQTTConnection(message.data.user_id);
-                this.saveUser(socket, message);
+                user.mqtt = this.createMQTTConnection({ clientId: user.user_id });
+                this.saveUser(socket, message, user);
             }
             switch (message.type) {
                 // Vendings
@@ -83,13 +84,16 @@ class SocketController {
                     break;
                 // Lockers
                 case LockersTypes.List:
-                    this.consultAllLockers(socket, message);
+                    this.consultAllLockers(user);
                     break;
                 case LockersTypes.GetLocker:
                     this.consultLocker(user, message);
                     break;
                 case LockersTypes.OpenLocker:
                     this.openBox(user, message);
+                    break;
+                case LockersTypes.CloseLocker:
+                    this.closeLocker(user, message);
                     break;
                 case BarCodeTypes.Listen:
                     this.listenBarCodeEvent(socket, message);
@@ -296,25 +300,16 @@ class SocketController {
                 }
             });
         });
-        this.saveUser = (socket, message) => __awaiter(this, void 0, void 0, function* () {
-            const user = {
+        this.saveUser = (socket, message, user) => __awaiter(this, void 0, void 0, function* () {
+            socket.id = message.data.user_id || message.data.device_id;
+            model_1.socketUsers.addUser(user || {
                 socket,
                 user_id: message.data.user_id,
                 device_id: message.data.device_id,
-            };
-            socket.id = message.data.user_id || message.data.device_id;
-            model_1.socketUsers.addUser(user);
+            });
         });
-        this.consultAllLockers = (socket, message) => __awaiter(this, void 0, void 0, function* () {
-            const user_id = message.data.user_id;
-            const options = {
-                clientId: user_id,
-                username: process.env.MQTT_USERNAME,
-                //   password: process.env.MQTT_PASSWORD,
-                port: parseInt(process.env.MQTT_PORT || "10110") || 10110,
-            };
-            console.log(user_id);
-            let client = mqtt_1.default.connect(process.env.MQTT_HOST, options);
+        this.consultAllLockers = (user) => __awaiter(this, void 0, void 0, function* () {
+            let client = user.mqtt;
             client.subscribe(process.env.LOCKERS_RESPONSE_TOPIC);
             client.publish(process.env.LOCKERS_REQUEST_TOPIC, JSON.stringify({
                 action: "get.lockers",
@@ -324,7 +319,7 @@ class SocketController {
                 console.log(response);
                 switch (response.action) {
                     case "locker.list":
-                        socket.send(JSON.stringify({
+                        user.socket.send(JSON.stringify({
                             type: LockersTypes.List,
                             data: {
                                 lockers: response.lockers,
@@ -335,24 +330,28 @@ class SocketController {
             });
         });
         this.openBox = (user, message) => __awaiter(this, void 0, void 0, function* () {
-            const locker_name = message.data.locker_name;
-            const box_name = message.data.box_name;
+            const locker_name = message.data.locker_name.toLocaleLowerCase();
+            const box_name = message.data.box_name.toLocaleLowerCase();
             const user_id = message.data.user_id;
+            const token = message.data.token;
             const options = {
                 clientId: user_id,
                 username: process.env.MQTT_USERNAME,
-                password: "****",
+                password: token,
                 port: parseInt(process.env.MQTT_PORT),
             };
-            let client = mqtt_1.default.connect(process.env.MQTT_HOST, options);
-            const action = {
-                action: "box.open",
-                "locker-name": locker_name.toLocaleLowerCase(),
-                "box-name": box_name.toLocaleLowerCase(),
-                "sender-id": user_id,
-            };
-            client.subscribe(process.env.LOCKERS_RESPONSE_TOPIC);
-            client.publish(process.env.LOCKERS_REQUEST_TOPIC, JSON.stringify(action));
+            let client = this.createMQTTConnection({ options });
+            yield new Promise(f => setTimeout(f, 500));
+            const requestTopic = process.env.LOCKERS_REQUEST_TOPIC;
+            const responseTopic = process.env.LOCKERS_RESPONSE_TOPIC;
+            client.subscribe(responseTopic);
+            client.publish(requestTopic, JSON.stringify({
+                'action': 'box.open',
+                'locker-name': locker_name,
+                'box-name': box_name,
+                'sender-id': user_id,
+                'token': token,
+            }));
             client.on("message", (_, message) => {
                 const response = JSON.parse(message.toString());
                 switch (response.action) {
@@ -406,14 +405,31 @@ class SocketController {
                 }
             });
         });
+        this.closeLocker = (user, message) => __awaiter(this, void 0, void 0, function* () {
+            const locker_name = message.data.locker_name.toLocaleLowerCase();
+            const box_name = message.data.box_name.toLocaleLowerCase();
+            const topic = `devices/lockers/${locker_name}/${box_name}`;
+            user.mqtt.subscribe(topic);
+            user.mqtt.publish(topic, '0');
+            user.mqtt.on("message", (_, message) => {
+                const response = JSON.parse(message.toString());
+                console.log('RESPONSE: ' + response);
+                user.socket.send(JSON.stringify({
+                    type: LockersTypes.CloseLocker,
+                    data: {
+                        response,
+                    },
+                }));
+            });
+        });
         this.listenBarCode = () => __awaiter(this, void 0, void 0, function* () {
             const options = {
-                clientId: (0, uuid_1.v1)(),
+                clientId: uuid_1.v1(),
                 username: process.env.MQTT_USERNAME,
                 password: process.env.MQTT_PASSWORD,
                 port: parseInt(process.env.MQTT_PORT || "") || 10110,
             };
-            let client = mqtt_1.default.connect(process.env.MQTT_HOST, options);
+            let client = this.createMQTTConnection({ options });
             client.on("connect", () => {
                 console.log('MQTT CONNECTED');
             });
@@ -446,14 +462,13 @@ class SocketController {
                 status: 'connected',
             }));
         };
-        this.createMQTTConnection = (clientId) => {
-            const options = {
-                clientId: clientId,
+        this.createMQTTConnection = (params) => {
+            const client = mqtt_1.default.connect(process.env.MQTT_HOST, params.options || {
+                clientId: params.clientId,
                 username: process.env.MQTT_USERNAME,
                 password: process.env.MQTT_PASSWORD,
                 port: parseInt(process.env.MQTT_PORT || "") || 10110,
-            };
-            const client = mqtt_1.default.connect(process.env.MQTT_HOST, options);
+            });
             client.on("connect", () => {
                 console.log('USER MQTT CONNECTED');
             });
