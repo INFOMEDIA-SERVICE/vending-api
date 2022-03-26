@@ -317,6 +317,8 @@ class SocketController {
     user.mqtt!.on("message", (_, message) => {
       const response = JSON.parse(message.toString());
 
+      console.log(response);
+
       switch (response.action) {
         case "machine.vend.start":
           user.socket!.send(
