@@ -551,6 +551,8 @@ paths:
                   user_id:
                     type: string
                     format: uuid
+                  token:
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFuZHJlc0B0ZXN0LmNvbSIsInJvbGUiOjAsImlkIjoiNWNhOTI2YzgtNDRlZi00ZWU3LWFkOTItYTZmNGNmNTFmYzk1IiwiaWF0IjoxNjM3NjI4ODM1LCJleHAiOjE2Mzc2NzIwMzV9.FyOrfI50rM7bGFeMo5zO8xX9OM42iTs5Lw-KRKeAo8A"
         400:
           description: Error message
           schema:
@@ -922,7 +924,94 @@ paths:
                   message:
                     type: string
                     example: "jwt must be provided"
-  
+
+  /vendings/type/4:
+    get:
+      tags:
+      - vendings
+      summary: Agregar o editar productos
+      operationId: addOrEditProducts
+      description: |
+        
+        type: Es la orden a ejecutar
+        data: Es el objeto que lleva todo el mensaje de la orden
+        
+        Si todo está marchando bien, el socket le devolverá el mismo "type" que mandaste
+        De lo contrario, la respuesta será un "type": -1
+        
+        Se debe mandar los siguientes parametros en el objeto "data"
+        
+        user_id: Identificador único del usuario
+        machine_id: Identificador de la vending
+        products: Productos a editar o agregar
+        token: JWT de autenticacion
+
+      produces:
+      - application/json
+      security:
+      - Bearer: []
+      parameters:
+        - in: body
+          name: body
+          schema:
+            properties:
+              type: 
+                type: number
+                example: 4
+              data:
+                properties:
+                  user_id: 
+                    type: string
+                    format: uuid
+                  machine_id:
+                    type: string
+                    example: "VM123456"
+                  products:
+                    type: array
+                    items:
+                      $ref: '#/definitions/SocketProduct'
+                  token:
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFuZHJlc0B0ZXN0LmNvbSIsInJvbGUiOjAsImlkIjoiNWNhOTI2YzgtNDRlZi00ZWU3LWFkOTItYTZmNGNmNTFmYzk1IiwiaWF0IjoxNjM3NjI4ODM1LCJleHAiOjE2Mzc2NzIwMzV9.FyOrfI50rM7bGFeMo5zO8xX9OM42iTs5Lw-KRKeAo8A"
+                    # $ref: '#/definitions/Token'
+
+      responses:
+        200:
+          description: Vendings disponibles
+          schema:
+            properties:
+              type: 
+                type: number
+                example: 4
+              data:
+                properties:
+                  message:
+                    type: string
+                    example: "Product addedd successfully"
+
+        400:
+          description: Error message
+          schema:
+            properties:
+              type:
+                type: number
+                example: -1
+              data:
+                properties:
+                  message:
+                    type: string
+                    example: "products are required"
+        401:
+          description: Error message
+          schema:
+            properties:
+              type:
+                type: number
+                example: -1
+              data:
+                properties:
+                  message:
+                    type: string
+                    example: "jwt must be provided"
 
   /lockers/:
     get:
@@ -1891,7 +1980,7 @@ definitions:
     required:
       - id
       - name
-      - item
+      - key
     properties:
       id:
         type: string
@@ -1902,6 +1991,9 @@ definitions:
       key:
         type: string
         example: "27"
+      stock:
+        type: number
+        example: 30
       description:
         type: string
         example: "Superheroe Barra"
