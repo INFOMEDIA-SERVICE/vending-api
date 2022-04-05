@@ -31,7 +31,7 @@ enum MachineActions {
   VendFinished = "vending.vend.finished",
   StartingVend = "vending.vend.startind",
   RequestingVend = "vend.request",
-  AddProduct = "vend.request",
+  AddProduct = "product.list.request",
 }
 
 enum LockersTypes {
@@ -86,6 +86,9 @@ class SocketController {
         break;
       case MachineTypes.Dispense:
         this.dispense(user, message);
+        break;
+      case MachineTypes.AddProduct:
+        this.addProduct(user, message);
         break;
 
       // Lockers
@@ -155,9 +158,14 @@ class SocketController {
       "VM",
       ""
     );
+
     const topic: string = "infomedia/vmachines/" + machine_id;
+    // const topic: string = process.env.MACHINE_RESPONSE_TOPIC!;
+
+    console.log(topic);
 
     user.mqtt!.subscribe(topic.toLocaleLowerCase());
+
     user.mqtt!.publish(
       process.env.MACHINE_REQUEST_TOPIC!,
       JSON.stringify({
@@ -167,7 +175,15 @@ class SocketController {
     );
 
     user.mqtt!.on("message", (_, message) => {
+
+      if (!message.toString().includes('{')) {
+        console.log('INVALID MESSAGE: ' + message);
+        return;
+      }
+
       const response = JSON.parse(message.toString());
+
+      console.log('RESPONSE TYPE 1: ' + JSON.stringify(response));
 
       switch (response.action) {
         case "product.list.response":
@@ -221,6 +237,62 @@ class SocketController {
           user.socket!.send(
             JSON.stringify({
               type: 2,
+              data: response,
+            })
+          );
+          break;
+      }
+    });
+  };
+
+  private addProduct = async (
+    user: ISocketUser,
+    message: IMessage
+  ): Promise<void> => {
+    const device_id: string = message.data.machine_id;
+    const products: string = message.data.products;
+
+    user.mqtt!.subscribe(process.env.MACHINE_RESPONSE_TOPIC!);
+
+    user.mqtt!.publish(
+      process.env.MACHINE_REQUEST_TOPIC!,
+      JSON.stringify({
+        action: MachineActions.AddProduct,
+        device_id,
+        products,
+      })
+    );
+
+    user.socket!.send(
+      JSON.stringify({
+        type: MachineTypes.AddProduct,
+        data: {
+          message: "Product added successfully",
+        },
+      })
+    );
+
+    user.mqtt!.on("message", (_, message) => {
+      const response = JSON.parse(message.toString());
+
+      console.log(response);
+
+      switch (response.action) {
+        case "product.list.response":
+          if (response.status < 0) {
+            user.socket!.send(
+              JSON.stringify({
+                type: -1,
+                data: {
+                  message: response.message,
+                },
+              })
+            );
+            return;
+          }
+          user.socket!.send(
+            JSON.stringify({
+              type: MachineTypes.AddProduct,
               data: response,
             })
           );
@@ -315,9 +387,9 @@ class SocketController {
     user.mqtt!.publish(process.env.MACHINE_REQUEST_TOPIC!, JSON.stringify(params));
 
     user.mqtt!.on("message", (_, message) => {
-      const response = JSON.parse(message.toString());
+      console.log(message.toString());
 
-      console.log(response);
+      const response = JSON.parse(message.toString());
 
       switch (response.action) {
         case "machine.vend.start":

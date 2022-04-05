@@ -32,7 +32,7 @@ var MachineActions;
     MachineActions["VendFinished"] = "vending.vend.finished";
     MachineActions["StartingVend"] = "vending.vend.startind";
     MachineActions["RequestingVend"] = "vend.request";
-    MachineActions["AddProduct"] = "vend.request";
+    MachineActions["AddProduct"] = "product.list.request";
 })(MachineActions || (MachineActions = {}));
 var LockersTypes;
 (function (LockersTypes) {
@@ -81,6 +81,9 @@ class SocketController {
                     break;
                 case MachineTypes.Dispense:
                     this.dispense(user, message);
+                    break;
+                case MachineTypes.AddProduct:
+                    this.addProduct(user, message);
                     break;
                 // Lockers
                 case LockersTypes.List:
@@ -131,13 +134,20 @@ class SocketController {
         this.getMachineProducts = (user, message, responseToUser = true) => __awaiter(this, void 0, void 0, function* () {
             const machine_id = message.data.machine_id.replace("VM", "");
             const topic = "infomedia/vmachines/" + machine_id;
+            // const topic: string = process.env.MACHINE_RESPONSE_TOPIC!;
+            console.log(topic);
             user.mqtt.subscribe(topic.toLocaleLowerCase());
             user.mqtt.publish(process.env.MACHINE_REQUEST_TOPIC, JSON.stringify({
                 action: "product.list.request",
                 device_id: message.data.machine_id,
             }));
             user.mqtt.on("message", (_, message) => {
+                if (!message.toString().includes('{')) {
+                    console.log('INVALID MESSAGE: ' + message);
+                    return;
+                }
                 const response = JSON.parse(message.toString());
+                console.log('RESPONSE TYPE 1: ' + JSON.stringify(response));
                 switch (response.action) {
                     case "product.list.response":
                         if (responseToUser) {
@@ -177,6 +187,43 @@ class SocketController {
                         }
                         user.socket.send(JSON.stringify({
                             type: 2,
+                            data: response,
+                        }));
+                        break;
+                }
+            });
+        });
+        this.addProduct = (user, message) => __awaiter(this, void 0, void 0, function* () {
+            const device_id = message.data.machine_id;
+            const products = message.data.products;
+            user.mqtt.subscribe(process.env.MACHINE_RESPONSE_TOPIC);
+            user.mqtt.publish(process.env.MACHINE_REQUEST_TOPIC, JSON.stringify({
+                action: MachineActions.AddProduct,
+                device_id,
+                products,
+            }));
+            user.socket.send(JSON.stringify({
+                type: MachineTypes.AddProduct,
+                data: {
+                    message: "Product added successfully",
+                },
+            }));
+            user.mqtt.on("message", (_, message) => {
+                const response = JSON.parse(message.toString());
+                console.log(response);
+                switch (response.action) {
+                    case "product.list.response":
+                        if (response.status < 0) {
+                            user.socket.send(JSON.stringify({
+                                type: -1,
+                                data: {
+                                    message: response.message,
+                                },
+                            }));
+                            return;
+                        }
+                        user.socket.send(JSON.stringify({
+                            type: MachineTypes.AddProduct,
                             data: response,
                         }));
                         break;
@@ -241,8 +288,8 @@ class SocketController {
             };
             user.mqtt.publish(process.env.MACHINE_REQUEST_TOPIC, JSON.stringify(params));
             user.mqtt.on("message", (_, message) => {
+                console.log(message.toString());
                 const response = JSON.parse(message.toString());
-                console.log(response);
                 switch (response.action) {
                     case "machine.vend.start":
                         user.socket.send(JSON.stringify({
@@ -425,7 +472,7 @@ class SocketController {
         });
         this.listenBarCode = () => __awaiter(this, void 0, void 0, function* () {
             const options = {
-                clientId: (0, uuid_1.v1)(),
+                clientId: uuid_1.v1(),
                 username: process.env.MQTT_USERNAME,
                 password: process.env.MQTT_PASSWORD,
                 port: parseInt(process.env.MQTT_PORT || "") || 10110,
